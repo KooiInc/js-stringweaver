@@ -17,6 +17,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
   
   Object.defineProperties(customStringExtensions, { 
     append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable },
+    enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable },
     extract: { value(from, to) { return wrap(extract(actualValue, from, to)); }, enumerable },
     find: { value({terms, caseSensitive = false} = {}) { return find(actualValue, {terms, caseSensitive}); }, enumerable },
     format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
@@ -29,7 +30,6 @@ function instanceCreator({initialstring, customMethods} = {}) {
     replaceWords: { value({replacements = [], caseSensitive = false} = {}) {
       return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
     }, enumerable },
-    surround: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable },
     toString: { value() { return actualValue; }, enumerable },
     truncate: { value({at, html = false, wordBoundary = false} = {}) {
       return wrap(truncate(actualValue, {at, html, wordBoundary})); }, enumerable },

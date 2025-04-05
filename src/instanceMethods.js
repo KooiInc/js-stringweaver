@@ -1,6 +1,6 @@
 import interpolate from "./Factories/interpolateFactory.js";
 
-import {isArrayOf, isNumber} from "./genericMethods.js";
+import {isArrayOf, isNumber, defineQuotingStyles} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 
 export {
@@ -176,59 +176,28 @@ function getStringValue(string) {
   return string?.value || (string?.constructor === String && string) || ``;
 }
 
-function defineQuotingStyles() {
-  // see https://en.wikipedia.org/wiki/Quotation_mark
-  const quots = {
-    backtick: ["`"],
-    bracket: [`{`, `}`],
-    curlyDouble: [`“`, `”`],
-    curlyDoubleUni: [`“`],
-    curlyLHDouble: [`„`, `”`],
-    curlyLHDoubleUni: [`„`, `“`],
-    curlyLHSingle: [`‚`, `’`],
-    curlyLHSingleUni: [`‚`, `❛`],
-    curlySingle: [`‛`, `’`],
-    curlySingleUni: [`‛`],
-    double: [`"`],
-    doublePrime: [`″`],
-    quillemets: [`«`, `»`],
-    quillemetsInward: [`»`, `«`],
-    quillemetsSingle: [`‹`, `›`],
-    quillemetsSingleInward: [`›`, `‹`],
-    single: [`'`],
-    squareBrackets: [`[`, `]`],
-    triplePrime: [`‴`],
-    reversedTriplePrime: [`‷`],
-  };
-  const regExpValues = Object.values(quots).map(v => v.map(v => `\\${v}`).join(``)).join('');
-  quots.re = RegExp(`^[${regExpValues}]|[${regExpValues}]$`, "g");
-  return quots;
-}
-
 function quotGetters(instance, wrap) {
   return { 
     value: {
-      get backtick() { return instance.surround(...quotingStyles.backtick); },
-      get bracket() { return instance.surround(...quotingStyles.bracket); },
-      get curlyDouble() { return instance.surround(...quotingStyles.curlyDouble); },
-      get curlyDoubleUni() { return instance.surround(...quotingStyles.curlyDoubleUni); },
-      get curlyLHDouble() { return instance.surround(...quotingStyles.curlyLHDouble); },
-      get curlyLHDoubleUni() { return instance.surround(...quotingStyles.curlyLHDoubleUni); },
-      get curlyLHSingle() { return instance.surround(...quotingStyles.curlyLHSingle); },
-      get curlyLHSingleUni() { return instance.surround(...quotingStyles.curlyLHSingleUni); },
-      get curlySingle() { return instance.surround(...quotingStyles.curlySingle); },
-      get curlySingleUni() { return instance.surround(...quotingStyles.curlySingleUni); },
-      get double() { return instance.surround(...quotingStyles.double);  },
-      get doublePrime() { return instance.surround(...quotingStyles.doublePrime);  },
-      get quillemets() { return instance.surround(...quotingStyles.quillemets); },
-      get quillemetsInward() { return instance.surround(...quotingStyles.quillemetsInward); },
-      get quillemetsSingle() { return instance.surround(...quotingStyles.quillemetsSingle); },
-      get quillemetsSingleInward() { return instance.surround(...quotingStyles.quillemetsSingleInward); },
+      get backtick() { return instance.enclose(...quotingStyles.backtick); },
+      get bracket() { return instance.enclose(...quotingStyles.bracket); },
+      get curlyDouble() { return instance.enclose(...quotingStyles.curlyDouble); },
+      get curlyDoubleInward() { return instance.enclose(...quotingStyles.curlyDoubleInward); },
+      get curlyDoubleEqual() { return instance.enclose(...quotingStyles.curlyDoubleEqual); },
+      get curlyLHDoubleInward() { return instance.enclose(...quotingStyles.curlyLHDoubleInward); },
+      get curlyLHSingle() { return instance.enclose(...quotingStyles.curlyLHSingle); },
+      get curlyLHSingleInward() { return instance.enclose(...quotingStyles.curlyLHSingleInward); },
+      get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
+      get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
+      get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
+      get double() { return instance.enclose(...quotingStyles.double);  },
+      get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
+      get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },
+      get guillemetsSingle() { return instance.enclose(...quotingStyles.guillemetsSingle); },
+      get guillemetsSingleInward() { return instance.enclose(...quotingStyles.guillemetsSingleInward); },
       get remove() { return wrap(`${instance.value.replace(quotingStyles.re, ``)}`); },
-      get reversedTriplePrime() { return instance.surround(...quotingStyles.reversedTriplePrime); },
-      get single() { return instance.surround(...quotingStyles.single); },
-      get squareBrackets() { return instance.surround(...quotingStyles.squareBrackets); },
-      get triplePrime() { return instance.surround(...quotingStyles.triplePrime);  },
+      get single() { return instance.enclose(...quotingStyles.single); },
+      get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
     }, 
     enumerable: false 
   };
