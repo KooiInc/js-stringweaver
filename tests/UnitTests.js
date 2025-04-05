@@ -31,6 +31,103 @@ describe(`Basics constructor`, () => {
   });
   
   describe(`Constructor static methods`, () => {
+    it(`$S.keys delivers all keys`, () => {
+      const keysShouldbe = [
+        'append',
+        'camelCase',
+        'clone',
+        'constructor',
+        'dashed',
+        'enclose',
+        'extract',
+        'find',
+        'firstUp',
+        'format',
+        'history',
+        'indexOf',
+        'insert',
+        'interpolate',
+        'lastIndexOf',
+        'prefix',
+        'prepend',
+        'quote',
+        'replaceWords',
+        'toString',
+        'trimAll',
+        'trimAllKeepLF',
+        'truncate',
+        'undo',
+        'undoAll',
+        'undoLast',
+        'value',
+        'valueOf',
+        'wordsUCFirst'
+      ];
+      
+      assert.deepStrictEqual($S.keys, keysShouldbe);
+    });
+    
+    it(`$S.info delivers all keys with additional information`, () => {
+      const keysShouldbe = [
+        'append (chainable (mutating) method)',
+        'camelCase (chainable (mutating) getter)',
+        'clone (chainable getter)',
+        'constructor (getter)',
+        'dashed (chainable (mutating) getter)',
+        'enclose (chainable (mutating) method)',
+        'extract (chainable (mutating) method)',
+        'find (method)',
+        'firstUp (chainable (mutating) getter)',
+        'format (chainable (mutating) method)',
+        'history (getter)',
+        'indexOf (method)',
+        'insert (chainable (mutating) method)',
+        'interpolate (chainable (mutating) method)',
+        'lastIndexOf (method)',
+        'prefix (chainable (mutating) method)',
+        'prepend (chainable (mutating) method)',
+        'quote (Object with chainable (mutable) getters. Use [constructor].quoteInfo for keys)',
+        'replaceWords (chainable (mutating) method)',
+        'toString (method)',
+        'trimAll (chainable (mutating) getter)',
+        'trimAllKeepLF (chainable (mutating) getter)',
+        'truncate (chainable (mutating) method)',
+        'undo (getter)',
+        'undoAll (getter)',
+        'undoLast (method)',
+        'value (getter)',
+        'valueOf (method)',
+        'wordsUCFirst (chainable (mutating) getter)'
+      ];
+      
+      assert.deepStrictEqual($S.info, keysShouldbe);
+    });
+    
+    it(`$S.keys.quoteInfo as expected`, () => {
+      const shouldBe = [
+        '[instance].quote.backtick (` [instance value] `)',
+        '[instance].quote.bracket ({ [instance value] })',
+        '[instance].quote.curlyDouble (“ [instance value] ”)',
+        '[instance].quote.curlyDoubleEqual (“ [instance value] “)',
+        '[instance].quote.curlyDoubleInward (” [instance value] “)',
+        '[instance].quote.curlyLHDouble („ [instance value] ”)',
+        '[instance].quote.curlyLHDoubleInward („ [instance value] “)',
+        '[instance].quote.curlyLHSingle (‚ [instance value] ’)',
+        '[instance].quote.curlyLHSingleInward (‚ [instance value] ‘)',
+        '[instance].quote.curlySingle (‛ [instance value] ’)',
+        '[instance].quote.curlySingleEqual (‛ [instance value] ‛)',
+        '[instance].quote.curlySingleInward (’ [instance value] ‛)',
+        '[instance].quote.double (" [instance value] ")',
+        '[instance].quote.guillemets (« [instance value] »)',
+        '[instance].quote.guillemetsInward (» [instance value] «)',
+        '[instance].quote.guillemetsSingle (‹ [instance value] ›)',
+        '[instance].quote.guillemetsSingleInward (› [instance value] ‹)',
+        "[instance].quote.single (' [instance value] ')",
+        '[instance].quote.squareBrackets ([ [instance value] ])'
+      ];
+      assert.deepStrictEqual($S.quoteInfo, shouldBe);
+    })
+    
     it(`$S.addCustom getter enumerable works as expected`, () => {
       $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().quote.curlyDouble; }, enumerable: true, isGetter: true});
       assert.strictEqual(Object.getOwnPropertyDescriptor($S`hi`, 'upperQuoted').enumerable, true);
@@ -44,15 +141,17 @@ describe(`Basics constructor`, () => {
     });
     
     it(`$S.addCustom method works as expected`, () => {
-      $S.addCustom({name: `surroundWith`, method: (me, start, end) => { return me.prepend(start).append(end); }, enumerable: false});
-      assert.strictEqual($S`HELLO WORLD`.surroundWith(`->`, `<-`).value, `->HELLO WORLD<-`);
+      $S.addCustom({name: `surroundWithInvertedArrows`, method: (me, add) => { return me.prepend(`->`).append(add); }, enumerable: false});
+      assert.strictEqual($S`HELLO WORLD`.surroundWithInvertedArrows(`<-`).value, `->HELLO WORLD<-`);
     });
     
-    it(`$S.keys delivers all keys`, () => {
-      const keysShouldbe = Object.keys({...Object.getOwnPropertyDescriptors($S``)})
-        .sort( (a,b) => a.localeCompare(b) );
-      assert.deepStrictEqual($S.keys, keysShouldbe);
+    it(`custom getter in $S.keys`, () => {
+      assert.strictEqual($S.keys.find(v => v === `lowerQuotSingle`), `lowerQuotSingle` );
     });
+    
+    it(`custom method in $S.keys`, () => {
+      assert.strictEqual($S.keys.find(v => v === `surroundWithInvertedArrows`), `surroundWithInvertedArrows` );
+    })
     
     it(`$S.format works as expected`, () => {
       const mymy = $S.format(`hello {wrld}`, {wrld: `there - `}, {wrld: `world`});
@@ -78,7 +177,7 @@ describe(`Basics constructor`, () => {
       assert.deepStrictEqual(re, /[a-z]|[0-3]/gim);
     });
     
-    it(`$S.regExp invalid returns error message`, () => {
+    it(`$S.regExp invalid returns string with error message`, () => {
       const re = $S.regExp(`
         ([a-z] // only lowercase a-z (a non terminated group)`,
         `g`,
