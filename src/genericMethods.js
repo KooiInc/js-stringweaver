@@ -1,5 +1,6 @@
 import xString from "../index.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
+import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 export {
   createExtendedCTOR, 
   resolveTemplateString, 
@@ -49,31 +50,9 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     randomString: {
       value: randomString
-    }
+    },
+    regExp: { value: createRegExp }
   });
   
   return ctor;
-}
-
-function createRegExp(str, ...args) {
-  try {
-    return regExp(str, ...args);
-  } catch (err) {
-    args = args && args.map(arg => `\${${ Array.isArray(arg) ? JSON.stringify(arg) : arg }}`) || [];
-    
-    return `Error creating Regular Expression from string "${
-      resolveTemplateString(str, ...args)}" \nRegExp error message: "${err.message}"`;
-  }
-}
-
-function regExp(regexStr, ...args) {
-  const flags = args.length && Array.isArray(args.slice(-1)) ? args.pop().join(``) : ``;
-  
-  return new RegExp(
-    (args.length &&
-      regexStr.raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``) ||
-      regexStr.raw.join(``))
-      .split(`\n`)
-      .map( line => line.replace(/\s|\/\/.*$/g, ``).trim().replace(/(@s!)/g, ` `) )
-      .join(``), flags);
 }

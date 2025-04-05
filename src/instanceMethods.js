@@ -1,4 +1,5 @@
 import interpolate from "./Factories/interpolateFactory.js";
+
 import {isArrayOf, isNumber} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 

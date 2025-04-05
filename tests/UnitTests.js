@@ -59,6 +59,34 @@ describe(`Basics constructor`, () => {
       assert.strictEqual(mymy.value, `hello there - hello world`);
     });
     
+    it(`$S.regExp (tagged template) as expected`, () => {
+      const re = $S.regExp`
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3
+        ${["g", "i"]} // globally`;
+      assert.strictEqual(re.constructor, RegExp);
+      assert.deepStrictEqual(re, /[a-z]|[0-3]/gi);
+    });
+    
+    it(`$S.regExp (function call) as expected`, () => {
+      const re = $S.regExp(`
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3`,
+        `g`,
+        `im`);
+      assert.strictEqual(re.constructor, RegExp);
+      assert.deepStrictEqual(re, /[a-z]|[0-3]/gim);
+    });
+    
+    it(`$S.regExp invalid returns error message`, () => {
+      const re = $S.regExp(`
+        ([a-z] // only lowercase a-z (a non terminated group)`,
+        `g`,
+        `im`);
+      assert.strictEqual(/Error creating/.test(re), true);
+      assert.strictEqual(/error message/.test(re), true);
+    });
+    
     it(`$S.uuid4 as expected`, () => {
       const uuid = $S.uuid4;
       const splitted = uuid.split(/-/);
