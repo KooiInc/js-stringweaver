@@ -6,7 +6,6 @@ export {
   xString, 
   isNumber, 
   isArrayOf, 
-  copyObjectToUnEnumerable,
 };
 
 function resolveTemplateString(str, ...args) {
@@ -54,14 +53,6 @@ function createExtendedCTOR(ctor, customMethods) {
   });
   
   return ctor;
-}
-
-function copyObjectToUnEnumerable(obj) {
-  const copy = {};
-  Object.entries(Object.getOwnPropertyDescriptors(obj)).forEach(([key, descriptor]) => {
-    Object.defineProperty(copy, key, {...descriptor, enumerable: false});
-  });
-  return copy;
 }
 
 function createRegExp(str, ...args) {

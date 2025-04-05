@@ -1,56 +1,59 @@
 import {
-  format, ucFirst, truncate, extract, trimAll, escHTML,
-  replaceWords, find, indexOf, lastIndexOf, insert,
-  append, casingFactory, quoteFactory,
-  prefix,
+  format, ucFirst, truncate, extract, trimAll, 
+  replaceWords, find, indexOf, lastIndexOf, insert, append, 
+  prefix, getStringValue, quotGetters, surroundWith,
+  toCamelcase, wordsFirstUp, toDashedNotation,
 } from "./instanceMethods.js";
 
-import {xString as $S, isNumber, copyObjectToUnEnumerable} from "./genericMethods.js";
-const quots = Object.entries(quoteFactory());
-const casing = Object.entries(casingFactory());
+import {xString as $S, isNumber} from "./genericMethods.js";
 export default instanceCreator;
 
-function instanceCreator({initialstring, customMethods, includeQuotCase = false} = {}) {
-  let instance;
+function instanceCreator({initialstring, customMethods} = {}) {
+  let customStringExtensions = { };
+  let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = initialstring?.constructor === String ? initialstring : ``;
   const history = [actualValue];
-  const customStringExtensions = copyObjectToUnEnumerable({
-    append(...strings) { return wrap(append(actualValue, ...strings)); },
-    extract(from, to) { return wrap(extract(actualValue, from, to)); },
-    find({terms, caseSensitive = false} = {}) { return find(actualValue, {terms, caseSensitive}); },
-    format(...tokens) { return wrap(format(actualValue, ...tokens)); },
-    indexOf(str) { return indexOf(actualValue, str); },
-    interpolate(...tokens) { return wrap(format(actualValue, ...tokens)); },
-    insert({values, at = 0} = {}) { return wrap(insert(actualValue, {values, at})); },
-    lastIndexOf(str) { return lastIndexOf(actualValue, str); },
-    prefix(...strings) { return wrap(prefix(actualValue, ...strings)); },
-    prepend(...strings) { return wrap(prefix(actualValue, ...strings)); },
-    replaceWords({replacements = [], caseSensitive = false} = {}) {
+  const enumerable = false;
+  
+  Object.defineProperties(customStringExtensions, { 
+    append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable },
+    extract: { value(from, to) { return wrap(extract(actualValue, from, to)); }, enumerable },
+    find: { value({terms, caseSensitive = false} = {}) { return find(actualValue, {terms, caseSensitive}); }, enumerable },
+    format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
+    indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable },
+    interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
+    insert: { value({ values, at = 0} = {}) { return wrap(insert(actualValue, { values, at})); }, enumerable },
+    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable },
+    prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable },
+    prepend: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable },
+    replaceWords: { value({replacements = [], caseSensitive = false} = {}) {
       return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
-    },
-    toString() { return actualValue; },
-    truncate({at, html = false, wordBoundary = false} = {}) {
-      return wrap(truncate(actualValue, {at, html, wordBoundary})); 
-    },
-    valueOf() { return actualValue; },
-    undoLast(nSteps) { return undoSteps(nSteps); },
-    
-    set value(value) { actualValue = value; },
-    
-    get clone() { return $S(actualValue); },
-    get constructor() { return $S.constructor; },
-    get history() { return history; },
-    get trimAll() { return wrap(trimAll(actualValue)); },
-    get trimAllKeepLF() { return wrap(trimAll(actualValue, true)); },
-    get undoAll() { return undoAll(); },
-    get undo() { return undoLast(); },
-    get value() { return actualValue; },
-    quote: {},
-    case: {},
+    }, enumerable },
+    surround: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable },
+    toString: { value() { return actualValue; }, enumerable },
+    truncate: { value({at, html = false, wordBoundary = false} = {}) {
+      return wrap(truncate(actualValue, {at, html, wordBoundary})); }, enumerable },
+    valueOf: { value() { return actualValue; }, enumerable },
+    undoLast: { value(nSteps) { return undoSteps(nSteps); }, enumerable },
+
+    camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable },    
+    clone: { get() { return $S(actualValue); }, enumerable },
+    constructor: { get() { return $S.constructor; }, enumerable },
+    dashed: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable },
+    firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable },
+    history: { get() { return history; }, enumerable },
+    quote: quotGetters(instance, wrap),
+    trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable },
+    trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); }, enumerable },
+    undoAll: { get() { return undoAll(); }, enumerable },
+    undo: { get() { return undoLast(); }, enumerable },
+    wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); }, enumerable },
+    value: { 
+      get() { return actualValue; }, 
+      set(value) { actualValue = getStringValue(value).length ? value : actualValue; }, enumerable },
   });
   
-  instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
-  injectMethods(customStringExtensions, customMethods, instance);
+  injectCustomMethods(customMethods);
   
   return Object.freeze(instance);
   
@@ -62,9 +65,6 @@ function instanceCreator({initialstring, customMethods, includeQuotCase = false}
           : key in String.prototype
             ? wrapNative(key)
             : undefined;
-      },
-      set( target, key, value ) {
-        return key in extensions && Reflect.set(extensions, key, value);
       },
     };
   }
@@ -106,8 +106,7 @@ function instanceCreator({initialstring, customMethods, includeQuotCase = false}
     return instance;
   }
   
-  function injectMethods(customStringExtensions, customMethods, instance) {
-    createQuotsAndCasing(customStringExtensions);
+  function injectCustomMethods(customMethods) {
     Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
       const {enumerable, method, isGetter} = methodContainer;
       const descriptor = isGetter
@@ -116,19 +115,5 @@ function instanceCreator({initialstring, customMethods, includeQuotCase = false}
       
       Object.defineProperty(customStringExtensions, methodName, descriptor);
     });
-  }
-  
-  function createQuotsAndCasing(customStringExtensions) {
-    quots.forEach(([key, method]) => {
-      const getter = { get() { return wrap(method(actualValue)); } };
-      Object.defineProperty(customStringExtensions.quote, key, getter);
-      Object.defineProperty(customStringExtensions, `q${ucFirst(key)}`, getter);
-    } );
-    
-    casing.forEach(([key, method]) => {
-      const getter = { get() { return wrap(method(actualValue)); } };
-      Object.defineProperty(customStringExtensions.case, key, getter);
-      Object.defineProperty(customStringExtensions, `c${ucFirst(key)}`, getter);
-    } );
   }
 }

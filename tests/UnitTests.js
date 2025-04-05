@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S, CustomStringConstructor} from "../index.js";
+import {defineQuotingStyles} from "../src/instanceMethods.js";
 
 describe(`Basics constructor`, () => {
   describe(`Instantiation`, () => {
@@ -31,15 +32,20 @@ describe(`Basics constructor`, () => {
   
   describe(`Constructor static methods`, () => {
     it(`$S.addCustom getter enumerable works as expected`, () => {
-      $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().qCurlyDouble; }, enumerable: true, isGetter: true});
+      $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().quote.curlyDouble; }, enumerable: true, isGetter: true});
       assert.strictEqual(Object.getOwnPropertyDescriptor($S`hi`, 'upperQuoted').enumerable, true);
       assert.strictEqual($S`Hello world`.upperQuoted.value, `“HELLO WORLD”`);
     });
     
     it(`$S.addCustom getter non enumerable works as expected`, () => {
-      $S.addCustom({name: `lowerQuotSingle`, method: me => {return me.toLowerCase().qCurlySingle; }, enumerable: false, isGetter: true});
+      $S.addCustom({name: `lowerQuotSingle`, method: me => {return me.toLowerCase().quote.curlySingle; }, enumerable: false, isGetter: true});
       assert.strictEqual(Object.getOwnPropertyDescriptor($S`hi`, 'lowerQuotSingle').enumerable, false);
-      assert.strictEqual($S`HELLO WORLD`.lowerQuotSingle.value, `❛hello world❜`);
+      assert.strictEqual($S`HELLO WORLD`.lowerQuotSingle.value, `‛hello world’`);
+    });
+    
+    it(`$S.addCustom method works as expected`, () => {
+      $S.addCustom({name: `surroundWith`, method: (me, start, end) => { return me.prepend(start).append(end); }, enumerable: false});
+      assert.strictEqual($S`HELLO WORLD`.surroundWith(`->`, `<-`).value, `->HELLO WORLD<-`);
     });
     
     it(`$S.keys delivers all keys`, () => {
@@ -105,33 +111,25 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.value, `Hello world and hello to you too!`);
   });
   
-  describe(`case/c[CaseOption]`, () => {
-    it(`camel (case.camel, cCamel)`, () => {
-      const hello = $S`Hello World`.case.camel;
+  describe(`case`, () => {
+    it(`camelCase`, () => {
+      const hello = $S`Hello World`.camelCase;
       assert.strictEqual(hello.value, `helloWorld`);
-      assert.strictEqual(hello.undo.value, `Hello World`);
-      assert.strictEqual(hello.cCamel.value, `helloWorld`);
     });
-    
-    it(`dashed (case.dashed, cDashed)`, () => {
-      const hello = $S`helloWorld`.case.dashed;
+
+    it(`dashed`, () => {
+      const hello = $S`helloWorld`.dashed;
       assert.strictEqual(hello.value, `hello-world`);
-      assert.strictEqual(hello.undo.value, `helloWorld`);
-      assert.strictEqual(hello.cDashed.value, `hello-world`);
     });
-    
-    it(`firstUC (case.firstUC, cFirstUC)`, () => {
-      const hello = $S`hello world`.case.firstUC;
+
+    it(`firstUp`, () => {
+      const hello = $S`hello world`.firstUp;
       assert.strictEqual(hello.value, `Hello world`);
-      assert.strictEqual(hello.undo.value, `hello world`);
-      assert.strictEqual(hello.cFirstUC.value, `Hello world`);
     });
-    
-    it(`wordsFirstUC (case.wordsFirstUC, cWordsFirstUC)`, () => {
-      const hello = $S`hello world`.case.wordsFirstUC;
-      assert.strictEqual(hello.value, `Hello World`);
-      assert.strictEqual(hello.undo.value, `hello world`);
-      assert.strictEqual(hello.cWordsFirstUC.value, `Hello World`);
+
+    it(`wordsUCFirst`, () => {
+      const hello = $S`hello world What a day 't is`.wordsUCFirst;
+      assert.strictEqual(hello.value, `Hello World What A Day 't Is`);
     });
   });
   
@@ -226,8 +224,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
         }
       }
     }, "{terms: /we|HERE/g} cs from RE" );
-    
-    
+        
     assert.deepStrictEqual(myStr.find({terms: /we|HERE|hello/gi}), {
       "searched4": "/we|HERE|hello/gi",
       "caseSensitive": "no",
@@ -252,6 +249,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
         }
       }
     }, "{terms: /we|HERE|hello/gi}  cs from RE /i" );
+    
+    assert.deepStrictEqual($S``.find({terms: /we|HERE|hello/gi}), {hits: `n/a`, result: `input is empty`}, "empty input" );
   });
   
   it(`[instance].constructor is CustomStringConstructor`, () => {
@@ -262,12 +261,14 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
   it(`extract as expected`, () => {
     const hi = $S`I said hello world didn't I?`;
     assert.strictEqual(hi.extract(7, 18).value, `hello world`);
+    assert.strictEqual($S``.extract(7, 18).value, ``, `empty string`);
   });
     
   it(`format as expected`, () => {
     // alias: interpolate
     const hi = $S`- hello dear {wrld}`.format({wrld: `you `}, {wrld: `world`});
     assert.strictEqual(hi.value, `- hello dear you - hello dear world`);
+    assert.strictEqual($S``.format({hi: `there`}).value, ``, `empty input string`);    
   });
   
   it(`history as expected`, () => {
@@ -276,29 +277,42 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.deepStrictEqual(hi.history, ['- hello dear {wrld}', '- hello dear you - hello dear world']);
   });
   
-  it(`insert as expected`, () => {
-    const hi = $S`oh dear world`.insert({values:`Hello `});
-    assert.strictEqual(hi.value, `Hello oh dear world`);
+  describe(`insert`, () => {
+    it(`insert as expected`, () => {
+      const hi = $S`oh dear world`.insert({values:`Hello `});
+      assert.strictEqual(hi.value, `Hello oh dear world`);
+    });
+    
+    it(`insert with empty input string as expected`, () => {
+      assert.strictEqual($S``.insert({values: [`hello`, ` `, `world`]}).value, `hello world`, `empty input string`);
+    });
+    
+    it(`insert no parameters as expected`, () => {
+      const hi = $S`oh dear world`.insert();
+      assert.strictEqual(hi.value, `oh dear world`);
+    });  
   });
   
-  it(`insert no parameters as expected`, () => {
-    const hi = $S`oh dear world`.insert();
-    assert.strictEqual(hi.value, `oh dear world`);
-  });
-  
-  it(`interpolate single template as expected`, () => {
-    const hi = $S`oh {dr} world`.interpolate({dr: `dear`});
-    assert.strictEqual(hi.value, `oh dear world`);
-  });
-  
-  it(`interpolate multiple templates as expected`, () => {
-    const hi = $S`- hello dear {wrld}`.interpolate({wrld: `you `}, {wrld: `world`});
-    assert.strictEqual(hi.value, `- hello dear you - hello dear world`);
-  });
-  
-  it(`interpolate no arguments as expected`, () => {
-    const hi = $S`- hello dear {wrld}`.interpolate();
-    assert.strictEqual(hi.value, `- hello dear {wrld}`);
+  describe(`interpolate`, () => {
+    it(`interpolate empty inputstring as expected`, () => {
+      const hi = $S``.interpolate({dr: `dear`});
+      assert.strictEqual(hi.value, ``);
+    });
+    
+    it(`interpolate single template as expected`, () => {
+      const hi = $S`oh {dr} world`.interpolate({dr: `dear`});
+      assert.strictEqual(hi.value, `oh dear world`);
+    });
+    
+    it(`interpolate multiple templates as expected`, () => {
+      const hi = $S`- hello dear {wrld}`.interpolate({wrld: `you `}, {wrld: `world`});
+      assert.strictEqual(hi.value, `- hello dear you - hello dear world`);
+    });
+    
+    it(`interpolate no arguments as expected`, () => {
+      const hi = $S`- hello dear {wrld}`.interpolate();
+      assert.strictEqual(hi.value, `- hello dear {wrld}`);
+    });
   });
   
   it(`indexof (override) as expected`, () => {
@@ -337,6 +351,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       assert.strictEqual(hi.value, `01 >> Hi`);
     });
     
+    it(`prefix empty input string as expected`, () => {
+      const hi = $S``.prefix(`HI`, ` `, `THERE`);
+      assert.strictEqual(hi.value, `HI THERE`);
+    });
+    
     it(`prepend no arguments as expected`, () => {
       const hi = $S`Hi`.prepend();
       assert.strictEqual(hi.value, `Hi`);
@@ -345,6 +364,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`prepend single as expected`, () => {
       const hi = $S`Hi`.prepend(`>>`);
       assert.strictEqual(hi.value, `>>Hi`);
+    });
+    
+    it(`prepend empty input string as expected`, () => {
+      const hi = $S``.prepend(`HI`, ` `, `THERE`);
+      assert.strictEqual(hi.value, `HI THERE`);
     });
     
     it(`prepend multiple as expected`, () => {
@@ -383,48 +407,30 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       const ccs = $S`hello world!`.replaceWords({replacements: [`HELLO`, `hi`, `hello`]});
       assert.strictEqual(ccs.value, `hi world!`);
     });
+    
+    it(`empty input string as expected`, () => {
+      const ccs = $S``.replaceWords({replacements: [`HELLO`, `hi`, `hello`]});
+      assert.strictEqual(ccs.value, ``);
+    });
   });
   
   describe(`quoting`, () => {
-    const allQuotingStyles = {
-      backtick: "`",
-      curlyDouble: [`“`, `”`],
-      curlyDoubleUni: `“`,
-      curlyLHDouble: [`„`, `”`],
-      curlyLHDoubleUni: [`„`, `“`],
-      curlyLHSingle: [`‚`, `’`],
-      curlyLHSingleUni: [`‚`, `❛`],
-      curlySingle: [`❛`, `❜`],
-      curlySingleUni: `❛`,
-      double: `"`,
-      pointyDouble: [`«`, `»`],
-      pointySingle: [`‹`, `›`],
-      single: `'`
-    };
-    
     it(`[instance].quote[quotingStyle] for all possibilities as expected`, () => {
-      Object.entries(allQuotingStyles).forEach(([key, quots]) => {
+      Object.entries(defineQuotingStyles).forEach(([key, quots]) => {
+        if (key === `re`) { return; }
         const hi = $S`quoting`.quote[key];
-        const [start, end] = Array.isArray(quots) ? quots : [quots, quots];
-        assert.strictEqual(hi.value, `${start}quoting${end}`);
-      });
-    });
-    
-    it(`[instance].quote.q[QuotingStyle] for all possibilities as expected`, () => {
-      Object.entries(allQuotingStyles).forEach(([key, quots]) => {
-        key = `q` + $S(key).case.firstUC;
-        const hi = $S`quoting`[key];
-        const [start, end] = Array.isArray(quots) ? quots : [quots, quots];
-        assert.strictEqual(hi.value, `${start}quoting${end}`);
+        const [start, end] = quots.length < 2 ? [quots[0], quots[0]] : quots;
+        assert.strictEqual(hi.value, `${start}quoting${end}`, `${key} ${hi}`);
       });
     });
     
     it(`[instance.quote.remove for all possibilities as expected]`, () => {
-      Object.entries(allQuotingStyles).forEach(([key, quots]) => {
+      Object.entries(defineQuotingStyles).forEach(([key, quots]) => {
+        if (key === `re`) { return; }
         const hi = $S`quoting`.quote[key];
-        const [start, end] = Array.isArray(quots) ? quots : [quots, quots];
-        assert.strictEqual(hi.value, `${start}quoting${end}`);
-        assert.strictEqual(hi.quote.remove.value, `quoting`);
+        const [start, end] = quots.length < 2 ? [quots[0], quots[0]] : quots;
+        assert.strictEqual(hi.value, `${start}quoting${end}`, `${key} ${hi}`);
+        assert.strictEqual(hi.quote.remove.value, `quoting`, `${key} ${hi}`);
       });
     });
   });
@@ -438,36 +444,56 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert(`${hi}`, `stringified`);
   });
   
-  it(`trimAll removes all excessive whitespace`, () => {
-    // excessive whitespace: all consecutive whitespaces (so 2 or more tabs, spaces, line feeds etc) 
-    const tooMuch = $S`stringified   with too\nmuch\n\nwhitespace       characters`;
-    assert.strictEqual(tooMuch.trimAll.value, "stringified with too\nmuch\nwhitespace characters");
+  describe(`trimAll`, () => {
+    it(`trimAll removes all excessive whitespace`, () => {
+      // excessive whitespace: all consecutive whitespaces (so 2 or more tabs, spaces, line feeds etc) 
+      const tooMuch = $S`stringified   with too\nmuch\n\nwhitespace       characters`;
+      assert.strictEqual(tooMuch.trimAll.value, "stringified with too\nmuch\nwhitespace characters");
+    });
+    
+    it(`trimAllKeepLF removes all excessive whitespace but keeps single line feeds if applicable`, () => {
+      const tooMuch = $S`stringified   with too\nmuch\n\nwhitespace       characters`;
+      assert.strictEqual(tooMuch.trimAllKeepLF.value, "stringified with too\nmuch\n\nwhitespace characters");
+    });
+    
+    if (`trimAll empty input string as expected`, () => {
+      assert.strictEqual($S``.trimAll.value, ``);
+    });
+    
+    if (`trimAllKeppLF empty input string as expected`, () => {
+      assert.strictEqual($S``.trimAllKeepLF.value, ``);
+    });
   });
-  
-  it(`trimAllKeepLF removes all excessive whitespace but keeps single line feeds if applicable`, () => {
-    const tooMuch = $S`stringified   with too\nmuch\n\nwhitespace       characters`;
-    assert.strictEqual(tooMuch.trimAllKeepLF.value, "stringified with too\nmuch\n\nwhitespace characters");
-  });
-  
-  describe(`trunctate`, () => {
-    it(`trunctate (no html, no wordBoundary) as expected`, () => {
+    
+  describe(`truncate`, () => {
+    it(`truncate (not html entity, no wordBoundary) as expected`, () => {
       const hi = $S`Hello universe`;
       assert.strictEqual(hi.truncate({at: 8}).value, `Hello u...`);
     });
     
-    it(`trunctate (no html, wordBoundary true) as expected`, () => {
+    it(`truncate (not html entity, wordBoundary true) as expected`, () => {
       const hi = $S`Hello universe say no more`;
       assert.strictEqual(hi.truncate({at: 8, wordBoundary: true}).value, `Hello...`);
     });
     
-    it(`trunctate (html true) as expected`, () => {
+    it(`truncate (html entity) as expected`, () => {
       const hi = $S`Hello universe say no more`;
       assert.strictEqual(hi.truncate({at: 8, html: true}).value, `Hello u&hellip;`);
     });
     
-    it(`trunctate (html true, wordBoundary true) as expected`, () => {
+    it(`truncate (html entity, wordBoundary true) as expected`, () => {
       const hi = $S`Hello universe say no more`;
       assert.strictEqual(hi.truncate({at: 16, html: true, wordBoundary: true}).value, `Hello universe&hellip;`);
+    });
+    
+    it(`truncate at >= input length as expected`, () => {
+      const hi = $S`Hello universe say no more`;
+      assert.strictEqual(hi.truncate({at: 26}).value, `Hello universe say no more`);
+    });
+    
+    it(`truncate empty input string as expected`, () => {
+      const hi = $S``;
+      assert.strictEqual(hi.truncate({at: 16, html: true, wordBoundary: true}).value, ``);
     });
   });
   
@@ -507,6 +533,23 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       const hi = $S`Hello`;
       hi.value += ` world`;
       assert.strictEqual(hi.value, `Hello world`);
+    });
+    
+    it(`value set with no string type as expected`, () => {
+      const hi = $S`hello`;
+      hi.value = {hello: 1};
+      assert.strictEqual(hi.value, `hello`);
+      // note: += will *always* stringify the value to add
+      hi.value += 42;
+      assert.strictEqual(hi.value, `hello42`);
+      hi.value += {hello: 1};
+      assert.strictEqual(hi.value, `hello42[object Object]`);
+    });
+    
+    it(`value set with empty string type as expected`, () => {
+      const hi = $S`hello`;
+      hi.value = ``;
+      assert.strictEqual(hi.value, `hello`);
     });
   });
 });
@@ -550,7 +593,7 @@ describe(`Native String methods are wrapped and usable`, () => {
   
   it(`toUpperCase is chainable`, () => {
     const hi = $S`hello world`;
-    assert.strictEqual(hi.toUpperCase().qDouble.value, `"HELLO WORLD"`);
+    assert.strictEqual(hi.toUpperCase().quote.double.value, `"HELLO WORLD"`);
   });
   
   it(`instance can be spreaded as Array`, () => {
