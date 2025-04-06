@@ -24,23 +24,31 @@ function isNumber(value) {
 }
 
 function isMutating(descriptor) {
-  return /wrap\(/i.test(descriptor.toString())
+  return /wrap\(|undo.*/i.test(descriptor.toString())
 }
 
-function getKeys() {
-  const instance = xString``;
-  return Object.entries(Object.getOwnPropertyDescriptors(instance))
-    .map(([key, descriptr]) => {
-      if (key === `quote`) { return `quote (Object with chainable (mutable) getters. Use [constructor].quoteInfo for keys)`; }
-      return `${key} (${
-        key === `clone`
-          ? `chainable getter`
-          : descriptr.value && descriptr.value.constructor === Function
-            ? (isMutating(descriptr.value) ? `chainable (mutating) method` : `method`)
-            : descriptr.value
-              ? `property`
-              : descriptr.get ? (isMutating(descriptr.get) ? `chainable (mutating) getter` : `getter`) : `-`})`;
-    }).sort( (a,b) => a.localeCompare(b) );
+function getSWInformation() {
+  const firstLine = xString`For the record:
+    - chainable getters/methods modify the instance string
+    - indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
+    .trimAll;
+  return [
+    firstLine.value,
+    ...Object.entries(Object.getOwnPropertyDescriptors(firstLine))
+      .map(([key, descriptr]) => {
+        if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
+        return `${key} (${
+          key === `clone`
+            ? `chainable getter`
+            : key in String.prototype 
+              ? `method, String override` 
+              : descriptr.value && descriptr.value.constructor === Function
+                ? (isMutating(descriptr.value) ? `chainable method` : `method`)
+                : descriptr.value
+                  ? `property`
+                  : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
+      .sort( (a,b) => a.localeCompare(b) )
+  ];
 }
 
 function createExtendedCTOR(ctor, customMethods) {
@@ -65,7 +73,7 @@ function createExtendedCTOR(ctor, customMethods) {
       }
     },
     info: {
-      get() { return getKeys(); }
+      get() { return getSWInformation(); }
     },
     keys: {
       get() { return Object.keys(Object.getOwnPropertyDescriptors(xString``)).sort( (a,b) => a.localeCompare(b) ); }

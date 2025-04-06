@@ -69,38 +69,38 @@ describe(`Basics constructor`, () => {
     
     it(`$S.info delivers all keys with additional information`, () => {
       const keysShouldbe = [
-        'append (chainable (mutating) method)',
-        'camelCase (chainable (mutating) getter)',
+        'append (chainable method)',
+        'camelCase (chainable getter)',
         'clone (chainable getter)',
-        'constructor (getter)',
-        'dashed (chainable (mutating) getter)',
-        'enclose (chainable (mutating) method)',
-        'extract (chainable (mutating) method)',
+        'constructor (method, String override)',
+        'dashed (chainable getter)',
+        'enclose (chainable method)',
+        'extract (chainable method)',
         'find (method)',
-        'firstUp (chainable (mutating) getter)',
-        'format (chainable (mutating) method)',
+        'firstUp (chainable getter)',
+        'format (chainable method)',
         'history (getter)',
-        'indexOf (method)',
-        'insert (chainable (mutating) method)',
-        'interpolate (chainable (mutating) method)',
-        'lastIndexOf (method)',
-        'prefix (chainable (mutating) method)',
-        'prepend (chainable (mutating) method)',
-        'quote (Object with chainable (mutable) getters. Use [constructor].quoteInfo for keys)',
-        'replaceWords (chainable (mutating) method)',
-        'toString (method)',
-        'trimAll (chainable (mutating) getter)',
-        'trimAllKeepLF (chainable (mutating) getter)',
-        'truncate (chainable (mutating) method)',
-        'undo (getter)',
-        'undoAll (getter)',
-        'undoLast (method)',
+        'indexOf (method, String override)',
+        'insert (chainable method)',
+        'interpolate (chainable method)',
+        'lastIndexOf (method, String override)',
+        'prefix (chainable method)',
+        'prepend (chainable method)',
+        'quote (Object. Use [constructor].quoteInfo for keys)',
+        'replaceWords (chainable method)',
+        'toString (method, String override)',
+        'trimAll (chainable getter)',
+        'trimAllKeepLF (chainable getter)',
+        'truncate (chainable method)',
+        'undo (chainable getter)',
+        'undoAll (chainable getter)',
+        'undoLast (chainable method)',
         'value (getter)',
-        'valueOf (method)',
-        'wordsUCFirst (chainable (mutating) getter)'
+        'valueOf (method, String override)',
+        'wordsUCFirst (chainable getter)'
       ];
-      
-      assert.deepStrictEqual($S.info, keysShouldbe);
+      // the first line may vary and is not important for the test
+      assert.deepStrictEqual($S.info.slice(1), keysShouldbe);
     });
     
     it(`$S.keys.quoteInfo as expected`, () => {
@@ -575,7 +575,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`trimAll removes all excessive whitespace`, () => {
       // excessive whitespace: all consecutive whitespaces (so 2 or more tabs, spaces, line feeds etc) 
       const tooMuch = $S`stringified   with too\nmuch\n\nwhitespace       characters`;
-      assert.strictEqual(tooMuch.trimAll.value, "stringified with too\nmuch\nwhitespace characters");
+      assert.strictEqual(tooMuch.trimAll.value, "stringified with too\nmuch\nwhitespace characters", String(tooMuch));
     });
     
     it(`trimAllKeepLF removes all excessive whitespace but keeps single line feeds if applicable`, () => {
