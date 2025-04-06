@@ -33,7 +33,7 @@ function getSWInformation() {
     ✔ indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
     .trimAll.value.split(/\n/);
   return firstLines.concat(
-    Object.entries(Object.getOwnPropertyDescriptors(firstLine))
+    Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
       return `${key} (${
