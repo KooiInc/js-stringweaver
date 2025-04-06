@@ -156,15 +156,13 @@ function insert(string, { values, at = 0 } = {}) {
 }
 
 function prefix(string, ...strings) {
-  string = getStringValue(string);
   strings = strings?.constructor === String && strings.length ? [strings] : isArrayOf(String, strings) && strings;
-  return strings ? insert(string, {values: strings, at: 0}) : string;
+  return strings ? insert(getStringValue(string), {values: strings, at: 0}) : getStringValue(string);
 }
 
 function append(string, ...strings2Append) {
-  string = getStringValue(string);
   strings2Append = isArrayOf(String, strings2Append) && strings2Append;
-  return strings2Append ? `${string}`.concat(strings2Append.join(``)) : string;
+  return strings2Append ? `${getStringValue(string)}`.concat(strings2Append.join(``)) : getStringValue(string);
 }
 
 function getStringValue(string) {
