@@ -28,27 +28,26 @@ function isMutating(descriptor) {
 }
 
 function getSWInformation() {
-  const firstLine = xString`For the record:
+  const firstLines = xString`For the record:
     ✔ chainable getters/methods modify the instance string
     ✔ indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
-    .trimAll;
-  return [
-    ...firstLine.value.split(/\n/),
-    ...Object.entries(Object.getOwnPropertyDescriptors(firstLine))
-      .map(([key, descriptr]) => {
-        if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
-        return `${key} (${
-          key === `clone`
-            ? `chainable getter`
-            : key in String.prototype 
-              ? `method, String override` 
-              : descriptr.value && descriptr.value.constructor === Function
-                ? (isMutating(descriptr.value) ? `chainable method` : `method`)
-                : descriptr.value
-                  ? `property`
-                  : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
-      .sort( (a,b) => a.localeCompare(b) )
-  ];
+    .trimAll.value.split(/\n/);
+  return firstLines.concat(
+    Object.entries(Object.getOwnPropertyDescriptors(firstLine))
+    .map(([key, descriptr]) => {
+      if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
+      return `${key} (${
+        key === `clone`
+          ? `chainable getter`
+          : key in String.prototype 
+            ? `method, String override` 
+            : descriptr.value && descriptr.value.constructor === Function
+              ? (isMutating(descriptr.value) ? `chainable method` : `method`)
+              : descriptr.value
+                ? `property`
+                : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
+    .sort( (a,b) => a.localeCompare(b) ) 
+  );
 }
 
 function createExtendedCTOR(ctor, customMethods) {
