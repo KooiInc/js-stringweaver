@@ -31,8 +31,8 @@ function getSWInformation() {
   const firstLines = xString`For the record:
     ✔ chainable getters/methods modify the instance string
     ✔ indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
-    .trimAll.value.split(/\n/);
-  return firstLines.concat(
+    .trimAll;
+  return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
