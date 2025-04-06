@@ -76,15 +76,10 @@ function extract(str, start, end) { return str.slice(start || 0, end); }
 
 function trimAll(string,  keepLines) {
   return checkAndRun(string, () => {
-    let newString = ``;
-    string = keepLines ? string.replace(/\n/g, `#LF#`) : string;
-    const test = chr => /\s/.test(chr);
-    for (let char of [...string]) {
-      newString += !test(char) || (test(char) && !test(newString.slice(-2))) ? char : ``;
-    }
-    return keepLines
-      ? newString.replace(/#LF#/g, `\n`)
-      : newString.replace(/\n{2,}/g, `\n`);  
+    const lines = string
+      .split(/\n/)
+      .map(line => line.trim().replace(/\s{2,}/g, ` `));
+    return keepLines ? lines.join('\n') : lines.filter(l => l.length > 0).join(`\n`);
   });
 }
 
