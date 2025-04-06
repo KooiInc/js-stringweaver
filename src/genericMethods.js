@@ -29,11 +29,11 @@ function isMutating(descriptor) {
 
 function getSWInformation() {
   const firstLine = xString`For the record:
-    - chainable getters/methods modify the instance string
-    - indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
+    ✔ chainable getters/methods modify the instance string
+    ✔ indexOf overrides deliver undefined when nothing was found (so one can use indexOf([some string value]) ?? 0`
     .trimAll;
   return [
-    firstLine.value,
+    ...firstLine.value.split(/\n/),
     ...Object.entries(Object.getOwnPropertyDescriptors(firstLine))
       .map(([key, descriptr]) => {
         if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }

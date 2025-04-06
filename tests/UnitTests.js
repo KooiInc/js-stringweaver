@@ -99,8 +99,9 @@ describe(`Basics constructor`, () => {
         'valueOf (method, String override)',
         'wordsUCFirst (chainable getter)'
       ];
-      // the first line may vary and is not important for the test
-      assert.deepStrictEqual($S.info.slice(1), keysShouldbe);
+      const info = $S.info;
+      // the first lines may vary and is not relevant for the test
+      assert.deepStrictEqual(info.slice(info.findIndex(v => v.startsWith(`append`))), keysShouldbe);
     });
     
     it(`$S.keys.quoteInfo as expected`, () => {
