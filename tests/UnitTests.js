@@ -86,7 +86,7 @@ describe(`Basics constructor`, () => {
         'lastIndexOf (method, String override)',
         'prefix (chainable method)',
         'prepend (chainable method)',
-        'quote (Object. Use [constructor].quoteInfo for keys)',
+        'quote (Object. See [constructor].quoteInfo)',
         'replaceWords (chainable method)',
         'toString (method, String override)',
         'trimAll (chainable getter)',

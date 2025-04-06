@@ -35,7 +35,7 @@ function getSWInformation() {
   return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
-      if (key === `quote`) { return `quote (Object. Use [constructor].quoteInfo for keys)`; }
+      if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
       return `${key} (${
         key === `clone`
           ? `chainable getter`
