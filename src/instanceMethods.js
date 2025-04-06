@@ -1,6 +1,6 @@
 import interpolate from "./Factories/interpolateFactory.js";
 
-import {isArrayOf, isNumber, defineQuotingStyles} from "./genericMethods.js";
+import {isArrayOf, isNumber, defineQuotingStyles,} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 
 export {
@@ -156,7 +156,7 @@ function insert(string, { values, at = 0 } = {}) {
 }
 
 function prefix(string, ...strings) {
-  strings = strings?.constructor === String && strings.length ? [strings] : isArrayOf(String, strings) && strings;
+  strings = isArrayOf(String, strings) && strings;
   return strings ? insert(getStringValue(string), {values: strings, at: 0}) : getStringValue(string);
 }
 

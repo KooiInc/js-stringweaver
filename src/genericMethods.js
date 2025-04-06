@@ -1,4 +1,4 @@
-import xString from "../index.js";
+import xString, {CustomStringConstructor} from "../index.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 
@@ -15,8 +15,14 @@ function resolveTemplateString(str, ...args) {
   return str.raw ?  String.raw({ raw: str }, ...args) : str;
 }
 
+function checkType(type, item) {
+  return type === String
+    ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
+    : item?.constructor !== type;
+}
+
 function isArrayOf(type, value) {
-  return Array.isArray(value) && value.length > 0 && !value.find(v => v?.constructor !== type);
+  return Array.isArray(value) && value.length > 0 && !value.find(v => checkType(type, v));
 }
 
 function isNumber(value) {
