@@ -2,4 +2,4 @@
 
 A "stringbuilder" library
 
-[Examples](https://stackblitz.com/edit/web-platform-merkl1yz?file=sbhelpers_new.js)
+<a target="_blank" href="https://kooi.dev/showFiddle/sjfd041g">Examples</a>
