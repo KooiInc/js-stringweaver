@@ -36,7 +36,7 @@ function isMutating(descriptor) {
 function getSWInformation() {
   const firstLines = xString`For the record:
     ✔ chainable getters/methods modify the instance string
-    ✔ indexOf overrides return [undefined] if nothing was found (so one can use indexOf([some string value]) ?? 0
+    ✔ indexOf overrides return [undefined] if nothing was found (so one can use [lastI]indexOf([some string value]) ?? 0
     ✔ includes information for custom methods/getters if applicable`
     .trimAll;
   return firstLines.value.split(/\n/).concat(
