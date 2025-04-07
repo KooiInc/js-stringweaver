@@ -146,12 +146,12 @@ describe(`Basics constructor`, () => {
       assert.strictEqual($S`HELLO WORLD`.surroundWithInvertedArrows(`<-`).value, `->HELLO WORLD<-`);
     });
     
-    it(`custom getter in $S.keys`, () => {
-      assert.strictEqual($S.keys.find(v => v === `lowerQuotSingle`), `lowerQuotSingle` );
+    it(`non enumerable custom getter NOT in instance keys`, () => {
+      assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined );
     });
     
-    it(`custom method in $S.keys`, () => {
-      assert.strictEqual($S.keys.find(v => v === `surroundWithInvertedArrows`), `surroundWithInvertedArrows` );
+    it(`custom enumerable getter in instance keys`, () => {
+      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted` );
     })
     
     it(`$S.format works as expected`, () => {
