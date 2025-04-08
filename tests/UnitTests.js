@@ -244,9 +244,44 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       const hello = $S`Hello World`.camelCase;
       assert.strictEqual(hello.value, `helloWorld`);
     });
+    
+    it(`camelCase from dashed`, () => {
+      const hello = $S`hello-world`.camelCase;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+    
+    it(`camelCase /w multiple spaces`, () => {
+      const hello = $S` hello    world   `.camelCase;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+    
+    it(`camelCase /w multiple dashes`, () => {
+      const hello = $S`-hello---world   `.camelCase;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
 
-    it(`kebabCase`, () => {
+    it(`kebabCase regular`, () => {
       const hello = $S`helloWorld`.kebabCase;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+    
+    it(`kebabCase /w numbers`, () => {
+      const hello = $S`hello42World`.kebabCase;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+    
+    it(`kebabCase /w spaces`, () => {
+      const hello = $S`hello   World`.kebabCase;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+    
+    it(`kebabCase /w diacriticals`, () => {
+      const hello = $S`hello   Woërld`.kebabCase;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+    
+    it(`kebabCase /w non alphabetic`, () => {
+      const hello = $S`hello $#!  World!`.kebabCase;
       assert.strictEqual(hello.value, `hello-world`);
     });
 
