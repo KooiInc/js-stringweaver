@@ -1,6 +1,6 @@
 import interpolate from "./Factories/interpolateFactory.js";
 
-import {isArrayOf, isNumber, defineQuotingStyles,} from "./genericMethods.js";
+import {isArrayOf, isNumber, defineQuotingStyles, getStringValue} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 
 export {
@@ -162,11 +162,12 @@ function prefix(string, ...strings) {
 
 function append(string, ...strings2Append) {
   strings2Append = isArrayOf(String, strings2Append) && strings2Append;
-  return strings2Append ? `${getStringValue(string)}`.concat(strings2Append.join(``)) : getStringValue(string);
-}
-
-function getStringValue(string) {
-  return string?.value || (string?.constructor === String && string) || ``;
+  
+  if (strings2Append && strings2Append.length > 0) {
+    return `${getStringValue(string)}`.concat(strings2Append.join(``))
+  }
+  
+  return getStringValue(string);
 }
 
 function quotGetters(instance, wrap) {
@@ -183,6 +184,7 @@ function quotGetters(instance, wrap) {
       get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
       get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
       get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
+      custom(start, end) { return instance.enclose(...[start, end ?? start]); },
       get double() { return instance.enclose(...quotingStyles.double);  },
       get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
       get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },

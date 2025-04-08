@@ -118,6 +118,7 @@ describe(`Basics constructor`, () => {
         '[instance].quote.curlySingle (‛ [instance value] ’)',
         '[instance].quote.curlySingleEqual (‛ [instance value] ‛)',
         '[instance].quote.curlySingleInward (’ [instance value] ‛)',
+        '[instance].quote.custom(start:string[, end:string])',
         '[instance].quote.double (" [instance value] ")',
         '[instance].quote.guillemets (« [instance value] »)',
         '[instance].quote.guillemetsInward (» [instance value] «)',

@@ -9,10 +9,15 @@ export {
   isNumber, 
   isArrayOf,
   defineQuotingStyles,
+  getStringValue,
 };
 
 function resolveTemplateString(str, ...args) {
   return str.raw ?  String.raw({ raw: str }, ...args) : str;
+}
+
+function getStringValue(string) {
+  return string?.value || (string?.constructor === String && string) || ``;
 }
 
 function checkType(type, item) {
@@ -90,14 +95,19 @@ function createExtendedCTOR(ctor, customMethods) {
         delete qStyles.re;
         return Object.entries(qStyles)
           .sort( (a,b) => a[0].localeCompare(b[0]) )
-          .reduce((acc, [k, v]) => ([...acc, `[instance].quote.${k} (${v.join(` [instance value] `)})`]), []);
+          .reduce((acc, [k, v]) => {
+            const val = v.constructor === Function ? `(start:string[, end:string])` : ` (${v.join(` [instance value] `)})`;
+            return [...acc, `[instance].quote.${k}${val}`];
+          }, []);
       }
     },
     uuid4: {
       get() { return uuid4(); }
     },
     randomString: {
-      value: randomString
+      value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
+        return xString(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic})); 
+      }
     },
     regExp: { value: createRegExp }
   });
@@ -107,6 +117,11 @@ function createExtendedCTOR(ctor, customMethods) {
 
 function defineQuotingStyles() {
   // see https://en.wikipedia.org/wiki/Quotation_mark
+  const custom = (start, end) => {
+    start = getStringValue(start);
+    end = getStringValue(end);
+    return [getStringValue(start), end.length ? end  : start]; 
+  } 
   const quots = {
     backtick: ["`", "`"],
     bracket: [`{`, `}`],
@@ -120,6 +135,7 @@ function defineQuotingStyles() {
     curlySingle: [`‛`, `’`],
     curlySingleEqual: [`‛`, `‛`],
     curlySingleInward: [`’`, `‛`],
+    custom,
     double: [`"`, `"`],
     guillemets: [`«`, `»`],
     guillemetsInward: [`»`, `«`],
@@ -128,7 +144,7 @@ function defineQuotingStyles() {
     single: [`'`, `'`],
     squareBrackets: [`[`, `]`],
   };
-  const regExpValues = Object.values(quots).map(v => v.map(v => `\\${v}`).join(``)).join('');
+  const regExpValues = Object.values(quots).filter(v => Array.isArray(v)).map(v => v.map(v => `\\${v}`).join(``)).join('');
   quots.re = RegExp(`^[${regExpValues}]|[${regExpValues}]$`, "g");
   return quots;
 }
