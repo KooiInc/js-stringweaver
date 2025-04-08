@@ -8,7 +8,7 @@ export {
   replaceWords, find, indexOf, lastIndexOf, insert,
   append, isNumber, prefix, getStringValue, toCamelcase,
   wordsFirstUp, toDashedNotation, quotGetters,
-  surroundWith, defineQuotingStyles,
+  surroundWith, defineQuotingStyles, toSnakeCase,
 };
 
 function checkAndRun(string, fn, or) {
@@ -39,6 +39,17 @@ function toDashedNotation(string) {
       .replace(/-{2,}/g, `-`)
       .replace(/[^a-z-]/g, ``)
       .replace(/^-|-$/, ``)
+  );
+}
+
+function toSnakeCase(string) {
+  return checkAndRun(string, () =>
+    string
+      .replace(/\s/g, '')
+      .replace(/[A-Z]/g, a => `_${a.toLowerCase()}`)
+      .replace(/_{2,}/g, `_`)
+      .replace(/[^a-z_]/g, ``)
+      .replace(/^_|_$/, ``)
   );
 }
 

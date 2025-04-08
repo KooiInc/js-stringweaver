@@ -51,6 +51,7 @@ describe(`Basics constructor`, () => {
         'prefix',
         'quote',
         'replaceWords',
+        'snakeCase',
         'toString',
         'trimAll',
         'trimAllKeepLF',
@@ -86,6 +87,7 @@ describe(`Basics constructor`, () => {
         'prefix (chainable method)',
         'quote (Object. See [constructor].quoteInfo)',
         'replaceWords (chainable method)',
+        'snakeCase (chainable getter)',
         'toString (method, String override)',
         'trimAll (chainable getter)',
         'trimAllKeepLF (chainable getter)',
@@ -283,6 +285,31 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`kebabCase /w non alphabetic`, () => {
       const hello = $S`hello $#!  World!`.kebabCase;
       assert.strictEqual(hello.value, `hello-world`);
+    });
+    
+    it(`snakeCase regular`, () => {
+      const hello = $S`helloWorld`.snakeCase;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+    
+    it(`snakeCase /w numbers`, () => {
+      const hello = $S`hello42World`.snakeCase;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+    
+    it(`snakeCase /w spaces`, () => {
+      const hello = $S`hello   World`.snakeCase;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+    
+    it(`snakeCase /w diacriticals`, () => {
+      const hello = $S`hello   Woërld`.snakeCase;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+    
+    it(`snakeCase /w non alphabetic`, () => {
+      const hello = $S`hello $#!  World!`.snakeCase;
+      assert.strictEqual(hello.value, `hello_world`);
     });
 
     it(`firstUp`, () => {

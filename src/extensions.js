@@ -2,7 +2,7 @@ import {
   format, ucFirst, truncate, extract, trimAll, 
   replaceWords, find, indexOf, lastIndexOf, insert, append, 
   prefix, getStringValue, quotGetters, surroundWith,
-  toCamelcase, wordsFirstUp, toDashedNotation,
+  toCamelcase, wordsFirstUp, toDashedNotation, toSnakeCase,
 } from "./instanceMethods.js";
 
 import {xString as $S, isNumber} from "./genericMethods.js";
@@ -42,6 +42,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
     firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable },
     history: { get() { return history; }, enumerable },
     quote: quotGetters(instance, wrap),
+    snakeCase: { get() { return wrap(toSnakeCase(getStringValue(actualValue))); } },
     trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable },
     trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); }, enumerable },
     undoAll: { get() { return undoAll(); }, enumerable },
