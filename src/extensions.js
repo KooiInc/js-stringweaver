@@ -38,7 +38,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
     camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable },    
     clone: { get() { return $S(actualValue); }, enumerable },
     constructor: { get() { return $S.constructor; }, enumerable },
-    dashed: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable },
+    kebabCase: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable },
     firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable },
     history: { get() { return history; }, enumerable },
     quote: quotGetters(instance, wrap),

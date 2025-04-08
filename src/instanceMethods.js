@@ -36,7 +36,9 @@ function toDashedNotation(string) {
     string
       .replace(/\s/g, '')
       .replace(/[A-Z]/g, a => `-${a.toLowerCase()}`)
-      .replace(/^-|-$/, ``) 
+      .replace(/-{2,}/g, `-`)
+      .replace(/[^a-z-]/g, ``)
+      .replace(/^-|-$/, ``)
   );
 }
 

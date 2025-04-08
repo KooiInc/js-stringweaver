@@ -37,7 +37,6 @@ describe(`Basics constructor`, () => {
         'camelCase',
         'clone',
         'constructor',
-        'dashed',
         'enclose',
         'extract',
         'find',
@@ -47,6 +46,7 @@ describe(`Basics constructor`, () => {
         'indexOf',
         'insert',
         'interpolate',
+        'kebabCase',
         'lastIndexOf',
         'prefix',
         'quote',
@@ -72,7 +72,6 @@ describe(`Basics constructor`, () => {
         'camelCase (chainable getter)',
         'clone (chainable getter)',
         'constructor (method, String override)',
-        'dashed (chainable getter)',
         'enclose (chainable method)',
         'extract (chainable method)',
         'find (method)',
@@ -82,6 +81,7 @@ describe(`Basics constructor`, () => {
         'indexOf (method, String override)',
         'insert (chainable method)',
         'interpolate (chainable method)',
+        'kebabCase (chainable getter)',
         'lastIndexOf (method, String override)',
         'prefix (chainable method)',
         'quote (Object. See [constructor].quoteInfo)',
@@ -238,14 +238,15 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.value, `Hello world and hello to you too!`);
   });
   
+  // todo
   describe(`case`, () => {
     it(`camelCase`, () => {
       const hello = $S`Hello World`.camelCase;
       assert.strictEqual(hello.value, `helloWorld`);
     });
 
-    it(`dashed`, () => {
-      const hello = $S`helloWorld`.dashed;
+    it(`kebabCase`, () => {
+      const hello = $S`helloWorld`.kebabCase;
       assert.strictEqual(hello.value, `hello-world`);
     });
 
