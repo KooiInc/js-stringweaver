@@ -15,113 +15,122 @@ function demonstrate() {
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
   
-  log(
-    $S`Initialization`
-      .toTag(`h2`, `head`)
-      .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.toTag(`div`, `normal`))
-      .value,
+  printInitializationExamples();
+  printStaticConstructorFunctionExamples();
+  printGetterExamples();
+  printMethodExamples();
+  
+  function printInitializationExamples() {
     
-    $S`✓ As tagged template:`
-      .append($S`
+    log(
+      $S`Initialization`
+        .toTag(`h2`, `head`)
+        .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.toTag(`div`, `normal`))
+        .value,
+      
+      $S`✓ As tagged template:`
+        .append($S`
         const wrld = "world";
         $S\`hello \${wrld}\``
-        .asCodeblock
-        .append(`=> `)
-        .append($S`hello world`.quote.curlyDouble))
-      .value,
-    
-    $S`✓ As function call: `
-      .append(`<br>`, $S`$S("hello world")`.toCode)
-      .append($S(`hello world`).quote.curlyDouble.prefix(` => `)).value,
-    
-    $S`Instance methods are chainable`
-      .toTag(`h3`, `head`)
-      .append($S`$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode)
-      .append(`<br> => `)
-      .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").quote.curlyDouble)
-      .value,
-    
-    $S`Native string function results are chainable`
-      .toTag(`h3`, `head`)
-      .append(
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward`.toCode,
-        `<br>=> `,
-        $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward)
-      .value,
-  );
-  
-  log(
-    $S`$S static stringweaver constructor properties/methods`.toTag(`h2`, `head`).value,
-    
-    $S`$S.keys`.toTag(`h3`, `head`).toTag(`summary`)
-      .append($S`includes user defined custom property/method keys`.asNote.toTag(`div`, `normal`))
-      .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`))
-      .toTag(`details`)
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S`$S.info`.toTag(`h3`, `head`).toTag(`summary`)
-      .append($S`includes user defined custom properties/methods`.asNote.toTag(`div`, `normal`))
-      .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`))
-      .toTag(`details`)
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S`$S.quoteInfo`.toTag(`h3`, `head`).toTag(`summary`)
-      .append($S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`))
-      .toTag(`details`)
-      .toTag(`div`, `normal`)
-      .value,
+          .asCodeblock
+          .append(`=> `)
+          .append($S`hello world`.quote.curlyDouble))
+        .value,
       
-    $S`$S.regExp`.toTag(`h3`, `head`)
-      .append($S`$S.regExp\`
+      $S`✓ As function call: `
+        .append(`<br>`, $S`$S("hello world")`.toCode)
+        .append($S(`hello world`).quote.curlyDouble.prefix(` => `)).value,
+      
+      $S`Instance methods are chainable`
+        .toTag(`h3`, `head`)
+        .append($S`$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode)
+        .append(`<br> => `)
+        .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").quote.curlyDouble)
+        .value,
+      
+      $S`Native string function results are chainable`
+        .toTag(`h3`, `head`)
+        .append(
+          $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward`.toCode,
+          `<br>=> `,
+          $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward)
+        .value,
+    );
+  }
+  
+  function printStaticConstructorFunctionExamples() {
+    log(
+      $S`$S static stringweaver constructor properties/methods`.toTag(`h2`, `head`).value,
+      
+      $S`$S.keys`.toTag(`h3`, `head`).toTag(`summary`)
+        .append($S`includes user defined custom property/method keys`.asNote.toTag(`div`, `normal`))
+        .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`))
+        .toTag(`details`)
+        .toTag(`div`, `normal`)
+        .value,
+      
+      $S`$S.info`.toTag(`h3`, `head`).toTag(`summary`)
+        .append($S`includes user defined custom properties/methods`.asNote.toTag(`div`, `normal`))
+        .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`))
+        .toTag(`details`)
+        .toTag(`div`, `normal`)
+        .value,
+      
+      $S`$S.quoteInfo`.toTag(`h3`, `head`).toTag(`summary`)
+        .append($S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`))
+        .toTag(`details`)
+        .toTag(`div`, `normal`)
+        .value,
+      
+      $S`$S.regExp`.toTag(`h3`, `head`)
+        .append($S`$S.regExp\`
         &nbsp;&nbsp;^[\\p{L}]  <span class="cmmt">//=> always start with a letter</span>
         &nbsp;&nbsp;[\\p{L}_\\.#\\-\\d+~=!]+  <span class="cmmt">//=> followed by letters including _ . # - 0-9 ~ = or !</span>
         &nbsp;&nbsp;\${[...\`gui\`]} <span class="cmmt">//=> flags ([g]lobal, case [i]nsensitive, [u]nicode)</span>\`;`
-        .asCodeblock)
-      .append($S`Result`.toTag(`b`).prefix(`=> `)
-        .append(`: `, $S(reDemo.toString()).toCode).toTag(`div`, `normal`))
-    .value,
-    
-    $S`$S.constructor`.toTag(`h3`, `head`)
-      .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append($S`function ${$S.constructor.name}(str, ...args) {...}`.toCode)
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S`$S.addCustom`
-      .toTag(`h3`, `head`)
-      .append(
-         $S`Using `
-         .append($S`$S.addCustom`.toCode, ` one can add ones own getters or methods`)
-         .toTag(`div`, `normal`))
-      .append(
-        $S`Syntax`.toTag(`i`)
-        .append(`: `, $S`$S.addCustom({
+          .asCodeblock)
+        .append($S`Result`.toTag(`b`).prefix(`=> `)
+          .append(`: `, $S(reDemo.toString()).toCode).toTag(`div`, `normal`))
+        .value,
+      
+      $S`$S.constructor`.toTag(`h3`, `head`)
+        .append($S`Result: `.prefix(`=> `).toTag(`b`))
+        .append($S`function ${$S.constructor.name}(str, ...args) {...}`.toCode)
+        .toTag(`div`, `normal`)
+        .value,
+      
+      $S`$S.addCustom`
+        .toTag(`h3`, `head`)
+        .append(
+          $S`Using `
+            .append($S`$S.addCustom`.toCode, ` one can add ones own getters or methods`)
+            .toTag(`div`, `normal`))
+        .append(
+          $S`Syntax`.toTag(`i`)
+            .append(`: `, $S`$S.addCustom({
           &nbsp;&nbsp;name:string, 
           &nbsp;&nbsp;method:function (me:the current stringweaver instance, ...args) => {...}, 
           &nbsp;&nbsp;isGetter:boolean = false, 
           &nbsp;&nbsp;enumerable:boolean = false
           &nbsp;&nbsp;<span class="cmmt">// ↳ true: visible in Object.keys([instance])</span>})`.asCodeblock))
-      .toTag(`div`, `normal`)
-      .value,
-
+        .toTag(`div`, `normal`)
+        .value,
+      
       $S`Examples`.toTag(`h3`, `head`).value,
       
       $S`
         <span class="cmmt">// a user defined getter</span>
         $S.addCustom({name: "festive", me => me.enclose("\\u{1F389}"), isGetter: true});
         const result = $S\`Hurray!\`.festive; `
-      .asCodeblock
-      .append($S`=&gt; `
-        .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble))
-      .toTag(`div`, `normal`)
-      .value,
-    
+        .asCodeblock
+        .append($S`=&gt; `
+          .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble))
+        .toTag(`div`, `normal`)
+        .value,
+      
       $S`
          <span class="cmmt">// a user defined method</span>
          $S.addCustom({ name: "toTag", method: (me, tagName, className) => {
-          &nbsp;&nbsp;className = className?.length ? $S(className).quote.double.prepend($S(" class=")) : "";
+          &nbsp;&nbsp;className = className?.length ? $S(className).quote.double.prefix($S(" class=")) : "";
           &nbsp;&nbsp;return me
           &nbsp;&nbsp;&nbsp;&nbsp;.enclose( 
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$S(tagName).append(className).enclose("&lt;", ">"),
@@ -129,44 +138,194 @@ function demonstrate() {
           &nbsp;}
          });
          const result = $S\`Hurray!\`.toTag("i", "green").toTag("b");`.asCodeblock
-      .append(
-        $S`result`.toCode.prefix(`=> `), ` `, 
-        $S`Hurray!`.toTag("i", "green").toTag("b").quote.curlyDouble)
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S`$S.randomString`.toTag(`h3`, `head`)
-      .append($S`Syntax: `.toTag(`i`))
-      .append($S`$S.randomString({
+        .append(
+          $S`result`.toCode.prefix(`=> `), ` `,
+          $S`Hurray!`.toTag("i", "green").toTag("b").quote.curlyDouble)
+        .toTag(`div`, `normal`)
+        .value,
+      
+      $S`$S.randomString`.toTag(`h3`, `head`)
+        .append($S`Syntax: `.toTag(`i`))
+        .append($S`$S.randomString({
          &nbsp;&nbsp;len:number = 12,
          &nbsp;&nbsp;includeUppercase:boolean = true,
          &nbsp;&nbsp;includeNumbers:boolean,
          &nbsp;&nbsp;includeSymbols:boolean,
          &nbsp;&nbsp;startAlphabetic:boolean})`.asCodeblock)
-      .append($S`Examples`.toTag(`h3`, `head`).value,)
-      .append(
-        $S`$S.randomString()`.toCode, `<br>=> `, 
-        $S.randomString().quote.curlyDouble).toTag(`div`, `normal b5`)
-      .append($S`$S.randomString({len: 24})`.toCode, 
-        `<br>=> `, 
-        $S.randomString({len: 24}).quote.curlyDouble).toTag(`div`, `normal b5`)
-      .append(
-        $S`$S.randomString({len: 16, includeNumbers: true})`.toCode, `<br>=> `, 
-        $S.randomString({
-          len: 16,
-          includeNumbers: true}).quote.curlyDouble).toTag(`div`, `normal b5`)
-      .append(
-        $S`$S.randomString({includeNumbers: true, includeSymbols: true})`.toCode, `<br>=> `,
-        $S.randomString({
-          includeNumbers: true, 
-          includeSymbols: true}).quote.curlyDouble).toTag(`div`, `normal b5`)
-      .append(
-        $S`$S.randomString({len: 32, includeUppercase: false})`.toCode, `<br>=> `,
-        $S.randomString({
-          len: 32,
-          includeUppercase: false}).quote.curlyDouble).toTag(`div`, `normal b5`)
+        .append($S`Examples`.toTag(`h3`, `head`).value,)
+        .append(
+          $S`$S.randomString()`.toCode, `<br>=> `,
+          $S.randomString().quote.curlyDouble).toTag(`div`, `normal b5`)
+        .append($S`$S.randomString({len: 24})`.toCode,
+          `<br>=> `,
+          $S.randomString({len: 24}).quote.curlyDouble).toTag(`div`, `normal b5`)
+        .append(
+          $S`$S.randomString({len: 16, includeNumbers: true})`.toCode, `<br>=> `,
+          $S.randomString({
+            len: 16,
+            includeNumbers: true
+          }).quote.curlyDouble).toTag(`div`, `normal b5`)
+        .append(
+          $S`$S.randomString({includeNumbers: true, includeSymbols: true})`.toCode, `<br>=> `,
+          $S.randomString({
+            includeNumbers: true,
+            includeSymbols: true
+          }).quote.curlyDouble).toTag(`div`, `normal b5`)
+        .append(
+          $S`$S.randomString({len: 32, includeUppercase: false})`.toCode, `<br>=> `,
+          $S.randomString({
+            len: 32,
+            includeUppercase: false
+          }).quote.curlyDouble).toTag(`div`, `normal b5`)
+        .value,
+    );
+  }
+  
+  function printGetterExamples() {
+    log($S("Instance getters").toTag(`h2`, `head`).value)
+    log(
+      $S("✓ [instance].camelCase").toTag(`h3`, `head`)
+        .append( $S`Tries converting the instance string 
+          to <a target="_blank" class="ExternalLink arrow"
+            href="https://developer.mozilla.org/en-US/docs/Glossary/Camel_case"
+            >Camel case</a>`.toTag("div", "normal b5") )
+        .append(
+          $S("$S`convert-me`.camelCase").toCode
+          .append( $S`convert-me`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`convert me please`.camelCase").toCode
+          .append( $S`convert me please`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("you -- should convert &nbsp;&nbsp;&nbsp;-me &nbsp;&nbsp;&nbsp;too.camelCase").toCode
+          .append( $S`you -- should convert    -me    too`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
       .value,
-  );
+    );
+    
+    const toClone = $S("I shall be cloned");
+    const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
+    
+    log(
+      $S("✓ [instance].clone").toTag(`h3`, `head`)
+        .append( $S`Clone an instance`.toTag("div", "normal b5") )
+        .append($S`
+            const toClone = $S("I shall be cloned");
+            const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");`.asCodeblock)
+        .append( 
+          $S`cloned`.toCode.append(cloned.quote.curlyDouble.prefix("=>")).asDiv,
+          $S`toClone`.toCode.append(toClone.quote.curlyDouble.prefix("=>")).asDiv
+        ).value,
+    );
+    
+    log(
+      $S("✓ [instance].firstUp").toTag(`h3`, `head`)
+        .append( $S`Converts the first letter of the instance string to upper case`.toTag("div", "normal b5") )
+        .append(
+          $S("$S`hello world`.firstUp").toCode,
+          $S`hello world`.firstUp.quote.curlyDouble.prefix(" => ")).asDiv
+        .append(
+          $S("$S`   hello world`.trim().firstUp").toCode,
+          $S`hello world`.trim().firstUp.quote.curlyDouble.prefix(" => ")).asDiv
+        .value,
+    );
+    
+    
+    const historyEx = JSON.stringify($S``.prefix("hello").append(` `, `world`).history);
+    log(
+      $S("✓ [instance].history").toTag(`h3`, `head`)
+        .append( $S`Every instance records its history, which may be retrieved using 
+            <code>.history</code>.`.asDiv
+          .append(`The history enables undoing things for an instance 
+            (see <code>undo/undoLast/undoAll</code>).`).toTag("div", "normal b5") )
+        .append(
+          $S("$S``.prefix('hello').append(` `, `world`).history").toCode,
+          $S` => `.append(historyEx)).asDiv 
+        .value,
+    );
+    
+    log($S`... Work in Progress ...`.asNote.asDiv.value);
+    
+    log(
+      $S("✓ [instance].kebabCase").toTag(`h3`, `head`)
+        .append( $S`Tries converting 
+            the instance string to <a target="_blank" class="ExternalLink arrow"
+            href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
+            >Kebab case</a> (aka 'dashed notation'), 
+            meaning that all words of a string 
+            will be converted to lower case, all non-letters/-numbers 
+            (all not a-z <i>including diacriticals</i>) 
+            will be removed and the converted words will be concatenated 
+            with hyphens. May be useful for css- or data-attributes.`
+            .toTag("div", "normal b5") )
+        .append(
+          $S("$S`ConvertMe`.kebabCase").toCode
+            .append( $S`ConvertMe`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert-Me Please`.kebabCase").toCode
+            .append( $S`Convert Me Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
+            .append( $S`Convert Me --    Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me, pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
+            .append( $S`Convert Me, Plëase $#!`.kebabCase
+              .replace("plase", "<b class='red'>plase</b>").quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`42 Convert Me, please`.kebabCase").toCode
+            .append( $S`42 Convert Me, Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .value,
+    );
+    
+    log(
+      $S("✓ [instance].snakeCase").toTag(`h3`, `head`)
+        .append( $S`Tries converting 
+            the instance string to <a target="_blank" class="ExternalLink arrow"
+            href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
+            >Snake case</a>, meaning that all words of a string 
+            will be converted to lower case, all non-letters/-numbers 
+            (all not a-z <i>including diacriticals</i>) 
+            will be removed and the converted words will be concatenated 
+            with underscore ('_'). May be useful for cleaning up property names.`
+          .toTag("div", "normal b5") )
+        .append(
+          $S("$S`convertMe`.snakeCase").toCode
+            .append( $S`convertMe`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert-Me Please`.snakeCase").toCode
+            .append( $S`Convert Me Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
+            .append( $S`Convert Me _    Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
+            .append( $S`Convert Me, PlËase $#!`.snakeCase
+              .replace("plase", "<b class='red'>plase</b>").quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`42 Convert Me, please`.snakeCase").toCode
+            .append( $S`42 Convert Me, Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .value,
+    );
+  }
+  
+  function printMethodExamples() {
+    log($S("Instance methods").toTag(`h2`, `head`).value,)
+    log(
+      $S("indexOf/lastIndexOf").toTag(`h3`, `head`)
+        .append(
+          $S("indexOf").toCode,
+          " and ",
+          $S("lastIndexOf").toCode,
+          " override the native ",
+          $S("String.prototype").toCode,
+          " methods. ").asDiv
+        .append(
+          $S("They return "),
+          $S("undefined").toCode,
+          " if the string to search was not found, instead of ",
+          $S("-1").toCode,
+          ".").asDiv
+        .value
+    );
+  }
   
   printHeader();
 }
@@ -202,7 +361,7 @@ async function createCodeElement() {
   const code = await(fetch("./index.js"))
     .then(res => res.text());
   const codeOverlay = $.div_jql(
-    {id: "codeOverlay"},
+    {id: "codeOverlay", data: {magDat: "42"}},
     $.pre({class: "language-javascript line-numbers"},
       $.code({class: "language-javascript"}, code) ) )
     .hide();
@@ -218,7 +377,7 @@ async function createCodeElement() {
     }
     
     if (!parentLi.querySelector(`#codeOverlay`)) {
-      codeOverlay.toDOM(parentLi).show();
+      codeOverlay.toDOM(parentLi);
       Prism.highlightAll();
       prismDone = true;
     }
@@ -235,14 +394,15 @@ function addCustomized() {
   $S.addCustom({name: "festive", method: me => me.enclose("\u{1F389}"), isGetter: true});
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
-      className = className?.length ? $S(className).quote.double.prepend($S(" class=")) : "";
+      className = className?.length ? $S(className).quote.double.prefix($S(" class=")) : "";
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
+  $S.addCustom({name: `asDiv`, method(me) {return me.toTag("div", "normal"); }, isGetter: true});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
   $S.addCustom({
     name: `asNote`, method: me =>
-      me.trim().toTag(`i`).prepend($S`Note`.toTag(`b`, `note`).append(`: `)), isGetter: true
+      me.trim().toTag(`i`).prefix($S`Note`.toTag(`b`, `note`).append(`: `)), isGetter: true
   });
   $S.addCustom({name: `asCodeblock`, method: me => me.trimAll.toTag(`code`).toTag(`pre`), isGetter: true});
 }
@@ -263,6 +423,9 @@ function initStyling() {
     }`,
     `.green { 
         color: green; 
+    }`,
+    `.red { 
+        color: red; 
     }`,
     `button[data-code-visible="hidden"]:before {
       content: 'Show code';
@@ -327,7 +490,6 @@ function initStyling() {
     `b.note {color: red; }`,
     `.normal {
        font-family: system-ui, sans-serif;
-       line-height: 1.5em;
        color: var(--grey-default);
      }`,
     `.b5 { margin-bottom: 0.5rem; }`,
