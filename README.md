@@ -2,4 +2,4 @@
 
 A "stringbuilder" library
 
-<a target="_blank" href="https://kooi.dev/showFiddle/sjfd041g">Examples</a>
+<a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Examples</a>
