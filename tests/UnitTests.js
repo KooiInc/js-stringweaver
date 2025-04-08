@@ -49,7 +49,6 @@ describe(`Basics constructor`, () => {
         'interpolate',
         'lastIndexOf',
         'prefix',
-        'prepend',
         'quote',
         'replaceWords',
         'toString',
@@ -85,7 +84,6 @@ describe(`Basics constructor`, () => {
         'interpolate (chainable method)',
         'lastIndexOf (method, String override)',
         'prefix (chainable method)',
-        'prepend (chainable method)',
         'quote (Object. See [constructor].quoteInfo)',
         'replaceWords (chainable method)',
         'toString (method, String override)',
@@ -143,7 +141,7 @@ describe(`Basics constructor`, () => {
     });
     
     it(`$S.addCustom method works as expected`, () => {
-      $S.addCustom({name: `surroundWithInvertedArrows`, method: (me, add) => { return me.prepend(`->`).append(add); }, enumerable: false});
+      $S.addCustom({name: `surroundWithInvertedArrows`, method: (me, add) => { return me.prefix(`->`).append(add); }, enumerable: false});
       assert.strictEqual($S`HELLO WORLD`.surroundWithInvertedArrows(`<-`).value, `->HELLO WORLD<-`);
     });
     
@@ -483,26 +481,6 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`prefix empty input string as expected`, () => {
       const hi = $S``.prefix(`HI`, ` `, `THERE`);
       assert.strictEqual(hi.value, `HI THERE`);
-    });
-    
-    it(`prepend no arguments as expected`, () => {
-      const hi = $S`Hi`.prepend();
-      assert.strictEqual(hi.value, `Hi`);
-    });
-    
-    it(`prepend single as expected`, () => {
-      const hi = $S`Hi`.prepend(`>>`);
-      assert.strictEqual(hi.value, `>>Hi`);
-    });
-    
-    it(`prepend empty input string as expected`, () => {
-      const hi = $S``.prepend(`HI`, ` `, `THERE`);
-      assert.strictEqual(hi.value, `HI THERE`);
-    });
-    
-    it(`prepend multiple as expected`, () => {
-      const hi = $S`Hi`.prepend(`01`, ` >> `);
-      assert.strictEqual(hi.value, `01 >> Hi`);
     });
   });
   
