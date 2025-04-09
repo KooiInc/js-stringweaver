@@ -8,6 +8,44 @@ let prismDone = false;
 await createCodeElement();
 demonstrate();
 
+// An alternative for .trimAll
+function trimEverythingAlternative(string) {
+  return string.trim().split(/\n/)
+    .map(parseLine)
+    .map(l => l
+      .replace(/(\p{P})\s/gu, `$1`)
+      .replace(/[,.;:?!]\p{P}(?=\p{L})/gu, a => a.split(``).join(` `))
+      .replace(/\w\s[,.;:?!]/gu, a => a.replace(/\s/g, ``))
+    )
+    .join(`\n`).replace(/\n\n/g, `\n`);
+  
+  function parseLine(line) {
+    line = [...line];
+    let nwStr = ``;
+    
+    while (line.length) {
+      const current = line.shift().concat(line.shift() ?? ``);
+      
+      switch (true) {
+        case /\s\s/.test(current) && /\s/.test(nwStr.at(-1)):
+          break;
+        case /\s\p{L}/u.test(current) ||
+        /\p{L}\p{L}/u.test(current) ||
+        (/(\p{L}\s)/u.test(current) && !/\p{P}/u.test(line[0])):
+          nwStr += current;
+          break;
+        case /(\s\p{P})/u.test(current) || /(\p{P}\s)/u.test(current):
+          nwStr += current.trim();
+          break;
+        default:
+          nwStr += current.trim()
+      }
+    }
+    
+    return nwStr;
+  }
+}
+
 function demonstrate() {
   addCustomized();
   const reDemo = $S.regExp`
@@ -123,8 +161,8 @@ function demonstrate() {
         const result = $S\`Hurray!\`.festive; `
         .asCodeblock
         .append($S`=&gt; `
-          .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble))
-        .toTag(`div`, `normal`)
+          .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble).asDiv)
+        .asDiv
         .value,
       
       $S`
@@ -139,9 +177,10 @@ function demonstrate() {
          });
          const result = $S\`Hurray!\`.toTag("i", "green").toTag("b");`.asCodeblock
         .append(
-          $S`result`.toCode.prefix(`=> `), ` `,
-          $S`Hurray!`.toTag("i", "green").toTag("b").quote.curlyDouble)
-        .toTag(`div`, `normal`)
+          $S`result`.toCode.prefix(`=> `).append(
+            ` `,
+            $S`Hurray!`.toTag("i", "green").toTag("b").quote.curlyDouble).asDiv)
+        .asDiv
         .value,
       
       $S`$S.randomString`.toTag(`h3`, `head`)
@@ -182,7 +221,10 @@ function demonstrate() {
   }
   
   function printGetterExamples() {
-    log($S("Instance getters").toTag(`h2`, `head`).value)
+    log($S("Instance getters").toTag(`h2`, `head`).value);
+    
+    log($S`&hellip; Work in Progress &hellip;`.asNote.asDiv.toTag(`h3`, `head`).value);
+    
     log(
       $S("✓ [instance].camelCase").toTag(`h3`, `head`)
         .append( $S`Tries converting the instance string 
@@ -191,13 +233,16 @@ function demonstrate() {
             >Camel case</a>`.toTag("div", "normal b5") )
         .append(
           $S("$S`convert-me`.camelCase").toCode
-          .append( $S`convert-me`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          .append( $S`convert-me`
+            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("$S`convert me please`.camelCase").toCode
-          .append( $S`convert me please`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          .append( $S`convert me please`
+            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("you -- should convert &nbsp;&nbsp;&nbsp;-me &nbsp;&nbsp;&nbsp;too.camelCase").toCode
-          .append( $S`you -- should convert    -me    too`.camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          .append( $S`you -- should convert    -me    too`
+            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
       .value,
     );
     
@@ -218,7 +263,8 @@ function demonstrate() {
     
     log(
       $S("✓ [instance].firstUp").toTag(`h3`, `head`)
-        .append( $S`Converts the first letter of the instance string to upper case`.toTag("div", "normal b5") )
+        .append( $S`Converts the first letter of the instance string to upper case`
+          .toTag("div", "normal b5") )
         .append(
           $S("$S`hello world`.firstUp").toCode,
           $S`hello world`.firstUp.quote.curlyDouble.prefix(" => ")).asDiv
@@ -242,7 +288,40 @@ function demonstrate() {
         .value,
     );
     
-    log($S`... Work in Progress ...`.asNote.asDiv.value);
+    log(
+      $S("✓ [instance].snakeCase").toTag(`h3`, `head`)
+        .append( $S`Tries converting 
+            the instance string to <a target="_blank" class="ExternalLink arrow"
+            href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
+            >Snake case</a>, meaning that all words of a string 
+            will be converted to lower case, all non-letters/-numbers 
+            (all not a-z <i>including diacriticals</i>) 
+            will be removed and the converted words will be concatenated 
+            with underscore ('_'). May be useful for cleaning up property names.`
+          .toTag("div", "normal b5") )
+        .append(
+          $S("$S`convertMe`.snakeCase").toCode
+            .append( $S`convertMe`
+              .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert-Me Please`.snakeCase").toCode
+            .append( $S`Convert Me Please`
+              .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
+            .append( $S`Convert Me _    Please`
+              .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
+            .append( $S`Convert Me, PlËase $#!`.snakeCase
+              .replace("plase", "<b class='red'>plase</b>")
+                .quote.curlyDouble.prefix(" => ")).asDiv )
+        .append(
+          $S("$S`42 Convert Me, please`.snakeCase").toCode
+            .append( $S`42 Convert Me, Please`
+              .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+        .value,
+    );
     
     log(
       $S("✓ [instance].kebabCase").toTag(`h3`, `head`)
@@ -261,47 +340,73 @@ function demonstrate() {
             .append( $S`ConvertMe`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("$S`Convert-Me Please`.kebabCase").toCode
-            .append( $S`Convert Me Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .append( $S`Convert Me Please`
+              .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
-            .append( $S`Convert Me --    Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .append( $S`Convert Me --    Please`
+              .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("$S`Convert Me, pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
             .append( $S`Convert Me, Plëase $#!`.kebabCase
-              .replace("plase", "<b class='red'>plase</b>").quote.curlyDouble.prefix(" => ")).asDiv )
+              .replace("plase", "<b class='red'>plase</b>")
+                .quote.curlyDouble.prefix(" => ")).asDiv )
         .append(
           $S("$S`42 Convert Me, please`.kebabCase").toCode
-            .append( $S`42 Convert Me, Please`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .append( $S`42 Convert Me, Please`
+              .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
         .value,
     );
     
+    const [cleanupStr1, cleanupStr2] = [
+      `<pre><code>$S\`clean me
+            
+            
+            please! \`.trimAll</code></pre>`,
+      `clean me
+        
+      up    ,
+        
+        ( please ! )   
+      {  ok  ? }
+    `];
+    
     log(
-      $S("✓ [instance].snakeCase").toTag(`h3`, `head`)
-        .append( $S`Tries converting 
-            the instance string to <a target="_blank" class="ExternalLink arrow"
-            href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
-            >Snake case</a>, meaning that all words of a string 
-            will be converted to lower case, all non-letters/-numbers 
-            (all not a-z <i>including diacriticals</i>) 
-            will be removed and the converted words will be concatenated 
-            with underscore ('_'). May be useful for cleaning up property names.`
-          .toTag("div", "normal b5") )
+      $S("✓ [instance].trimAll").toTag(`h3`, `head`)
+        .append($S`Tries to trim all superfluous white space from the instance string. 
+          So multiple spaces, tabs, linefeeds are reduced to single white space or no
+          white space if before a line feed. This is a fairly simple and certainly not
+          a failsafe method (see second example)`.toTag("div", "normal b5") )
         .append(
-          $S("$S`convertMe`.snakeCase").toCode
-            .append( $S`convertMe`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            $S`Example 1`.toTag(`h3`, `head between`),
+            cleanupStr1,
+            $S`<pre>${$S`clean    me
+          
+             please!   `.trimAll.quote.curlyDouble.prefix(`=> `)}</pre>`.asDiv)
         .append(
-          $S("$S`Convert-Me Please`.snakeCase").toCode
-            .append( $S`Convert Me Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          $S`Example 2`.toTag(`h3`, `head between`),
+          $S`<pre><code>$S\`clean me
+        
+            up    ,
+        
+            ( please !  )   
+          {  ok  ? }
+          \`.trimAll</code></pre>`
+        .append( `<pre>${$S`${cleanupStr2}`.trimAll.quote.curlyDouble.prefix(" => ")}</pre>`).asDiv )
         .append(
-          $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
-            .append( $S`Convert Me _    Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
-        .append(
-          $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
-            .append( $S`Convert Me, PlËase $#!`.snakeCase
-              .replace("plase", "<b class='red'>plase</b>").quote.curlyDouble.prefix(" => ")).asDiv )
-        .append(
-          $S("$S`42 Convert Me, please`.snakeCase").toCode
-            .append( $S`42 Convert Me, Please`.snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          $S`Example 2a`.toTag(`h3`, `head between`),
+          $S("We created a custom getter called <code>trimEverything</code> with a " +
+            "different approach to this").asDiv,
+          $S`(go to the <a href="#top">page top</a>, click 'Show code' and scroll to line 11).
+            It's pretty convoluted and<br>still not perfect, but hey, it's an idea ...`.asDiv,
+          $S`<pre><code>$S\`clean me
+        
+            up    ,
+        
+            ( please !  )   
+          {  ok  ? }
+          \`.trimEverything</code></pre>`
+        .append( `<pre>${$S`${cleanupStr2}`.trimEverything.quote.curlyDouble.prefix(" => ")}</pre>`).asDiv )
         .value,
     );
   }
@@ -354,6 +459,7 @@ function printHeader() {
     $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
         target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
     .value,
+    `<a id="top"></a>`,
   );
 }
 
@@ -404,7 +510,10 @@ function addCustomized() {
     name: `asNote`, method: me =>
       me.trim().toTag(`i`).prefix($S`Note`.toTag(`b`, `note`).append(`: `)), isGetter: true
   });
-  $S.addCustom({name: `asCodeblock`, method: me => me.trimAll.toTag(`code`).toTag(`pre`), isGetter: true});
+  $S.addCustom({name: `asCodeblock`, method: me => 
+      me.trimAll.toTag(`code`).toTag(`pre`), isGetter: true});
+  $S.addCustom({name: `trimEverything`, method: me => 
+      me.constructor(trimEverythingAlternative(me.value)), isGetter: true});
 }
 
 function initStyling() {
@@ -465,32 +574,38 @@ function initStyling() {
     `code:not(.codeblock, .language-javascript) {
         background-color: rgb(227, 230, 232);
         color: var(--code-color);
-        padding: 2px 4px;
+        padding: 0 4px;
         display: inline-block;
         border-radius: 4px;
-        margin: 2px 0px;
       }`,
     `code.codeblock { 
         background-color: rgb(227, 230, 232);
-        margin: 0.3rem 0px 0.3rem;
         color: rgb(12, 13, 14);
         border: none;
         border-radius: 4px;
         max-width: 80vw;
+        padding: 4px;
       }`,
     `h2 {font-size: 1.3rem; line-height: 1.4rem}`,
     `pre:not(.language-javascript) {
         font-weight: normal;
         max-width: 400px;
-        margin: 0.3rem 0;
+        margin: 0.3rem 0px 0.5rem;;
+        code {
+          padding: 5px;
+        }
+    }`,
+    `pre:not(.language-javascript).syntax {
+      margin-top: 0.2rem;
     }`,
     `pre.language-javascript {
       max-height: 50vh;
     }`,
-    `b.note {color: red; }`,
+    `b.note { color: red; }`,
     `.normal {
        font-family: system-ui, sans-serif;
        color: var(--grey-default);
+       margin: 3px;
      }`,
     `.b5 { margin-bottom: 0.5rem; }`,
     `h1.head, h2.head, h3.head {
@@ -498,7 +613,12 @@ function initStyling() {
       font-family: system-ui, sans-serif;
       margin-bottom: 0.4rem;
     }`,
-    `h3.head { font-size: 1.1rem; }`,
+    `h3.head { 
+      font-size: 1.1rem;
+     }`,
+    `h3.head.between { 
+        margin-top: 0.4rem;
+     }`,
     `h2.head, h1.head { 
        border: 1px dotted var(--grey-default);
        padding: 0.3rem; 
@@ -523,14 +643,14 @@ function initStyling() {
       }
     }`,
     `a.ExternalLink {
-        background-color: #FFF;
+      background-color: transparent;
     }`,
     `a.ExternalLink.arrow:hover::after { 
         fontSize: 0.7rem;
         position: absolute;
         zIndex: 2;
         display: inline-block;
-        padding: 3px 6px;
+        padding: 1px 6px;
         border: 1px solid #777;
         box-shadow: 1px 1px 5px #777;
         margin: 1rem 0 0 -1rem;
@@ -546,24 +666,5 @@ function initStyling() {
     `a.ExternalLink[target="_blank"].arrow:hover::after {
       content: ' Opens in new tab/window';
     }`,
-    `#showNwYear i { 
-        color: #b34b44;
-        font-weight: bold;
-        margin-top: 1rem;
-        display: inline-block;
-        padding: 5px;
-        background-color: #FFFFAA;
-      }`,
-    `#showNwYear:before { 
-        content: 'Sure! Until next new year\\1F389 lasts:';
-        color: #777;
-        display: block;
-      }`,
-    `[data-should] {
-        margin-top: 0.3rem;
-      }`,
-    `[data-should]:before { 
-        content: attr(data-should);
-      }`,
   );
 }
