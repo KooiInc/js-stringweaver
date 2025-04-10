@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+<template id="customGetterSyntax">
+$S.addCustom({
+  name:string,
+  method:function (me:the current stringweaver instance, ...args) => { },
+  isGetter:boolean = false,
+  enumerable:boolean = false
+  // ↳ true: visible in Object.keys([instance])
+})
+</template>
+
+<template id="festiveExample">
+// a user defined getter
+$S.addCustom( {
+  name: "festive",
+  method: me =>
+  me.enclose("\u{1F389}"),
+  isGetter: true 
+} );
+const result = $S`Hurray!`.festive;
+</template>
+
+<template id="toTagExample">
+// a user defined method
+$S.addCustom( { 
+    name: "toTag", 
+    method: (me, tagName, className) => {
+    className = className?.length
+      ? $S(className).quote.double.prefix($S(" class="))
+      : "";
+    return me.enclose(
+      $S(tagName).append(className).enclose("<", ">"),
+      $S(tagName).enclose("&lt;/", "&gt;") );
+  }
+} );
+const result = $S`Hurray!`.toTag("i", "green").toTag("b");
+</template>
+
+<template id="cloneExample">
+const toClone = $S("I shall be cloned");
+const cloned = toClone
+  .clone
+  .replace("shall be", "was")
+  .append(", yeah!");
+</template>
+
+<template id="regExpExample">
+$S.regExp`
+  ^[\p{L}]              //=> always start with a letter
+  [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
+  ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
+</template>
+
+<template id="taggedTemplateExample">
+const wrld = "world";
+$S`hello ${wrld}`
+</template>
+
+<template id="valueExample1">
+const empty = $S("");
+empty.value = 'hello world';
+</template>
+
+<template id="valueExample2">
+  const empty = $S("");
+  empty.value = 'hello ';
+  empty.value += 'world';
+</template>
+
+</body>
+</html>

@@ -49,15 +49,17 @@ function getSWInformation() {
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
       return `${key} (${
-        key === `clone`
-          ? `chainable getter`
-          : key in String.prototype 
-            ? `method, String override` 
-            : descriptr.value && descriptr.value.constructor === Function
-              ? (isMutating(descriptr.value) ? `chainable method` : `method`)
-              : descriptr.value
-                ? `property`
-                : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
+        key === `value` 
+          ? `getter/setter`
+          : key === `clone`
+            ? `chainable getter`
+            : key in String.prototype 
+              ? `method, String override` 
+              : descriptr.value && descriptr.value.constructor === Function
+                ? (isMutating(descriptr.value) ? `chainable method` : `method`)
+                : descriptr.value
+                  ? `property`
+                  : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
     .sort( (a,b) => a.localeCompare(b) ) 
   );
 }
