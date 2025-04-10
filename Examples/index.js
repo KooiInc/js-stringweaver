@@ -1,4 +1,4 @@
-import {logFactory, $} from "./index.browser.js";
+import {logFactory, $} from "./DOMhelpers.js";
 import {default as $S} from "../index.js";
 
 initStyling();
@@ -9,41 +9,20 @@ await createCodeElement();
 demonstrate();
 
 // An alternative for .trimAll
-function trimEverythingAlternative(string) {
-  return string.trim().split(/\n/)
-    .map(parseLine)
-    .map(l => l
-      .replace(/(\p{P})\s/gu, `$1`)
-      .replace(/[,.;:?!]\p{P}(?=\p{L})/gu, a => a.split(``).join(` `))
-      .replace(/\w\s[,.;:?!]/gu, a => a.replace(/\s/g, ``))
-    )
-    .join(`\n`).replace(/\n\n/g, `\n`);
-  
-  function parseLine(line) {
-    line = [...line];
-    let nwStr = ``;
-    
-    while (line.length) {
-      const current = line.shift().concat(line.shift() ?? ``);
-      
-      switch (true) {
-        case /\s\s/.test(current) && /\s/.test(nwStr.at(-1)):
-          break;
-        case /\s\p{L}/u.test(current) ||
-        /\p{L}\p{L}/u.test(current) ||
-        (/(\p{L}\s)/u.test(current) && !/\p{P}/u.test(line[0])):
-          nwStr += current;
-          break;
-        case /(\s\p{P})/u.test(current) || /(\p{P}\s)/u.test(current):
-          nwStr += current.trim();
-          break;
-        default:
-          nwStr += current.trim()
-      }
-    }
-    
-    return nwStr;
-  }
+function trimAllAlternative(string) {
+  return string
+    .trim()
+    .split(/\n/)
+    .map( l => l.replace(/\s{2,}/g, ` `).trim() )
+    .filter(l => l.length)
+    .map( l => l
+      .replace(/(\p{Ps})\s/gu, a => a.trim())
+      .replace(/\s(\p{Pe})/gu, (_,b) => b.trim())
+      .replace(/(\p{S})\s/gu, a => a.trim())
+      .replace(/\s(\p{S})/gu, (_,b) => b.trim())
+      .replace(/\s(\p{Po})/gu, (_,b) => b.trim())
+      .replace(/([;,.:])(\S)/g, (a,b,c) => b + ` ` + c) )
+    .join(`\n`);
 }
 
 function demonstrate() {
@@ -510,10 +489,10 @@ function addCustomized() {
     name: `asNote`, method: me =>
       me.trim().toTag(`i`).prefix($S`Note`.toTag(`b`, `note`).append(`: `)), isGetter: true
   });
+  $S.addCustom({name: `trimEverything`, method: me =>
+      me.constructor(trimAllAlternative(me.value)), isGetter: true});
   $S.addCustom({name: `asCodeblock`, method: me => 
-      me.trimAll.toTag(`code`).toTag(`pre`), isGetter: true});
-  $S.addCustom({name: `trimEverything`, method: me => 
-      me.constructor(trimEverythingAlternative(me.value)), isGetter: true});
+      me.trimEverything.replace(/\/\/↳/g, `// ↳ `).toTag(`code`).toTag(`pre`), isGetter: true});
 }
 
 function initStyling() {
