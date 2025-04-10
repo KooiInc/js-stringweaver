@@ -1,7 +1,7 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
 import {default as $S} from "../index.js";
-
+const exampleCode = await fetchTemplates();
 initStyling();
 window.$S = $S; // try it out in the console
 const {log, logTop} = logFactory();
@@ -33,6 +33,7 @@ function demonstrate() {
   printGetterExamples();
   printMethodExamples();
   printHeader();
+  Prism.highlightAll();
 }
 
 function printInitializationExamples() {
@@ -43,10 +44,7 @@ function printInitializationExamples() {
       .value,
     
     $S`✓ As tagged template:`
-      .append($S`
-        const wrld = "world";
-        $S\`hello \${wrld}\``
-        .asCodeblock
+      .append($S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
         .append($S`hello world`.quote.curlyDouble))
       .value,
@@ -114,11 +112,7 @@ function regExpEx() {
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
   log(
     $S`$S.regExp`.toTag(`h3`, `head`)
-    .append($S`$S.regExp\`
-        &nbsp;&nbsp;^[\\p{L}]&nbsp;<span class="cmmt">//=&gt;always start with a letter</span>
-        &nbsp;&nbsp;[\\p{L}_\\.#\\-\\d+~=!]+ <span class="cmmt">&nbsp;//=&gt;followed by letters including _&nbsp;.&nbsp;#&nbsp;-&nbsp;0-9&nbsp;~&nbsp;!</span>
-        &nbsp;&nbsp;\${[...\`gui\`]} <span class="cmmt">&nbsp;//=&gt;flags ([g]lobal, case [i]nsensitive, [u]nicode)</span>\`;`
-      .asCodeblock)
+    .append($S(exampleCode.regExpExample).asCodeblock)
     .append($S`Result`.toTag(`b`).prefix(`=> `)
       .append(`: `, $S(reDemo.toString()).toCode).toTag(`div`, `normal`))
     .value,
@@ -135,38 +129,22 @@ function addCustomEx() {
           .toTag(`div`, `normal`))
       .append(
         $S`Syntax`.toTag(`i`)
-          .append(`: `, $S`$S.addCustom({
-          &nbsp;&nbsp;name:string, 
-          &nbsp;&nbsp;method:function (me:the current stringweaver instance, ...args) => {...}, 
-          &nbsp;&nbsp;isGetter:boolean = false, 
-          &nbsp;&nbsp;enumerable:boolean = false
-          &nbsp;&nbsp;<span class="cmmt">// ↳ true: visible in Object.keys([instance])</span>})`.asCodeblock))
+          .append(`: `, exampleCode.customGetterSyntax))
     .toTag(`div`, `normal`)
     .value,
     
-    $S`Examples`.toTag(`h3`, `head`).value,
+    $S`Examples`.toTag(`h3`, `head`)
+    .append($S`<b>User defined <i>getter</i> <code>.festive</code></b>`.asDiv).value,
     
-    $S`
-        <span class="cmmt">// a user defined getter</span>
-        $S.addCustom({name: "festive", me => me.enclose("\\u{1F389}"), isGetter: true});
-        const result = $S\`Hurray!\`.festive; `
-      .asCodeblock
-      .append($S`=&gt; `
-        .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble).asDiv)
+    $S`${exampleCode.festiveExample}`
+    .append($S`=&gt; `
+      .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble).asDiv)
     .asDiv
     .value,
     
-    $S`
-         <span class="cmmt">// a user defined method</span>
-         $S.addCustom({ name: "toTag", method: (me, tagName, className) => {
-          &nbsp;&nbsp;className = className?.length ? $S(className).quote.double.prefix($S(" class=")) : "";
-          &nbsp;&nbsp;return me
-          &nbsp;&nbsp;&nbsp;&nbsp;.enclose( 
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$S(tagName).append(className).enclose("&lt;", ">"),
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$S(tagName).enclose("&lt;/", ">") );
-          &nbsp;}
-         });
-         const result = $S\`Hurray!\`.toTag("i", "green").toTag("b");`.asCodeblock
+    $S`<b>User defined <i>method</i> <code>.toTag</code></b>`.asDiv.value,
+    
+    $S`${exampleCode.toTagExample}`
       .append(
         $S`result`.toCode.prefix(`=> `).append(
           ` `,
@@ -180,12 +158,7 @@ function randomStringEx() {
   log(
     $S`$S.randomString`.toTag(`h3`, `head`)
     .append($S`Syntax: `.toTag(`i`))
-    .append($S`$S.randomString({
-         &nbsp;&nbsp;len:number = 12,
-         &nbsp;&nbsp;includeUppercase:boolean = true,
-         &nbsp;&nbsp;includeNumbers:boolean,
-         &nbsp;&nbsp;includeSymbols:boolean,
-         &nbsp;&nbsp;startAlphabetic:boolean})`.asCodeblock)
+    .append($S`${exampleCode.randomStringSyntax}`)
     .append($S`Examples`.toTag(`h3`, `head`).value,)
     .append(
       $S`$S.randomString()`.toCode
@@ -264,9 +237,7 @@ function cloneEx() {
   log(
     $S("✓ [instance].clone").toTag(`h3`, `head`)
       .append( $S`Clone an instance`.toTag("div", "normal b5") )
-      .append($S`
-            const toClone = $S("I shall be cloned");
-            const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");`.asCodeblock)
+      .append( exampleCode.cloneExample )
       .append(
         $S`cloned`.toCode.append(cloned.quote.curlyDouble.prefix("=>")).asDiv,
         $S`toClone`.toCode.append(toClone.quote.curlyDouble.prefix("=>")).asDiv
@@ -458,6 +429,80 @@ function trimAllKeepLFEx() {
   );
 }
 
+function undoEx() {
+  const initial = $S` `.append('World').prefix('Hello').toLowerCase(); 
+  
+  log(
+    $S("✓ [instance].undo").toTag(`h3`, `head`)
+    .append(
+      $S`Sets the instance string value to the previous string value 
+          (from the history, see <code>$S.history</code>`
+        .toTag("div", "normal b5") )
+    .append(
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
+        .toCode
+        .append(` => `, $S(initial.value).quote.curlyDouble).asDiv ) 
+    .append(
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
+      .toCode
+      .append(` => `, $S(initial.undo.value).quote.curlyDouble).asDiv ) 
+    .value
+  );
+}
+
+function undoAllEx() {
+  const initial = $S` `.append('World').prefix('Hello').toLowerCase();
+  
+  log(
+    $S("✓ [instance].undoAll").toTag(`h3`, `head`)
+      .append(
+        $S`Sets the instance string value to the initial string value 
+          (from the history, see <code>$S.history</code>`
+          .toTag("div", "normal b5") )
+      .append(
+        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
+          .toCode
+          .append(` => `, $S(initial.value).quote.curlyDouble).asDiv )
+      .append(
+        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undoAll")
+          .toCode
+          .append(` => `, $S(initial.undoAll.value).quote.curlyDouble).asDiv )
+      .value
+  );
+}
+
+function valueEx() {
+  const empty = $S("");
+  empty.value = 'hello world';
+  const empty2 = $S("");
+  empty2.value = 'hello ';
+  empty2.value += 'world';
+  const emptyClone = empty2.clone;
+  emptyClone.value += {hello: 1, world: 2}; // stringified
+
+  log(
+    $S("✓ [instance].value").toTag(`h3`, `head`)
+    .append(
+      `<br>`,
+      $S`<code>[instance].value</code> is a getter and a setter for the instance string value.`,
+      `<br>`,
+      $S`if the given value is not a string, setting it will do nothing`.asNote )
+    .toTag("div", "normal b5")
+    .append(exampleCode.valueExample1) 
+    .append(`<code>empty.value</code> => `, $S(empty.value).quote.curlyDouble).asDiv
+    .append(
+      `<br>`,
+      $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
+      .append($S`be aware that non string values will be stringified here`.asNote)
+      .asDiv
+    )
+    .append(exampleCode.valueExample2)
+    .append(`<code>empty.value</code> => `, $S(empty2.value).quote.curlyDouble).asDiv
+    .append(`<code>emptyClone.value</code> => `, $S(emptyClone.value).quote.curlyDouble).asDiv
+    .value
+  );
+}
+
 function printGetterExamples() {
   log($S("Instance getters").toTag(`h2`, `head`).value);
   log($S`&hellip; Work in Progress &hellip;`.asNote.asDiv.toTag(`h3`, `head`).value);
@@ -469,6 +514,9 @@ function printGetterExamples() {
   snakeCaseEx();
   trimAllEx();
   trimAllKeepLFEx();
+  undoEx();
+  undoAllEx();
+  valueEx();
 }
 
 function printMethodExamples() {
@@ -542,7 +590,6 @@ async function createCodeElement() {
     if (!parentLi.querySelector(`#codeOverlay`)) {
       console.log(`once ...`);
       codeOverlay.toDOM(parentLi);
-      Prism.highlightAll();
     }
     
     codeOverlay.show();
@@ -569,15 +616,28 @@ function addCustomized() {
   });
   $S.addCustom({name: `trimEverything`, method: me =>
       me.constructor(trimAllAlternative(me.value)), isGetter: true});
-  $S.addCustom({
-    name: `asCodeblock`, 
-    method: me => 
-      me.trimEverything
-        .replace(/\/\/↳/g, `// ↳ `)
-        .replace(`&nbsp;`, ` `)
-        .toTag(`code`)
-        .toTag(`pre`), 
-    isGetter: true});
+}
+
+function toCodeBlock(str) {
+  return `<pre class="line-numbers language-javascript"><code class="language-javascript">${
+    str}</code></pre>`;
+}
+
+function getCodeblocks(templates) {
+  const exampleBlocks = templates.find(`template`);
+  
+  return [...exampleBlocks].reduce( (acc, block) => {
+    const codeTemplate = 
+      $S`<pre class="language-javascript line-numbers"><code class="language-javascript">{code}</code></pre>`;
+    return { 
+      ...acc, 
+      [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
+  }, {});
+}
+
+async function fetchTemplates() {
+  $.allowTag(`template`);
+  return getCodeblocks($.virtual(`<div>${await fetch(`./codeTemplates.txt`).then(r => r.text())}</div>`));
 }
 
 function initStyling() {
@@ -663,7 +723,7 @@ function initStyling() {
       margin-top: 0.2rem;
     }`,
     `pre.language-javascript {
-      max-height: 50vh;
+      max-height: 500px;
     }`,
     `b.note { color: red; }`,
     `.normal {
