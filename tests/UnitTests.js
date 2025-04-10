@@ -95,7 +95,7 @@ describe(`Basics constructor`, () => {
         'undo (chainable getter)',
         'undoAll (chainable getter)',
         'undoLast (chainable method)',
-        'value (getter)',
+        'value (getter/setter)',
         'valueOf (method, String override)',
         'wordsUCFirst (chainable getter)'
       ];
