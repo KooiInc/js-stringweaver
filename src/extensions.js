@@ -23,7 +23,10 @@ function instanceCreator({initialstring, customMethods} = {}) {
     format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
     indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable },
     interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
-    insert: { value({ values, at = 0} = {}) { return wrap(insert(actualValue, { values, at})); }, enumerable },
+    insert: { value({ value, values, at } = {}) { 
+        return wrap(insert(actualValue, { value, values, at })); 
+      }, enumerable 
+    },
     lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable },
     prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable },
     replaceWords: { value({replacements = [], caseSensitive = false} = {}) {

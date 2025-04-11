@@ -28,6 +28,7 @@ function surroundWith(string, start, end) {
   if (!start && !end) {
     return string;
   }
+  [start, end] = isArrayOf(String, [start, end ?? ``]) ? [start, end] : [``, ``];
   return `${start}${string}${end || start}`;
 }
 
@@ -147,19 +148,30 @@ function find(string, {terms, caseSensitive = false} = {}) {
 
 // SEE https://youtu.be/99Zacm7SsWQ?t=2101
 function indexOf(string, findMe, fromIndex) {
-  const index = (string?.value || string || ``).indexOf(findMe, fromIndex);
-  return index < 0 ? undefined : index;
+  string = getStringValue(string);
+  fromIndex = isNumber(fromIndex) ? fromIndex : 0;
+  const index = string.indexOf(findMe, fromIndex || 0);
+  return index < 0 ? undefined : index;  
 }
 
 function lastIndexOf(string, findMe, beforeIndex) {
-  const index = (string?.value || string || ``).lastIndexOf(findMe, beforeIndex);
+  string = getStringValue(string);
+  beforeIndex = isNumber(beforeIndex) ? beforeIndex : string.length;
+  const index = string.lastIndexOf(findMe, beforeIndex);
   return index < 0 ? undefined : index;
 }
 
-function insert(string, { values, at = 0 } = {}) {
-  string = string?.value || string || ``;
-  at = at || 0;
-  values = isArrayOf(String, values) ? values.join(``) : values?.constructor === String ?  values : ``;
+function insert(string, { value, values, at = 0 } = {}) {
+  string = getStringValue(string);
+  at = isNumber(at) ? at : 0;
+  const valuesMaybeValue = getStringValue(values);
+  values = getStringValue(value).length 
+    ? value
+    : valuesMaybeValue.length
+    ? valuesMaybeValue
+    : isArrayOf(String, values) 
+      ? values.map(v => getStringValue(v)).join(``) 
+      : [];
   
   return values.length <= 1
     ? string

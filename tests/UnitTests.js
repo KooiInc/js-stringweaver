@@ -448,6 +448,40 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual($S``.constructor.name, `CustomStringConstructor`);
   });
   
+  describe(`enclose`, () => {
+    it(`enclose without values does nothing`, () => {
+      assert.strictEqual($S`Hello world`.enclose().value, `Hello world`);
+    });
+    
+    it(`enclose with start value only as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose(`**`).value, `**Hello world**`);
+    });
+    
+    it(`enclose with start and end value only as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose(`**`, "<").value, `**Hello world<`);
+    });
+    
+    it(`enclose with start value === instance as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose($S`**`).value, `**Hello world**`);
+    });
+    
+    it(`enclose with start/end value === instance as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose($S`**`, $S`<`).value, `**Hello world<`);
+    });
+    
+    it(`enclose with start value === instance, end value === string as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose($S`**`, `<`).value, `**Hello world<`);
+    });
+    
+    it(`enclose with start value === string, end value === instance as expected`, () => {
+      assert.strictEqual($S`Hello world`.enclose(`**`, $S`<`).value, `**Hello world<`);
+    });
+    
+    it(`enclose with start value !== string, end value === instance does nothing`, () => {
+      assert.strictEqual($S`Hello world`.enclose([1, 2, 4], $S`<`).value, `Hello world`);
+    });
+  })
+  
   it(`extract as expected`, () => {
     const hi = $S`I said hello world didn't I?`;
     assert.strictEqual(hi.extract(7, 18).value, `hello world`);
@@ -468,13 +502,37 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
   });
   
   describe(`insert`, () => {
-    it(`insert as expected`, () => {
-      const hi = $S`oh dear world`.insert({values:`Hello `});
+    it(`insert (values array) as expected`, () => {
+      const hi = $S`oh dear world`.insert({values: [`Hello `]});
+      assert.strictEqual(hi.value, `Hello oh dear world`);
+    });
+    
+    it(`insert (single value) as expected`, () => {
+      const hi = $S`oh dear world`.insert({value: `Hello `});
       assert.strictEqual(hi.value, `Hello oh dear world`);
     });
     
     it(`insert with empty input string as expected`, () => {
-      assert.strictEqual($S``.insert({values: [`hello`, ` `, `world`]}).value, `hello world`, `empty input string`);
+      assert.strictEqual($S``.insert({values: [`hello`, ` `, `world`]}).value, `hello world`);
+    });
+    
+    it(`insert with single string as values as expected`, () => {
+      assert.strictEqual($S`world`.insert({values: `hello `}).value, `hello world`);
+    });
+    
+    it(`insert at only as expected`, () => {
+      const hi = $S`oh dear world`.insert({at: 5});
+      assert.strictEqual(hi.value, `oh dear world`);
+    });
+    
+    it(`insert impossible at-value as expected`, () => {
+      const hi = $S`oh dear world`.insert({value: `Hello`, at: 25});
+      assert.strictEqual(hi.value, `oh dear worldHello`);
+    });
+    
+    it(`insert negative at-value as expected`, () => {
+      const hi = $S`oh dear world`.insert({values: [` `, `Hello`], at: -6});
+      assert.strictEqual(hi.value, `oh dear Hello world`);
     });
     
     it(`insert no parameters as expected`, () => {
