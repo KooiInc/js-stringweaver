@@ -27,7 +27,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
     },
     lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable },
     prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable },
-    replaceWords: { value({replacements = [], caseSensitive = false} = {}) {
+    replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
       return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
     }, enumerable },
     toString: { value() { return actualValue; }, enumerable },

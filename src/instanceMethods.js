@@ -1,6 +1,6 @@
 import interpolate from "./Factories/interpolateFactory.js";
 
-import {isArrayOf, isNumber, defineQuotingStyles, getStringValue} from "./genericMethods.js";
+import {isArrayOf, isNumber, defineQuotingStyles, getStringValue, escapeRE} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 
 export {
@@ -95,25 +95,25 @@ function trimAll(string,  keepLines) {
   });
 }
 
-function replaceWords(string, {replacements = [], caseSensitive = false} = {}) {
-  return checkAndRun(string, () => {
-    const evenLength =  replacements?.length % 2 === 0;
-    const cando = Array.isArray(replacements) && !replacements.find( v =>
-        Object.getPrototypeOf( v ?? -1)?.constructor !== String) &&
-      caseSensitive?.constructor === Boolean;
+function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) {
+  string = getStringValue(string);
+  let replacements2Array = Object.entries(replacements).flat();
+  const cando = isArrayOf(String, replacements2Array) && caseSensitive?.constructor === Boolean;
+  const modifiers = `g${!caseSensitive ? 'i' : ''}`;
+  
+  if (cando) {
+    replacements2Array = replacements2Array.map(v => getStringValue(v)).filter(v => replacements2Array.length > 0);
     
-    replacements = cando && !evenLength ? replacements.slice(0, -1) : replacements;
-    
-    if (cando) {
-      while (replacements.length) {
-        const [initial, replacement] = [replacements.shift(), replacements.shift()];
-        const re = RegExp(initial, `g${!caseSensitive ? 'i' : ''}`);
+    if (replacements2Array.length) {
+      while (replacements2Array.length) {
+        const [initial, replacement] = [replacements2Array.shift(), replacements2Array.shift()];
+        const re = escapeRE(initial, modifiers);
         string = string.replace(re, replacement);
       }
     }
-    
-    return string;  
-  });
+  }
+  
+  return string;
 }
 
 // SEE https://youtu.be/99Zacm7SsWQ?t=2101
