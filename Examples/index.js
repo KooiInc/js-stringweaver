@@ -34,11 +34,6 @@ function demonstrate() {
   printMethodExamples();
   printHeader();
   Prism.highlightAll();
-  
-  if (/localhost/.test(location.href)) {
-    // temp
-    window.scrollTo(0, 10000);
-  }
 }
 
 function printInitializationExamples() {
