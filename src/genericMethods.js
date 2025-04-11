@@ -1,4 +1,4 @@
-import xString, {CustomStringConstructor} from "../index.js";
+import xString, {CustomStringConstructor, customMethods} from "../index.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 
@@ -56,10 +56,13 @@ function getSWInformation() {
             : key in String.prototype 
               ? `method, String override` 
               : descriptr.value && descriptr.value.constructor === Function
-                ? (isMutating(descriptr.value) ? `chainable method` : `method`)
+                ? (isMutating(descriptr.value) 
+                  ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
                 : descriptr.value
                   ? `property`
-                  : descriptr.get ? (isMutating(descriptr.get) ? `chainable getter` : `getter`) : `-`})`; })
+                  : descriptr.get ? (isMutating(descriptr.get) 
+                    ? `chainable getter${key in customMethods ? ` *custom*` : ``}` 
+                    : `getter`) : `-`})`; })
     .sort( (a,b) => a.localeCompare(b) ) 
   );
 }
@@ -89,7 +92,10 @@ function createExtendedCTOR(ctor, customMethods) {
       get() { return getSWInformation(); }
     },
     keys: {
-      get() { return Object.keys(Object.getOwnPropertyDescriptors(xString``)).sort( (a,b) => a.localeCompare(b) ); }
+      get() { 
+        return Object.keys(Object.getOwnPropertyDescriptors(xString``)).sort( (a,b) => a.localeCompare(b) )
+          .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v); 
+      }
     },
     quoteInfo: {
       get() {

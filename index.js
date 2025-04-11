@@ -4,7 +4,7 @@ import { resolveTemplateString as resolveString, createExtendedCTOR } from "./sr
 const customMethods = {};
 const defaultStringCTOR = createExtendedCTOR(CustomStringConstructor, customMethods);
 
-export {defaultStringCTOR as default, CustomStringConstructor};
+export {defaultStringCTOR as default, CustomStringConstructor, customMethods};
 
 function CustomStringConstructor(str, ...args) {
   return createInstance({initialstring: resolveString(str, ...args), customMethods});
