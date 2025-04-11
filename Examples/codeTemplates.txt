@@ -99,3 +99,27 @@ const lastWord2Universe = instance =>
     .append(" and universe");
 lastWord2Universe(initial);
 </template>
+
+<template id="replaceWordsExample">
+const ex1 = $S("replace me").replaceWords({ 
+  replacements: {replace: "Hello", me: "world"} });
+  
+const ex2 = $S("replace me").replaceWords({ 
+  replacements: {replace: "Hello", ME: "world"}, 
+  caseSensitive: true });
+
+const ex2a = $S("replace me").replaceWords({ 
+  replacements: {rePLAce: "Hello", ME: "world"} });
+  
+const ex3 = $S("replace /.+me\\").replaceWords({ 
+  replacements: {replace: "Hello", "/.+me\\": $S`world`.quote.squareBrackets}});
+/*                                  ↳ for searching words to replace 
+   in the instance string value a regular expression is constructed. 
+   Words with special characters reserved for regular expressions 
+   should be replaced too */
+
+const ex4 = $S("repläce me").replaceWords({
+    replacements: {"repläce": "Hello", me: $S`세계`.festive}});
+</template>
+<template>
+</template>

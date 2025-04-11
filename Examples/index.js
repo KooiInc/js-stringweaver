@@ -37,9 +37,8 @@ function demonstrate() {
   
   if (/localhost/.test(location.href)) {
     // temp
-    window.scrollTo(0, 5000);  
+    window.scrollTo(0, 10000);
   }
-  
 }
 
 function printInitializationExamples() {
@@ -135,7 +134,8 @@ function printMethodExamples() {
   indexOfEx();
   lastIndexOfEx();
   insertEx();
-  
+  prefixEx();
+  replaceWordsEx();
   // wip
   window.scrollTo(0, 5000);
 }
@@ -558,7 +558,7 @@ function valueEx() {
 /* region method examples */
 function appendEx() {
   log(
-    $S(" [instance].append(...values:array&lt;string|instance>)").toTag(`h3`, `head code`)
+    $S(" [instance].append(...values:[string|instance])").toTag(`h3`, `head code`)
       .append( 
         $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
         .append(
@@ -631,14 +631,6 @@ function encloseEx() {
   );
 }
 
-function extractEx() {
-  
-}
-
-function findEx() {
-  
-}
-
 function formatEx() {
   
 }
@@ -680,14 +672,14 @@ function indexOfEx() {
     .append(
       $S`String(initial)`.toCode,
       " => ",
-      initial.value
+      initial.qcd.value
     ).asDiv.value
   );
 }
 
 function insertEx() {
   log(
-    $S(" [instance].insert({value:string|instance, values:string|instance|array&lt;string|instance>, at:number=0})")
+    $S(" [instance].insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
     .toTag(`h3`, `head code`)
       
     .append(
@@ -702,56 +694,56 @@ function insertEx() {
     .append(
       $S('$S("hello world").insert({values: "dear ", at: 6})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).value)
+        .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).qcd.value)
     ).asDiv
 
     .append(
       $S('$S("hello world").insert({values: ["oh", " ", "dear", " "] , at: 6})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).value)
+        .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).qcd.value)
     ).asDiv
     
     .append(
       $S('$S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "] , at: 6})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).value)
+        .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert({value: $S("I say").festive})')
         .toCode
-        .append(` => `, $S("hello world").insert({value: $S("I say").festive}).value)
+        .append(` => `, $S("hello world").insert({value: $S("I say").festive}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert({values: "So, i said: "' +
         '<span class="cmmt">// Note: valueS may also be single string</span>"})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: "So, i said: "}).value)
+        .append(` => `, $S("hello world").insert({values: "So, i said: "}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert({values: ["42"], at: 100})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).value)
+        .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert({values: [42]})')
         .toCode
-        .append(` => `, $S("hello world").insert({values: [42]}).value)
+        .append(` => `, $S("hello world").insert({values: [42]}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert({value: {value: 1}})')
         .toCode
-        .append(` => `, $S("hello world").insert({value: 1}).value)
+        .append(` => `, $S("hello world").insert({value: 1}).qcd.value)
     ).asDiv
       
     .append(
       $S('$S("hello world").insert()')
         .toCode
-        .append(` => `, $S("hello world").insert().value)
+        .append(` => `, $S("hello world").insert().qcd.value)
     ).asDiv
       
     .value
@@ -793,16 +785,95 @@ function lastIndexOfEx() {
     .append(
       $S`initial.value`.toCode,
       " => ",
-      initial.value
+      initial.qcd.value
     ).asDiv.value
   );
 }
 
 function prefixEx() {
-  
+  log(
+    $S(" [instance].prefix(...strings2Prefix:[string])")
+      .toTag(`h3`, `head code`)
+      
+    .append(
+      $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
+          order of the strings from <code>strings2Prefix</code>.
+          Will do nothing if one of the given <code>strings2Prefix</code> is not a string or instance.`
+    ).toTag("div", "normal b5")
+      
+    .append(
+      $S`$S("world").prefix("hello", " ")`.toCode
+        .append(` => `, $S("world").prefix("hello", " ").qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`$S("world").prefix("hello", " and", " ", "then again ... bye ")`.toCode
+        .append(` => `, $S("world").prefix("hello", " and", " ", "then again ... bye ").qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`$S("world").prefix()`.toCode
+        .append(` => `, $S("world").prefix().qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`$S("world").prefix(42, "Hello ")`.toCode
+        .append(` => `, $S("world").prefix(42, "Hello ").qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`$S("world").prefix($S\`Hello! \`.toTag("b").toTag("i", "green"), "hello ").festive`.toCode
+        .append(` => `, $S("world").prefix($S`Hello! `.toTag(`b`).toTag(`i`, `green`), "hello ").festive.value)
+    ).asDiv
+   .value
+  );
 }
 
 function replaceWordsEx() {
+  const ex1 = $S("replace me").replaceWords({
+    replacements: {replace: "Hello", me: "world"} });
+  const ex2 = $S("replace me").replaceWords({
+    replacements: {replace: "Hello", ME: "world"},
+    caseSensitive: true });
+  const ex2a = $S("replace me").replaceWords({
+    replacements: {rePLAce: "Hello", ME: "world"} });
+  const ex3 = $S("replace /.+me\\").replaceWords({
+    replacements: {replace: "Hello", "/.+me\\": $S`world`.quote.squareBrackets}});
+  const ex4 = $S("repläce me").replaceWords({
+    replacements: {"repläce": "Hello", me: $S`세계`.festive}});
+  
+  log(
+    $S(" [instance].replaceWords({replacements:{&ltstring,string|instance>}, caseSensitive:boolean=false})")
+    .toTag(`h3`, `head code`)
+    
+    .append(
+      $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
+    ).toTag("div", "normal b5")
+      
+    .append(exampleCode.replaceWordsExample)
+      
+    .append(
+        $S`ex1`.toCode.append(` => `, ex1.qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`ex2`.toCode.append(` => `, ex2.qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`ex2a`.toCode.append(` => `, ex2a.qcd.value)
+    ).asDiv
+
+    .append(
+      $S`ex3`.toCode.append(` => `, ex3.qcd.value)
+    ).asDiv
+      
+    .append(
+      $S`ex4`.toCode.append(` => `, ex4.qcd.value)
+    ).asDiv
+      
+    .value
+  );
   
 }
 
