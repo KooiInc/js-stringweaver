@@ -46,18 +46,18 @@ function printInitializationExamples() {
     $S`✓ As tagged template:`
       .append($S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
-        .append($S`hello world`.quote.curlyDouble))
+        .append($S`hello world`.qcd))
       .value,
     
     $S`✓ As function call: `
       .append(`<br>`, $S`$S("hello world")`.toCode)
-      .append($S(`hello world`).quote.curlyDouble.prefix(` => `)).value,
+      .append($S(`hello world`).qcd.prefix(` => `)).value,
     
     $S`Instance methods are chainable`
       .toTag(`h3`, `head`)
       .append($S`$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode)
       .append(`<br> => `)
-      .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").quote.curlyDouble)
+      .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd)
       .value,
     
     $S`Native string function results are chainable`
@@ -138,7 +138,7 @@ function addCustomEx() {
     
     $S`${exampleCode.festiveExample}`
     .append($S`=&gt; `
-      .append($S`result`.toCode, `: `, $S("Hurray!").festive.quote.curlyDouble).asDiv)
+      .append($S`result`.toCode, `: `, $S("Hurray!").festive.qcd).asDiv)
     .asDiv
     .value,
     
@@ -148,7 +148,7 @@ function addCustomEx() {
       .append(
         $S`result`.toCode.prefix(`=> `).append(
           ` `,
-          $S`Hurray!`.toTag("i", "green").toTag("b").quote.curlyDouble).asDiv)
+          $S`Hurray!`.toTag("i", "green").toTag("b").qcd).asDiv)
     .asDiv
     .value,
   );
@@ -164,14 +164,14 @@ function randomStringEx() {
       $S`$S.randomString()`.toCode
       .append(
         `<br>=> `,
-         $S.randomString().quote.curlyDouble)
+         $S.randomString().qcd)
         .toTag(`div`, `normal b5`)
       )
       .append(
         $S`$S.randomString({len: 24})`.toCode
         .append(
           `<br>=> `,
-          $S.randomString({len: 24}).quote.curlyDouble)
+          $S.randomString({len: 24}).qcd)
         .toTag(`div`, `normal b5`) 
       )
       .append(
@@ -181,7 +181,7 @@ function randomStringEx() {
            $S.randomString({
             len: 16,
             includeNumbers: true
-           }).quote.curlyDouble)
+           }).qcd)
          .toTag(`div`, `normal b5`) 
       )
       .append(
@@ -191,7 +191,7 @@ function randomStringEx() {
             $S.randomString({
               includeNumbers: true,
               includeSymbols: true
-            }).quote.curlyDouble)
+            }).qcd)
           .toTag(`div`, `normal b5`)
       )
       .append(
@@ -201,7 +201,7 @@ function randomStringEx() {
           $S.randomString({
               len: 32,
               includeUppercase: false
-          }).quote.curlyDouble)
+          }).qcd)
         .toTag(`div`, `normal b5`)
       )
       .value );
@@ -217,15 +217,15 @@ function camelCaseEx() {
       .append(
         $S("$S`convert-me`.camelCase").toCode
           .append( $S`convert-me`
-            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .camelCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`convert me please`.camelCase").toCode
           .append( $S`convert me please`
-            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .camelCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("you -- should convert &nbsp;&nbsp;&nbsp;-me &nbsp;&nbsp;&nbsp;too.camelCase").toCode
           .append( $S`you -- should convert    -me    too`
-            .camelCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .camelCase.qcd.prefix(" => ")).asDiv )
       .value,
   );
 }
@@ -239,8 +239,8 @@ function cloneEx() {
       .append( $S`Clone an instance`.toTag("div", "normal b5") )
       .append( exampleCode.cloneExample )
       .append(
-        $S`cloned`.toCode.append(cloned.quote.curlyDouble.prefix("=>")).asDiv,
-        $S`toClone`.toCode.append(toClone.quote.curlyDouble.prefix("=>")).asDiv
+        $S`cloned`.toCode.append(cloned.qcd.prefix("=>")).asDiv,
+        $S`toClone`.toCode.append(toClone.qcd.prefix("=>")).asDiv
       ).value,
   );
 }
@@ -252,10 +252,10 @@ function firstUpEx() {
         .toTag("div", "normal b5") )
       .append(
         $S("$S`hello world`.firstUp").toCode,
-        $S`hello world`.firstUp.quote.curlyDouble.prefix(" => ")).asDiv
+        $S`hello world`.firstUp.qcd.prefix(" => ")).asDiv
       .append(
         $S("$S`   hello world`.trim().firstUp").toCode,
-        $S`hello world`.trim().firstUp.quote.curlyDouble.prefix(" => ")).asDiv
+        $S`hello world`.trim().firstUp.qcd.prefix(" => ")).asDiv
       .value,
   );
 }
@@ -290,24 +290,24 @@ function snakeCaseEx() {
       .append(
         $S("$S`convertMe`.snakeCase").toCode
           .append( $S`convertMe`
-            .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .snakeCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert-Me Please`.snakeCase").toCode
           .append( $S`Convert Me Please`
-            .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .snakeCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
           .append( $S`Convert Me _    Please`
-            .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .snakeCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
           .append( $S`Convert Me, PlËase $#!`.snakeCase
             .replace("plase", "<b class='red'>plase</b>")
-            .quote.curlyDouble.prefix(" => ")).asDiv )
+            .qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`42 Convert Me, please`.snakeCase").toCode
           .append( $S`42 Convert Me, Please`
-            .snakeCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .snakeCase.qcd.prefix(" => ")).asDiv )
       .value,
   );
 }
@@ -327,24 +327,24 @@ function kebabCaseEx() {
         .toTag("div", "normal b5") )
       .append(
         $S("$S`ConvertMe`.kebabCase").toCode
-          .append( $S`ConvertMe`.kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+          .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert-Me Please`.kebabCase").toCode
           .append( $S`Convert Me Please`
-            .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
           .append( $S`Convert Me --    Please`
-            .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert Me, pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
           .append( $S`Convert Me, Plëase $#!`.kebabCase
             .replace("plase", "<b class='red'>plase</b>")
-            .quote.curlyDouble.prefix(" => ")).asDiv )
+            .qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`42 Convert Me, please`.kebabCase").toCode
           .append( $S`42 Convert Me, Please`
-            .kebabCase.quote.curlyDouble.prefix(" => ")).asDiv )
+            .kebabCase.qcd.prefix(" => ")).asDiv )
       .value,
   );
 }
@@ -374,7 +374,7 @@ function trimAllEx() {
         cleanupStr1,
         $S`<pre>${$S`clean    me
           
-             please!   `.trimAll.quote.curlyDouble.prefix(`=> `)}</pre>`.asDiv)
+             please!   `.trimAll.qcd.prefix(`=> `)}</pre>`.asDiv)
       .append(
         $S`Example 2`.toTag(`h3`, `head between`),
         $S`<pre><code>$S\`clean me
@@ -384,7 +384,7 @@ function trimAllEx() {
             ( please !  )   
           {  ok  ? }
           \`.trimAll</code></pre>`
-          .append( `<pre>${$S`${cleanupStr2}`.trimAll.quote.curlyDouble.prefix(" => ")}</pre>`).asDiv )
+          .append( `<pre>${$S`${cleanupStr2}`.trimAll.qcd.prefix(" => ")}</pre>`).asDiv )
       .append(
         $S`Example 2a`.toTag(`h3`, `head between`),
         $S("We created a custom getter called <code>trimEverything</code> with a " +
@@ -398,7 +398,7 @@ function trimAllEx() {
             ( please !  )   
           {  ok  ? }
           \`.trimEverything</code></pre>`
-          .append( `<pre>${$S`${cleanupStr2}`.trimEverything.quote.curlyDouble.prefix(" => ")}</pre>`).asDiv )
+          .append( `<pre>${$S`${cleanupStr2}`.trimEverything.qcd.prefix(" => ")}</pre>`).asDiv )
       .value,
   );
 }
@@ -422,7 +422,7 @@ function trimAllKeepLFEx() {
       .append(
         $S`<pre>${$S`clean    me
             
-               please!   `.trimAllKeepLF.quote.curlyDouble.prefix(`=> `)}</pre>`
+               please!   `.trimAllKeepLF.qcd.prefix(`=> `)}</pre>`
         .asDiv
       )
     ).value
@@ -441,11 +441,11 @@ function undoEx() {
     .append(
       $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
         .toCode
-        .append(` => `, $S(initial.value).quote.curlyDouble).asDiv ) 
+        .append(` => `, $S(initial.value).qcd).asDiv ) 
     .append(
       $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
       .toCode
-      .append(` => `, $S(initial.undo.value).quote.curlyDouble).asDiv ) 
+      .append(` => `, $S(initial.undo.value).qcd).asDiv ) 
     .value
   );
 }
@@ -462,11 +462,11 @@ function undoAllEx() {
       .append(
         $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
           .toCode
-          .append(` => `, $S(initial.value).quote.curlyDouble).asDiv )
+          .append(` => `, $S(initial.value).qcd).asDiv )
       .append(
         $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undoAll")
           .toCode
-          .append(` => `, $S(initial.undoAll.value).quote.curlyDouble).asDiv )
+          .append(` => `, $S(initial.undoAll.value).qcd).asDiv )
       .value
   );
 }
@@ -489,7 +489,7 @@ function valueEx() {
       $S`if the given value is not a string, setting it will do nothing`.asNote )
     .toTag("div", "normal b5")
     .append(exampleCode.valueExample1) 
-    .append(`<code>empty.value</code> => `, $S(empty.value).quote.curlyDouble).asDiv
+    .append(`<code>empty.value</code> => `, $S(empty.value).qcd).asDiv
     .append(
       `<br>`,
       $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
@@ -497,8 +497,8 @@ function valueEx() {
       .asDiv
     )
     .append(exampleCode.valueExample2)
-    .append(`<code>empty.value</code> => `, $S(empty2.value).quote.curlyDouble).asDiv
-    .append(`<code>emptyClone.value</code> => `, $S(emptyClone.value).quote.curlyDouble).asDiv
+    .append(`<code>empty.value</code> => `, $S(empty2.value).qcd).asDiv
+    .append(`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd).asDiv
     .value
   );
 }
@@ -577,6 +577,8 @@ async function createCodeElement() {
       $.code({class: "language-javascript"}, code) ) )
     .hide();
   
+  
+  
   $.delegate(`click`, `#codeVwr`, evt => {
     const bttn = evt.target;
     const parentLi = bttn.closest(`li`);
@@ -588,8 +590,8 @@ async function createCodeElement() {
     }
     
     if (!parentLi.querySelector(`#codeOverlay`)) {
-      console.log(`once ...`);
       codeOverlay.toDOM(parentLi);
+      Prism.highlightAll();
     }
     
     codeOverlay.show();
@@ -608,7 +610,8 @@ function addCustomized() {
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
-  $S.addCustom({name: `asDiv`, method(me) {return me.toTag("div", "normal"); }, isGetter: true});
+  $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
+  $S.addCustom({name: `asDiv`, method(me) { return me.toTag("div", "normal"); }, isGetter: true});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
   $S.addCustom({
     name: `asNote`, method: me =>
