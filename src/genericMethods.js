@@ -10,6 +10,7 @@ export {
   isArrayOf,
   defineQuotingStyles,
   getStringValue,
+  escapeRE,
 };
 
 function resolveTemplateString(str, ...args) {
@@ -121,6 +122,11 @@ function createExtendedCTOR(ctor, customMethods) {
   });
   
   return ctor;
+}
+
+function escapeRE(reString, modifiers) {
+  
+  return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
 }
 
 function defineQuotingStyles() {
