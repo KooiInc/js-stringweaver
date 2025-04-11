@@ -38,8 +38,6 @@ describe(`Basics constructor`, () => {
         'clone',
         'constructor',
         'enclose',
-        'extract',
-        'find',
         'firstUp',
         'format',
         'history',
@@ -74,8 +72,6 @@ describe(`Basics constructor`, () => {
         'clone (chainable getter)',
         'constructor (method, String override)',
         'enclose (chainable method)',
-        'extract (chainable method)',
-        'find (method)',
         'firstUp (chainable getter)',
         'format (chainable method)',
         'history (getter)',
@@ -333,116 +329,6 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(y.value, `Hi`);
   });
   
-  it(`find as expected (multiple paths)`, () => {
-    const myStr = $S`Hello, here we are, aren't we?`;
-    
-    assert.deepStrictEqual(myStr.find({terms: `we`}), {
-      "searched4": "we",
-      "caseSensitive": "no",
-      "foundAny": true,
-        "hits": 2,
-        "result": {
-          "we": {
-            "at": [
-              12,
-              27
-            ]
-          }
-        }
-      }, "{terms: `we`} cs undefined" );
-    
-    assert.deepStrictEqual(myStr.find({terms: [`here`, `we`]}), {
-        "searched4": "here, we",
-        "caseSensitive": "no",
-        "foundAny": true,
-        "hits": 3,
-        "result": {
-          "here": {
-            "at": [
-              7
-            ]
-          },
-          "we": {
-            "at": [
-              12,
-              27
-            ]
-          }
-        }
-      }, "{terms: [`here`, `we`]} cs undefined");
-    
-    assert.deepStrictEqual(myStr.find({terms: [`here`, `WE`], caseSensitive: true}), {
-      "searched4": "here, WE",
-      "caseSensitive": "YES",
-      "foundAny": true,
-      "hits": 1,
-      "result": {
-        "here": {
-          "at": [
-            7
-          ]
-        }
-      }
-    }, "{terms: [`here`, `WE`], caseSensitive: true}  cs true" );
-    
-    assert.deepStrictEqual(myStr.find({terms: /we/g}), {
-      "searched4": "/we/g",
-      "caseSensitive": "YES",
-      "foundAny": true,
-      "hits": 2,
-      "result": {
-        "we": {
-          "at": [
-            12,
-            27
-          ]
-        }
-      }
-    }, "{terms: /we/g}  cs from RE" );
-    
-    assert.deepStrictEqual(myStr.find({terms: /we|HERE/g}), {
-      "searched4": "/we|HERE/g",
-      "caseSensitive": "YES",
-      "foundAny": true,
-      "hits": 2,
-      "result": {
-        "we": {
-          "at": [
-            12,
-            27
-          ]
-        }
-      }
-    }, "{terms: /we|HERE/g} cs from RE" );
-        
-    assert.deepStrictEqual(myStr.find({terms: /we|HERE|hello/gi}), {
-      "searched4": "/we|HERE|hello/gi",
-      "caseSensitive": "no",
-      "foundAny": true,
-      "hits": 4,
-      "result": {
-        "Hello": {
-          "at": [
-            0
-          ]
-        },
-        "here": {
-          "at": [
-            7
-          ]
-        },
-        "we": {
-          "at": [
-            12,
-            27
-          ]
-        }
-      }
-    }, "{terms: /we|HERE|hello/gi}  cs from RE /i" );
-    
-    assert.deepStrictEqual($S``.find({terms: /we|HERE|hello/gi}), {hits: `n/a`, result: `input is empty`}, "empty input" );
-  });
-  
   it(`[instance].constructor is CustomStringConstructor`, () => {
     assert.deepStrictEqual($S``.constructor, CustomStringConstructor);
     assert.strictEqual($S``.constructor.name, `CustomStringConstructor`);
@@ -482,12 +368,6 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
   })
   
-  it(`extract as expected`, () => {
-    const hi = $S`I said hello world didn't I?`;
-    assert.strictEqual(hi.extract(7, 18).value, `hello world`);
-    assert.strictEqual($S``.extract(7, 18).value, ``, `empty string`);
-  });
-    
   it(`format as expected`, () => {
     // alias: interpolate
     const hi = $S`- hello dear {wrld}`.format({wrld: `you `}, {wrld: `world`});
@@ -602,6 +482,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`prefix empty input string as expected`, () => {
       const hi = $S``.prefix(`HI`, ` `, `THERE`);
       assert.strictEqual(hi.value, `HI THERE`);
+    });
+    
+    it(`prefix (one of) input not a string as expected`, () => {
+      const hi = $S`HI`.prefix(`there`, [42]);
+      assert.strictEqual(hi.value, `HI`);
     });
   });
   

@@ -1,6 +1,6 @@
 import {
   format, ucFirst, truncate, trimAll, replaceWords,
-  find, indexOf, lastIndexOf, insert, append, prefix,
+  indexOf, lastIndexOf, insert, append, prefix,
   getStringValue, quotGetters, surroundWith,
   toCamelcase, wordsFirstUp, toDashedNotation, toSnakeCase,
 } from "./instanceMethods.js";
@@ -18,7 +18,6 @@ function instanceCreator({initialstring, customMethods} = {}) {
   Object.defineProperties(customStringExtensions, { 
     append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable },
     enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable },
-    find: { value({terms, caseSensitive = false} = {}) { return find(actualValue, {terms, caseSensitive}); }, enumerable },
     format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
     indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable },
     interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },

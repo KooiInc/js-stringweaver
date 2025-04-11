@@ -4,9 +4,9 @@ import {isArrayOf, isNumber, defineQuotingStyles, getStringValue} from "./generi
 const quotingStyles = defineQuotingStyles();
 
 export {
-  format, ucFirst, truncate, extract, trimAll, 
-  replaceWords, find, indexOf, lastIndexOf, insert,
-  append, isNumber, prefix, getStringValue, toCamelcase,
+  format, ucFirst, truncate, trimAll, replaceWords,
+  indexOf, lastIndexOf, insert, append,
+  isNumber, prefix, getStringValue, toCamelcase,
   wordsFirstUp, toDashedNotation, quotGetters,
   surroundWith, defineQuotingStyles, toSnakeCase,
 };
@@ -86,8 +86,6 @@ function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
   );
 }
 
-function extract(str, start, end) { return str.slice(start || 0, end); }
-
 function trimAll(string,  keepLines) {
   return checkAndRun(string, () => {
     const lines = string
@@ -116,34 +114,6 @@ function replaceWords(string, {replacements = [], caseSensitive = false} = {}) {
     
     return string;  
   });
-}
-
-function find(string, {terms, caseSensitive = false} = {}) {
-  return checkAndRun(string, () => {
-    const termsIsArrayOfStrings = isArrayOf(String, terms);
-    const termsIsSingleString = terms?.constructor === String;
-    const termsIsRE = terms?.constructor === RegExp;
-    caseSensitive = caseSensitive?.constructor !== Boolean ? false : caseSensitive;
-    terms = termsIsRE || termsIsArrayOfStrings ? terms : termsIsSingleString && [terms] || undefined;
-    
-    if (!terms) {
-      return {hits: `n/a`, result: `please provide valid search terms`};
-    }
-    
-    const xCase = !termsIsRE && (!caseSensitive ? `i` : ``) || ``;
-    if (termsIsRE && !/g/.test(terms.flags)) { terms = RegExp(terms, `g${terms.flags}`); }
-    const re = termsIsRE ? terms : RegExp(terms.join(`|`), `g${xCase}`);
-    let result = [...string.matchAll(re)];
-    const hits = result?.length;
-    const foundAny = hits > 0;
-    const caseSensitiveTxt = /i/.test(re.flags) ? `no` : `YES`;
-    
-    result = foundAny
-      ? result.reduce( (acc, v) =>
-        ({...acc, ...{ [v[0]]: { at: ( acc[v[0]]?.at || []).concat(v.index) } } } ),{})
-      : {};
-    return { searched4: termsIsRE ? terms.toString() : terms.join(`, `), caseSensitive: caseSensitiveTxt, foundAny, hits, result };  
-  }, {hits: `n/a`, result: `input is empty`});
 }
 
 // SEE https://youtu.be/99Zacm7SsWQ?t=2101
