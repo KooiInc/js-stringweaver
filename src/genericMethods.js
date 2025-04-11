@@ -20,14 +20,14 @@ function getStringValue(string) {
   return string?.value || (string?.constructor === String && string) || ``;
 }
 
-function checkType(type, item) {
-  return type === String
+function checkType(type, item, includeInstances) {
+  return type === String && includeInstances
     ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
     : item?.constructor !== type;
 }
 
-function isArrayOf(type, value) {
-  return Array.isArray(value) && value.length > 0 && !value.find(v => checkType(type, v));
+function isArrayOf(type, value, includeInstances = true) {
+  return Array.isArray(value) && value.length > 0 && !value.find(v => checkType(type, v, includeInstances));
 }
 
 function isNumber(value) {
