@@ -120,6 +120,57 @@ const ex3 = $S("replace /.+me\\").replaceWords({
 
 const ex4 = $S("repläce me").replaceWords({
     replacements: {"repläce": "Hello", me: $S`세계`.festive}});
+
+const ex5 = ex4.clone.replaceWords({
+    replacements: {"🎉": "😋"} });    
 </template>
+
+<template id="truncateExample">
+const testStr = $S`Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+   sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+   quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat 
+   nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
+   sunt in culpa qui officia deserunt mollit anim id est laborum.`
+const examples = {
+  const examples = {
+     ex1: testStr.clone.truncate({at: 15}),
+     ex2: testStr.clone.truncate({at: 35, wordBoundary: true}),
+     //                                   ↳ boundary is ","
+     ex3: testStr.clone.truncate({at: 20, html: true}),
+     ex4: testStr.clone.truncate({at: 20, html: true, wordBoundary: true}),
+     //                                               ↳ boundary is "&amp;lt;space>"
+     ex5: testStr.clone.truncate({at: 28, html: true, wordBoundary: true}),
+     //                                               ↳ boundary is "]"
+     ex6: testStr.clone.truncate({at: 355, html: true}),
+     ex7: testStr.clone.truncate({at: 350, html: true, wordBoundary: true}),
+     //                                                ↳ boundary is ")"
+     ex8: testStr.clone.truncate({at: 27, wordBoundary: true})
+     //                                   ↳ boundary is "}"
+  };
+};
+</template>
+
+<template id="undoLastExample">
+const undoExample = $S("START");
+undoExample
+  .prefix("Hello")
+  .insert({value: " ... ", at: 5})
+  .append(" ... ")
+  .append("world")
+  .festive;
+const cloned = undoExample.clone;
+const examples = {
+  get ex1() { return undoExample; },
+  get ex2() { return undoExample.undoLast(1); },
+  get ex3() { return undoExample.undoLast(2); },
+  get ex4() { return undoExample.undoLast(10); },
+  //                                      ↳ equals [instance].undoAll
+  get ex5() { return cloned.undoLast(1); },
+  get ex6() { return cloned.undoLast(-3); },
+  //                                  ↳ equals [instance].undoAll
+};
+</template>
+
 <template>
 </template>
