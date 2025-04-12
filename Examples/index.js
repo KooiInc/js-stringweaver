@@ -132,8 +132,6 @@ function printMethodExamples() {
   replaceWordsEx();
   truncateEx();
   undoLastEx();
-  // wip
-  window.scrollTo(0, 15000);
 }
 
 /* region static constructor function examples */
