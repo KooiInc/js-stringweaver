@@ -123,7 +123,6 @@ function printGetterExamples() {
 
 function printMethodExamples() {
   log($S("Instance methods").toTag(`h2`, `head`).value,);
-  log($S`&hellip; Work in Progress &hellip;`.asNote.asDiv.toTag(`h3`, `head`).value);
   appendEx();
   encloseEx();
   indexOfEx();
@@ -131,8 +130,10 @@ function printMethodExamples() {
   insertEx();
   prefixEx();
   replaceWordsEx();
+  truncateEx();
+  undoLastEx();
   // wip
-  window.scrollTo(0, 5000);
+  window.scrollTo(0, 15000);
 }
 
 /* region static constructor function examples */
@@ -277,14 +278,18 @@ function camelCaseEx() {
 }
 
 function cloneEx() {
-  const toClone = $S("I shall be cloned");
+  const toClone = $S("I shall be ").append("cloned");
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
   
   log(
     $S(" [instance].clone").toTag(`h3`, `head code`)
-      .append( $S`Clone an instance`.toTag("div", "normal b5") )
+      .append( $S`Clone the instance.`.asDiv )
+      .append( $S("the history of the originating instance is also cloned")
+        .asNote
+        .toTag("div", "normal b5"))
       .append( exampleCode.cloneExample )
       .append(
+        $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")).asDiv,
         $S`cloned`.toCode.append(cloned.qcd.prefix("=>")).asDiv,
         $S`toClone`.toCode.append(toClone.qcd.prefix("=>")).asDiv
       ).value,
@@ -836,6 +841,8 @@ function replaceWordsEx() {
     replacements: {replace: "Hello", "/.+me\\": $S`world`.quote.squareBrackets}});
   const ex4 = $S("repläce me").replaceWords({
     replacements: {"repläce": "Hello", me: $S`세계`.festive}});
+  const ex5 = ex4.clone.replaceWords({
+    replacements: {"🎉": "😋"} });
   
   log(
     $S(" [instance].replaceWords({replacements:{&ltstring,string|instance>}, caseSensitive:boolean=false})")
@@ -867,21 +874,97 @@ function replaceWordsEx() {
       $S`ex4`.toCode.append(` => `, ex4.qcd.value)
     ).asDiv
       
+    .append(
+      $S`ex5`.toCode.append(` => `, ex5.qcd.value)
+    ).asDiv
+      
     .value
   );
   
 }
 
-function toStringEx() {
-  
-}
-
 function truncateEx() {
+  const testStr = $S`Lorem ipsum dolor {sit} [a]met, consectetur adipiscing elit, 
+   sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
+   quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat 
+   (nulla) pariatur. Excepteur sint occaecat cupidatat non proident, 
+   sunt in culpa qui officia deserunt mollit anim id est laborum.`.trimAll;
+  const examples = {
+     ex1: testStr.clone.truncate({at: 15}),
+     ex2: testStr.clone.truncate({at: 35, wordBoundary: true}),
+     ex3: testStr.clone.truncate({at: 20, html: true}),
+     ex4: testStr.clone.truncate({at: 20, html: true, wordBoundary: true}),
+     ex5: testStr.clone.truncate({at: 28, html: true, wordBoundary: true}),
+     ex6: testStr.clone.truncate({at: 355, html: true}),
+     ex7: testStr.clone.truncate({at: 350, html: true, wordBoundary: true}),
+     ex8: testStr.clone.truncate({at: 27, wordBoundary: true})  
+  };
   
+  const allInOne = $S(" [instance].truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
+    .toTag(`h3`, `head code`)
+    .append(
+      $S`Truncates the instance string value at position <code>[at]</code> and append 
+        either three dots ("..." <code>html: false</code>) or "&amphellip; (&hellip;)" <code>html: true</code>.
+        If <code>wordBoundary</code> is true truncation is done at the nearest possible word boundary (of the
+        the truncated string). Word boundaries are for example ;, ), }, &lt;space>, &lt;tab> ... etc.`
+    ).toTag("div", "normal b5")
+    .append(exampleCode.truncateExample);
+  
+  const exLen = Object.keys(examples).length;
+  
+  for (let i = 0; i < exLen; i += 1) {
+    allInOne.append(
+      $S`ex${i+1}`
+        .toCode
+        .append(` => `, examples[`ex${i+1}`].qcd).value).asDiv;
+  }
+  
+  log(allInOne.value);
 }
 
 function undoLastEx() {
+  const undoExample = $S("START");
+  undoExample
+    .prefix("Hello")
+    .insert({value: " ... ", at: 5})
+    .append(" ... ")
+    .append("world")
+    .festive;
+  const cloned = undoExample.clone;
+  const examples = {
+    get ex1() { return undoExample; },
+    get ex2() { return undoExample.undoLast(1); },
+    get ex3() { return undoExample.undoLast(2); },
+    get ex4() { return undoExample.undoLast(10); },
+    get ex5() { return cloned.undoLast(1); },
+    get ex6() { return cloned.undoLast(-3); },
+  };
   
+  const allInOne = $S(" [instance].undoLast(nSsteps:number)")
+    .toTag(`h3`, `head code`)
+    .append(
+      $S`Sets the instance value back to <code>nSteps</code> in its history` )
+    .toTag("div", "normal b5")
+    
+    .append(exampleCode.undoLastExample)
+      
+    .append($S`<code>undoExample.history</code>`
+      .append(" => ", `[${undoExample.history.join(`, `)}]`).asDiv)
+    
+    .append($S`<code>cloned.history</code>`
+      .append(" => ", `[${cloned.history.join(`, `)}]`).asDiv);
+  
+  const exLen = Object.keys(examples).length;
+  
+  for (let i = 0; i < exLen; i += 1) {
+    allInOne.append(
+      $S`ex${i+1}`
+        .toCode
+        .append(` => `, $S`${examples[`ex${i+1}`]}`.qcd)).asDiv;
+  }
+  
+  log(allInOne.value);
 }
 
 function valueOfEx() {
@@ -972,16 +1055,16 @@ function addCustomized() {
 
 function toCodeBlock(str) {
   return `<pre class="line-numbers language-javascript"><code class="language-javascript">${
-    str}</code></pre>`;
+    str.trim()}</code></pre>`;
 }
 
 function getCodeblocks(templates) {
-  const exampleBlocks = templates.find(`template`);
+  const exampleBlocks = templates.find(`template[id]`);
   
   return [...exampleBlocks].reduce( (acc, block) => {
     const codeTemplate = 
       $S`<pre class="language-javascript line-numbers"><code class="language-javascript">{code}</code></pre>`;
-    return { 
+    return {
       ...acc, 
       [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
   }, {});
