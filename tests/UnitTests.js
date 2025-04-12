@@ -497,32 +497,32 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
     
     it (`case sensitive multiple replacements`, () => {
-      const ccs = $S`hello world!`.replaceWords({replacements: [`hello`, `hi`, `World`, `universe`], caseSensitive: true});
+      const ccs = $S`hello world!`.replaceWords({replacements: {hello: `hi`, World: `universe`}, caseSensitive: true});
       assert.strictEqual(ccs.value, `hi world!`);
     });
     
-    it(`case sensitive multiple replacements`, () => {
-      const cci = $S`hello world!`.replaceWords({replacements: [`hello`, `hi`, `World`, `universe`]});
+    it(`case insensitive multiple replacements`, () => {
+      const cci = $S`hello world!`.replaceWords({replacements: {hello: `hi`, World: `universe`}});
       assert.strictEqual(cci.value, `hi universe!`);
     });
     
     it(`single replacement as expected`, () => {
-      const cci = $S`hello world!`.replaceWords({replacements: [`hello`, `hi`]});
+      const cci = $S`hello world!`.replaceWords({ replacements: {hello: `hi`} });
       assert.strictEqual(cci.value, `hi world!`);
     });
     
     it(`single replacement case sensitive as expected`, () => {
-      const ccs = $S`hello world!`.replaceWords({replacements: [`HELLO`, `hi`], caseSensitive: true});
+      const ccs = $S`hello world!`.replaceWords({replacements: {HELLO: `hi`}, caseSensitive: true});
       assert.strictEqual(ccs.value, `hello world!`);
     });
     
     it(`invalid nr of replacement parameters as expected`, () => {
-      const ccs = $S`hello world!`.replaceWords({replacements: [`HELLO`, `hi`, `hello`]});
+      const ccs = $S`hello world!`.replaceWords({replacements: {HELLO: `hi`}});
       assert.strictEqual(ccs.value, `hi world!`);
     });
     
     it(`empty input string as expected`, () => {
-      const ccs = $S``.replaceWords({replacements: [`HELLO`, `hi`, `hello`]});
+      const ccs = $S``.replaceWords({replacements: {}});
       assert.strictEqual(ccs.value, ``);
     });
   });
@@ -585,8 +585,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
     
     it(`truncate (not html entity, wordBoundary true) as expected`, () => {
-      const hi = $S`Hello universe say no more`;
-      assert.strictEqual(hi.truncate({at: 8, wordBoundary: true}).value, `Hello...`);
+      const hi = $S`Hello, (universe) say no more`;
+      assert.strictEqual(hi.truncate({at: 8, wordBoundary: true}).value, `Hello,...`);
     });
     
     it(`truncate (html entity) as expected`, () => {
@@ -595,8 +595,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
     
     it(`truncate (html entity, wordBoundary true) as expected`, () => {
-      const hi = $S`Hello universe say no more`;
-      assert.strictEqual(hi.truncate({at: 16, html: true, wordBoundary: true}).value, `Hello universe&hellip;`);
+      const hi = $S`Hello universe: say no more`;
+      assert.strictEqual(hi.truncate({at: 18, html: true, wordBoundary: true}).value, `Hello universe:&hellip;`);
     });
     
     it(`truncate at >= input length as expected`, () => {

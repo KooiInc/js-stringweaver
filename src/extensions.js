@@ -12,7 +12,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
   let customStringExtensions = { };
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = initialstring?.constructor === String ? initialstring : ``;
-  const history = [actualValue];
+  let history = [actualValue];
   const enumerable = false;
   
   Object.defineProperties(customStringExtensions, { 
@@ -37,11 +37,14 @@ function instanceCreator({initialstring, customMethods} = {}) {
     undoLast: { value(nSteps) { return undoSteps(nSteps); }, enumerable },
 
     camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable },    
-    clone: { get() { return $S(actualValue); }, enumerable },
+    clone: { get() { return clone(); }, enumerable },
     constructor: { get() { return $S.constructor; }, enumerable },
     kebabCase: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable },
     firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable },
-    history: { get() { return history; }, enumerable },
+    history: { 
+      get() { return history; },
+      set(value) { history = value; },
+      enumerable },
     quote: quotGetters(instance, wrap),
     snakeCase: { get() { return wrap(toSnakeCase(getStringValue(actualValue))); } },
     trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable },
@@ -51,7 +54,10 @@ function instanceCreator({initialstring, customMethods} = {}) {
     wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); }, enumerable },
     value: { 
       get() { return actualValue; }, 
-      set(value) { actualValue = getStringValue(value).length ? value : actualValue; }, enumerable },
+      set(value) { 
+        actualValue = getStringValue(value).length ? value : actualValue;
+        history.push(actualValue);
+      }, enumerable },
   });
   
   injectCustomMethods(customMethods);
@@ -70,6 +76,12 @@ function instanceCreator({initialstring, customMethods} = {}) {
     };
   }
   
+  function clone() {
+    const newInstance = $S(actualValue);
+    newInstance.history = [...history];
+    return newInstance;
+  }
+  
   function wrapNative(key) {
     return actualValue[key] instanceof Function
       ? function(...args) {
@@ -85,9 +97,20 @@ function instanceCreator({initialstring, customMethods} = {}) {
   }
   
   function undoSteps(steps) {
-    if (!isNumber(steps)) { return wrap(actualValue, false); }
-    steps = history.length - steps;
-    while(history.length > steps ) { history.pop(); }
+    if (!isNumber(steps)) {
+      return wrap(actualValue, false); 
+    }
+    
+    const historyLen = history.length;
+    
+    if (steps >= historyLen || steps < 1) {
+      history = history.slice(0, 1);
+      actualValue = history.at(-1); 
+      return wrap(history.at(-1), false);  
+    }
+    
+    history = history.slice(0, historyLen - steps);
+    
     actualValue = history.at(-1);
     return wrap(actualValue, false);
   }
