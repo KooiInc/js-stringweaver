@@ -78,9 +78,12 @@ function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
     
     const subString = string.slice(0, at - 1);
     const endwith = html ? "&hellip;" : `...`;
+    const boundary = wordBoundary 
+      ? [...subString.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1)?.index ?? subString.length 
+      : subString.length;
     
     return (wordBoundary
-      ? subString.slice(0, subString.lastIndexOf(" "))
+      ? subString.slice(0, boundary+1).trim()
       : subString) + endwith; 
     }
   );
