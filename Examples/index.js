@@ -895,7 +895,7 @@ function truncateEx() {
      ex4: testStr.clone.truncate({at: 20, html: true, wordBoundary: true}),
      ex5: testStr.clone.truncate({at: 28, html: true, wordBoundary: true}),
      ex6: testStr.clone.truncate({at: 355, html: true}),
-     ex7: testStr.clone.truncate({at: 350, html: true, wordBoundary: true}),
+     ex7: testStr.clone.truncate({at: 340, html: true, wordBoundary: true}),
      ex8: testStr.clone.truncate({at: 27, wordBoundary: true})  
   };
   
@@ -903,7 +903,7 @@ function truncateEx() {
     .toTag(`h3`, `head code`)
     .append(
       $S`Truncates the instance string value at position <code>[at]</code> and append 
-        either three dots ("..." <code>html: false</code>) or "&amphellip; (&hellip;)" <code>html: true</code>.
+        either three dots ("..." <code>html: false</code>) or "&amp;hellip; (&hellip;)" <code>html: true</code>.
         If <code>wordBoundary</code> is true truncation is done at the nearest possible word boundary (of the
         the truncated string). Word boundaries are for example ;, ), }, &lt;space>, &lt;tab> ... etc.`
     ).toTag("div", "normal b5")
