@@ -844,7 +844,7 @@ function interpolateEx() {
       $S`Alias for <code><a
         class="externalLink arrow"
         target="_top"
-        data-internal="[instance].format example" href="#formatEx">[instance].format</a></code>`.asDiv
+        data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`.asDiv
     ).toTag("div", "normal b5").value
   ) 
 }
