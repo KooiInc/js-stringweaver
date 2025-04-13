@@ -576,7 +576,7 @@ function wordsFirstUpEx() {
         $S("$S`hello world`.wordsUCFirst").toCode,
         $S`hello world`.wordsUCFirst.qcd.prefix(" => ")).asDiv
       .append(
-        $S("$S`   hello world and whatNOT`.trim().firstUp").toCode,
+        $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
         $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")).asDiv
       .value,
   );
