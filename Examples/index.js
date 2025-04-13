@@ -127,6 +127,7 @@ function printGetterExamples() {
   undoEx();
   undoAllEx();
   valueEx();
+  wordsFirstUpEx();
 }
 
 function printMethodExamples() {
@@ -563,6 +564,21 @@ function valueEx() {
     .append(`<code>empty.value</code> => `, $S(empty2.value).qcd).asDiv
     .append(`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd).asDiv
     .value
+  );
+}
+
+function wordsFirstUpEx() {
+  log(
+    $S(" .wordsUCFirst").toIdTag({tag: "h3", id: "getter-wordsucfirst", className: "head code"})
+      .append( $S`Converts the first letter of every word of the instance string to upper case.`
+        .toTag("div", "normal b5") )
+      .append(
+        $S("$S`hello world`.wordsUCFirst").toCode,
+        $S`hello world`.wordsUCFirst.qcd.prefix(" => ")).asDiv
+      .append(
+        $S("$S`   hello world and whatNOT`.trim().firstUp").toCode,
+        $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")).asDiv
+      .value,
   );
 }
 /* endregion getter examples */
