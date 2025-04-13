@@ -2,6 +2,7 @@ import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
 import {default as $S} from "../index.js";
 const exampleCode = await fetchTemplates();
+let codeOverlay;
 initStyling();
 window.$S = $S; // try it out in the console
 const {log, logTop} = logFactory();
@@ -26,6 +27,7 @@ function trimAllAlternative(string) {
 }
 
 function demonstrate() {
+  setDelegates();
   createCodeElement().then(_ => Promise.resolve(`ok`));
   addCustomized();
   printInitializationExamples();
@@ -33,35 +35,37 @@ function demonstrate() {
   printGetterExamples();
   printMethodExamples();
   printHeader();
+  createTOC();
+  $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
   Prism.highlightAll();
 }
 
 function printInitializationExamples() {
   log(
     $S`Initialization`
-      .toTag(`h2`, `head`)
+      .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
       .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.toTag(`div`, `normal`))
       .value,
     
-    $S` As tagged template:`.toTag(`h3`, `head code`)
+    $S`As tagged template`.toIdTag({tag: "h3", id: "initialization-astt", className: "head code"})
       .append($S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
         .append($S`hello world`.qcd))
       .value,
     
-    $S` As function call: `.toTag(`h3`, `head code`)
+    $S`As function call`.toIdTag({tag: "h3", id: "initialization-asfn", className: "head code"})
       .append($S`$S("hello world")`.toCode)
       .append($S(`hello world`).qcd.prefix(` => `)).value,
     
-    $S` Instance methods are chainable`
-      .toTag(`h3`, `head code`)
+    $S`Instance methods are chainable`
+      .toIdTag({tag: "h3", id: "initialization-instance-chainable", className: "head code"})
       .append($S`$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode)
       .append(`<br> => `)
       .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd)
       .value,
     
-    $S` Native string function results are chainable`
-      .toTag(`h3`, `head code`)
+    $S`Native string function results are chainable`
+      .toIdTag({tag: "h3", id: "initialization-native-chainable", className: "head code"})
       .append(
         $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward`.toCode,
         `<br>=> `,
@@ -71,30 +75,34 @@ function printInitializationExamples() {
 }
 
 function printStaticConstructorFunctionExamples() {
+  const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
   log(
-    $S`$S static stringweaver constructor properties/methods`.toTag(`h2`, `head`).value,
-    
-    $S` $S.keys`.toTag(`h3`, `head code`).toTag(`summary`)
-      .append($S`includes user defined custom property/method keys`.asNote.toTag(`div`, `normal`))
+    $S`Static constructor properties/methods`
+      .toIdTag({tag: "h2", id: "chapter-static", className: "head code"}).value,
+      $S`${h3("$S.keys", "static-keys")}`
+      .toTag(`summary`)
+      .append($S`includes user defined custom property/method keys`.asNote)
       .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`))
-      .toTag(`details`)
+      .toTag(`details`, 'in-content')
       .toTag(`div`, `normal`)
       .value,
     
-    $S` $S.info`.toTag(`h3`, `head code`).toTag(`summary`)
-      .append($S`includes user defined custom properties/methods`.asNote.toTag(`div`, `normal`))
+      $S`${h3("$S.info", "static-info")}`
+      .toTag(`summary`)
+      .append($S`includes user defined custom properties/methods`.asNote)
       .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`))
-      .toTag(`details`)
+      .toTag(`details`, 'in-content')
       .toTag(`div`, `normal`)
       .value,
     
-    $S` $S.quoteInfo`.toTag(`h3`, `head code`).toTag(`summary`)
+      $S`${h3("$S.info", "static-quoteinfo")}`
+      .toTag(`summary`)
       .append($S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`))
-      .toTag(`details`)
+      .toTag(`details`, 'in-content')
       .toTag(`div`, `normal`)
       .value,
     
-    $S` $S.constructor`.toTag(`h3`, `head code`)
+    $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
       .append($S`Result: `.prefix(`=> `).toTag(`b`))
       .append($S`function ${$S.constructor.name}(str, ...args) {...}`.toCode)
       .toTag(`div`, `normal`)
@@ -107,7 +115,7 @@ function printStaticConstructorFunctionExamples() {
 }
 
 function printGetterExamples() {
-  log($S("Instance getters").toTag(`h2`, `head`).value);
+  log($S("Instance getters").toIdTag({tag: "h2", id: "chapter-getter", className: "head code"}).value);
   camelCaseEx();
   cloneEx();
   firstUpEx();
@@ -122,18 +130,21 @@ function printGetterExamples() {
 }
 
 function printMethodExamples() {
-  log($S("Instance methods").toTag(`h2`, `head`).value,);
+  log(
+    $S("Instance methods")
+      .toIdTag({tag: "h2", id: "chapter-method", className: "head code"})
+      .value );
   appendEx();
   encloseEx();
+  formatEx();
   indexOfEx();
-  lastIndexOfEx();
   insertEx();
+  interpolateEx();
+  lastIndexOfEx();
   prefixEx();
   replaceWordsEx();
   truncateEx();
   undoLastEx();
-  // wip
-  window.scrollTo(0, 15000);
 }
 
 /* region static constructor function examples */
@@ -143,8 +154,8 @@ function regExpEx() {
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
   log(
-    $S` $S.regExp`.toTag(`h3`, `head code`)
-      .append($S(exampleCode.regExpExample).asCodeblock)
+    $S` $S.regExp`.toIdTag({tag: "h3", id: "static-regexp", className: "head code"})
+      .append(exampleCode.regExpExample)
       .append($S`Result`.toTag(`b`).prefix(`=> `)
         .append(`: `, $S(reDemo.toString()).toCode).toTag(`div`, `normal`))
       .value,
@@ -154,7 +165,7 @@ function regExpEx() {
 function addCustomEx() {
   log(
     $S` $S.addCustom`
-      .toTag(`h3`, `head code`)
+      .toIdTag({tag: "h3", id: "static-addcustom", className: "head code"})
       .append(
         $S`Using `
           .append($S`$S.addCustom`.toCode, ` one can add ones own getters or methods`)
@@ -188,7 +199,7 @@ function addCustomEx() {
 
 function uuid4Ex() {
   log(
-    $S` $S.uuid4`.toTag(`h3`, `head code`)
+    $S` $S.uuid4`.toIdTag({tag: "h3", id: "static-uuid4", className: "head code"})
     .append(
       $S`$S.uuid4`.toCode,
       ` => `,
@@ -201,7 +212,7 @@ function uuid4Ex() {
 
 function randomStringEx() {
   log(
-    $S` $S.randomString`.toTag(`h3`, `head code`)
+    $S` $S.randomString`.toIdTag({tag: "h3", id: "static-randomstring", className: "head code"})
       .append($S`Syntax: `.toTag(`i`))
       .append($S`${exampleCode.randomStringSyntax}`)
       .append($S`Examples`.toTag(`h3`, `head`).value,)
@@ -256,7 +267,7 @@ function randomStringEx() {
 /* region getter examples */
 function camelCaseEx() {
   log(
-    $S(" [instance].camelCase").toTag(`h3`, `head code`)
+    $S(" .camelCase").toIdTag({tag: "h3", id: "getter-camelcase", className: "head code"})
       .append( $S`Tries converting the instance string 
           to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Camel_case"
@@ -282,13 +293,14 @@ function cloneEx() {
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
   
   log(
-    $S(" [instance].clone").toTag(`h3`, `head code`)
+    $S(" .clone").toIdTag({tag: "h3", id: "getter-clone", className: "head code"})
       .append( $S`Clone the instance.`.asDiv )
       .append( $S("the history of the originating instance is also cloned")
         .asNote
         .toTag("div", "normal b5"))
       .append( exampleCode.cloneExample )
       .append(
+        $S`toClone.history`.toCode.append($S`${JSON.stringify(toClone.history)}`.prefix("=>")).asDiv,
         $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")).asDiv,
         $S`cloned`.toCode.append(cloned.qcd.prefix("=>")).asDiv,
         $S`toClone`.toCode.append(toClone.qcd.prefix("=>")).asDiv
@@ -298,7 +310,7 @@ function cloneEx() {
 
 function firstUpEx() {
   log(
-    $S(" [instance].firstUp").toTag(`h3`, `head code`)
+    $S(" .firstUp").toIdTag({tag: "h3", id: "getter-firstup", className: "head code"})
       .append( $S`Converts the first letter of the instance string to upper case`
         .toTag("div", "normal b5") )
       .append(
@@ -314,7 +326,7 @@ function firstUpEx() {
 function historyEx() {
   const historyEx = JSON.stringify($S``.prefix("hello").append(` `, `world`).history);
   log(
-    $S(" [instance].history").toTag(`h3`, `head code`)
+    $S(" .history").toIdTag({tag: "h3", id: "getter-history", className: "head code"})
       .append( $S`Every instance records its history, which may be retrieved using 
             <code>.history</code>.`.asDiv
         .append(`The history enables undoing things for an instance 
@@ -328,7 +340,7 @@ function historyEx() {
 
 function snakeCaseEx() {
   log(
-    $S(" [instance].snakeCase").toTag(`h3`, `head code`)
+    $S(" .snakeCase").toIdTag({tag: "h3", id: "getter-snakecase", className: "head code"})
       .append( $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
@@ -365,14 +377,14 @@ function snakeCaseEx() {
 
 function kebabCaseEx() {
   log(
-    $S(" [instance].kebabCase").toTag(`h3`, `head code`)
+    $S(" .kebabCase").toIdTag({tag: "h3", id: "getter-kebabcase", className: "head code"})
       .append( $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
             >Kebab case</a> (aka 'dashed notation'), 
             meaning that all words of a string 
-            will be converted to lower case, all non-letters/-numbers 
-            (all not a-z <i>including diacriticals</i>) 
+            will be converted to lower case. All non-letters/-numbers 
+            (<b>not</b> a-z, A-Z <i>including diacriticals</i>) 
             will be removed and the converted words will be concatenated 
             with hyphens. May be useful for css- or data-attributes.`
         .toTag("div", "normal b5") )
@@ -380,21 +392,21 @@ function kebabCaseEx() {
         $S("$S`ConvertMe`.kebabCase").toCode
           .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
-        $S("$S`Convert-Me Please`.kebabCase").toCode
-          .append( $S`Convert Me Please`
+        $S("$S`Convert-Me _Please`.kebabCase").toCode
+          .append( $S`Convert Me _Please`
             .kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
         $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
           .append( $S`Convert Me --    Please`
             .kebabCase.qcd.prefix(" => ")).asDiv )
       .append(
-        $S("$S`Convert Me, pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
-          .append( $S`Convert Me, Plëase $#!`.kebabCase
+        $S("$S`Convert Me, _pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
+          .append( $S`Convert Me, _Plëase $#!`.kebabCase
             .replace("plase", "<b class='red'>plase</b>")
             .qcd.prefix(" => ")).asDiv )
       .append(
-        $S("$S`42 Convert Me, please`.kebabCase").toCode
-          .append( $S`42 Convert Me, Please`
+        $S("$S`42 Convert Me, &Please`.kebabCase").toCode
+          .append( $S`42 Convert Me, &Please`
             .kebabCase.qcd.prefix(" => ")).asDiv )
       .value,
   );
@@ -415,7 +427,7 @@ function trimAllEx() {
     `];
   
   log(
-    $S(" [instance].trimAll").toTag(`h3`, `head code`)
+    $S(" .trimAll").toIdTag({tag: "h3", id: "getter-trimall", className: "head code"})
       .append($S`Tries to trim all superfluous white space from the instance string. 
           So multiple spaces, tabs, linefeeds are reduced to single white space or no
           white space if after a line feed. This is a fairly simple and certainly not
@@ -460,7 +472,7 @@ function trimAllKeepLFEx() {
             
             please! \`.trimAllKeepLF</code></pre>`;
   log(
-    $S(" [instance].trimAllKeepLF").toTag(`h3`, `head code`)
+    $S(" .trimAllKeepLF").toIdTag({tag: "h3", id: "getter-trimallkeeplf", className: "head code"})
     .append(
       $S`Tries to trim all superfluous white space <i>except line feeds</i> 
         from the instance string. So multiple whitespace are reduced to single 
@@ -484,7 +496,7 @@ function undoEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase(); 
   
   log(
-    $S(" [instance].undo").toTag(`h3`, `head code`)
+    $S(" .undo").toIdTag({tag: "h3", id: "getter-undo", className: "head code"})
     .append(
       $S`Sets the instance string value to the previous string value 
           (from the history, see <code>$S.history</code>`
@@ -505,7 +517,7 @@ function undoAllEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase();
   
   log(
-    $S(" [instance].undoAll").toTag(`h3`, `head code`)
+    $S(" .undoAll").toIdTag({tag: "h3", id: "getter-undoall", className: "head code"})
       .append(
         $S`Sets the instance string value to the initial string value 
           (from the history, see <code>$S.history</code>`
@@ -532,10 +544,10 @@ function valueEx() {
   emptyClone.value += {hello: 1, world: 2}; // stringified
 
   log(
-    $S(" [instance].value").toTag(`h3`, `head code`)
+    $S(" .value").toIdTag({tag: "h3", id: "getter-value", className: "head code"})
     .append(
       `<br>`,
-      $S`<code>[instance].value</code> is a getter and a setter for the instance string value.`,
+      $S`<code>.value</code> is a getter and a setter for the instance string value.`,
       `<br>`,
       $S`if the given value is not a string, setting it will do nothing`.asNote )
     .toTag("div", "normal b5")
@@ -558,7 +570,7 @@ function valueEx() {
 /* region method examples */
 function appendEx() {
   log(
-    $S(" [instance].append(...values:[string|instance])").toTag(`h3`, `head code`)
+    $S(" .append(...values:[string|instance])").toIdTag({tag: "h3", id: "method-append", className: "head code"})
       .append( 
         $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
         .append(
@@ -574,7 +586,8 @@ function appendEx() {
 
 function encloseEx() {
   log(
-    $S(" [instance].enclose(start:string|instance[, end:string|instance])").toTag(`h3`, `head code`)
+    $S(" .enclose(start:string|instance[, end:string|instance])")
+      .toIdTag({tag: "h3", id: "method-enclose", className: "head code"})
       .append(
         $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
           ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
@@ -632,7 +645,64 @@ function encloseEx() {
 }
 
 function formatEx() {
+// the tokens used for tableRowTemplate
+  const theNames = [
+    { pre: "Mary", last: "Peterson" },
+    { pre: "Muhammed", last: "Ali" },
+    { pre: "Missy", last: "Johnson" },
+    { pre: "Hillary", last: "Clinton" },
+    { pre: "Foo", last: "Bar" },
+    { pre: "Bar", last: "Foo" },
+    { pre: "小平", last: "邓" },
+    { pre: "Володимир", last: "Зеленський" },
+    { pre: "zero (0)", last: 0 },
+    { pre: "Row", last: 10 },
+    { pre: "replacement {last} is empty string", last: '' },
+    { pre: "<i class='notifyHeader'>Non string values: ignored</i>", last: "<span class='largeArrowDown'></span>" },
+    { pre: "replacement {last} is array", last: [1, 2, 3] },
+    { pre: "replacement {last} is null", last: null },
+    { pre: "replacement {last} is object", last: {} },
+    { pre: "replacement {last} is undefined", last: undefined },
+    { pre: "<i class='notifyHeader'>Missing keys: ignored</i>", last: "<span class='largeArrowDown'></span>" },
+    { last: "key {pre} not in token" },
+    { pre: "key {last} not in token" },
+    { pre: "<i class='notifyHeader'>Empty token ({}), or invalid keys</i>", last: "<span class='largeArrowDown'></span>" },
+    {},
+    { some: "nothing to replace", name: "nothing" },
+    { pre: "<i class='notifyHeader'>invalid token (array): not included</i>", last: "<span class='largeArrowDown'></span>" },
+    ["nothing", "nada", "zip", "没有什么",
+      "niente", "rien", "ничего"]
+  ];
   
+  const tableRows = $S("<tr><td>{pre}</td><td>{last}</td></tr>").format(...theNames);
+  
+  const tableTemplate = $S(
+    "<table>\
+      <caption>{caption}</caption>\
+      <tr>\
+        <th>prename</th>\
+        <th>surname</th>\
+      </tr>\
+      <tbody>{rows}</tbody>\
+    </table>");
+  
+  const exampleTable = tableTemplate.format({
+    caption: `<code>tableRowTemplate.format(...)</code> using <code>theNames</code>`,
+    rows: tableRows.value } );
+  
+  const allInOne = $S(" .format(...token:object&lt;string, string>)")
+    .toIdTag({tag: "h3", id: "method-format", className: "head code"})
+    .append(
+      $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
+        <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.asDiv,
+      $S`Visit the <a target="_blank" class="externalLink arrow" href="https://github.com/KooiInc/StringInterpolator"
+        >StringInterpolator</a>  module to learn more.`.asDiv
+    ).toTag("div", "normal b5")
+    .append(exampleCode.formatExample)
+    .append($S`exampleTable`.toCode).append(` =>`).toTag("div", "normal b5")
+    .append(exampleTable);
+  
+  log(allInOne.value);
 }
 
 function indexOfEx() {
@@ -644,7 +714,8 @@ function indexOfEx() {
   word2Universe(initial);
   
   log(
-    $S(" [instance].indexOf(str2Find:string,[ fromIndex:number])").toTag(`h3`, `head code`)
+    $S(" .indexOf(str2Find:string,[ fromIndex:number])")
+      .toIdTag({tag: "h3", id: "method-indexof", className: "head code"})
       .append(
         $S("indexOf").toCode,
         " (as well as ",
@@ -679,8 +750,8 @@ function indexOfEx() {
 
 function insertEx() {
   log(
-    $S(" [instance].insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
-    .toTag(`h3`, `head code`)
+    $S(" .insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
+      .toIdTag({tag: "h3", id: "method-insert", className: "head code"})
       
     .append(
       $S`Inserts either <code>[value]</code> or <code>[values]</code> into the instance string value
@@ -750,6 +821,18 @@ function insertEx() {
   );
 }
 
+function interpolateEx() {
+  log($S(" .interpolate(...token:object&lt;string, string>)")
+    .toIdTag({tag: "h3", id: "method-interpolate", className: "head code"})
+    .append(
+      $S`Alias for <code><a
+        class="externalLink arrow"
+        target="_top"
+        data-internal="[instance].format example" href="#formatEx">[instance].format</a></code>`.asDiv
+    ).toTag("div", "normal b5").value
+  ) 
+}
+
 function lastIndexOfEx() {
   const initial = $S`hello world world`;
   const lastWord2Universe = instance =>
@@ -758,7 +841,8 @@ function lastIndexOfEx() {
   lastWord2Universe(initial);
   
   log(
-    $S(" [instance].lastIndexOf(lastStr2Find:string[, beforeIndex:number])").toTag(`h3`, `head code`)
+    $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])")
+      .toIdTag({tag: "h3", id: "method-lastindexof", className: "head code"})
       .append(
         $S("lastIndexOf").toCode,
         " (as well as ",
@@ -792,8 +876,8 @@ function lastIndexOfEx() {
 
 function prefixEx() {
   log(
-    $S(" [instance].prefix(...strings2Prefix:[string])")
-      .toTag(`h3`, `head code`)
+    $S(" .prefix(...strings2Prefix:[string])")
+      .toIdTag({tag: "h3", id: "method-prefix", className: "head code"})
       
     .append(
       $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
@@ -845,8 +929,8 @@ function replaceWordsEx() {
     replacements: {"🎉": "😋"} });
   
   log(
-    $S(" [instance].replaceWords({replacements:{&ltstring,string|instance>}, caseSensitive:boolean=false})")
-    .toTag(`h3`, `head code`)
+    $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})")
+      .toIdTag({tag: "h3", id: "method-replacewords", className: "head code"})
     
     .append(
       $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
@@ -901,11 +985,11 @@ function truncateEx() {
      ex8: testStr.clone.truncate({at: 27, wordBoundary: true})  
   };
   
-  const allInOne = $S(" [instance].truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
-    .toTag(`h3`, `head code`)
+  const allInOne = $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
+    .toIdTag({tag: "h3", id: "method-truncate", className: "head code"})
     .append(
       $S`Truncates the instance string value at position <code>[at]</code> and append 
-        either three dots ("..." <code>html: false</code>) or "&amphellip; (&hellip;)" <code>html: true</code>.
+        either three dots ("..." <code>html: false</code>) or "&amp;hellip; (&hellip;)" <code>html: true</code>.
         If <code>wordBoundary</code> is true truncation is done at the nearest possible word boundary (of the
         the truncated string). Word boundaries are for example ;, ), }, &lt;space>, &lt;tab> ... etc.`
     ).toTag("div", "normal b5")
@@ -941,8 +1025,8 @@ function undoLastEx() {
     get ex6() { return cloned.undoLast(-3); },
   };
   
-  const allInOne = $S(" [instance].undoLast(nSsteps:number)")
-    .toTag(`h3`, `head code`)
+  const allInOne = $S(" .undoLast(nSsteps:number)")
+    .toIdTag({tag: "h3", id: "method-undolast", className: "head code"})
     .append(
       $S`Sets the instance value back to <code>nSteps</code> in its history` )
     .toTag("div", "normal b5")
@@ -965,10 +1049,6 @@ function undoLastEx() {
   }
   
   log(allInOne.value);
-}
-
-function valueOfEx() {
-  
 }
 /* endregion method examples */
 
@@ -1003,32 +1083,11 @@ function printHeader() {
 async function createCodeElement() {
   const code = await(fetch("./index.js"))
     .then(res => res.text());
-  const codeOverlay = $.div_jql(
-    {id: "codeOverlay", data: {magDat: "42"}},
+  codeOverlay = $.div_jql(
+    {id: "codeOverlay"},
     $.pre({class: "language-javascript line-numbers"},
       $.code({class: "language-javascript"}, code) ) )
     .hide();
-  
-  
-  
-  $.delegate(`click`, `#codeVwr`, evt => {
-    const bttn = evt.target;
-    const parentLi = bttn.closest(`li`);
-    const isVisible = bttn.dataset.codeVisible === `visible`;
-    
-    if (isVisible) {
-      codeOverlay.hide();
-      return bttn.dataset.codeVisible = `hidden`;
-    }
-    
-    if (!parentLi.querySelector(`#codeOverlay`)) {
-      codeOverlay.toDOM(parentLi);
-      Prism.highlightAll();
-    }
-    
-    codeOverlay.show();
-    return bttn.dataset.codeVisible = `visible`;
-  });
 }
 
 function addCustomized() {
@@ -1042,6 +1101,15 @@ function addCustomized() {
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
+  $S.addCustom({
+    name: "toIdTag", method: (me, {tag, id, className} = {}) => {
+      tag = getStringValue(tag);
+      if (!tag) { return me; }
+      className = getStringValue(className) ? $S(className).quote.double.prefix($S(" class=")) : "";
+      id = getStringValue(id) ? $S`${id}`.quote.double.prefix(" id=") : "";
+      return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
+    }
+  });
   $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
   $S.addCustom({name: `asDiv`, method(me) { return me.toTag("div", "normal"); }, isGetter: true});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
@@ -1051,6 +1119,10 @@ function addCustomized() {
   });
   $S.addCustom({name: `trimEverything`, method: me =>
       me.constructor(trimAllAlternative(me.value)), isGetter: true});
+}
+
+function getStringValue(string) {
+  return string?.value || (string?.constructor === String && string);
 }
 
 function toCodeBlock(str) {
@@ -1075,8 +1147,72 @@ async function fetchTemplates() {
   return getCodeblocks($.virtual(`<div>${await fetch(`./codeTemplates.txt`).then(r => r.text())}</div>`));
 }
 
+function setDelegates() {
+  $.delegate(`click`, `#codeVwr`, evt => {
+    const bttn = evt.target;
+    const parentLi = bttn.closest(`li`);
+    const isVisible = bttn.dataset?.codeVisible === `visible`;
+    
+    if (isVisible) {
+      codeOverlay.hide();
+      return bttn.dataset.codeVisible = `hidden`;
+    }
+    
+    if (!parentLi.querySelector(`#codeOverlay`)) {
+      codeOverlay.toDOM(parentLi).appendTo($(bttn).parent);
+      Prism.highlightAll();
+    }
+    
+    codeOverlay.show();
+    return bttn.dataset.codeVisible = `visible`;
+  });
+  $.delegate(`click`, `.toc, details .toc`, evt => {
+    const fromDetailsElement = evt.target.closest(`details.in-content`);
+    $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
+    
+    if (fromDetailsElement) {
+      evt.preventDefault();
+      $(`.in-content`).each(el => el.open = false);
+    }
+    return;
+  });
+  $.delegate(`click`, `.lemma`, (_, me) => {
+    $(`.lemma[data-active='1']`).data.set({active: "0"});
+    me.data.set({active: "1"});
+  });
+}
+
+function createTOC() {
+  $.nodes(`h3.head.code`).forEach(head => {
+    $(head).append(`<span class='toc'></span>`);
+  })
+  const chapters = $.nodes(`[id^=chapter]`);
+  const toc = [];
+  chapters.forEach((chapter) => {
+    const lemmaX = chapter.id.split(`-`).pop();
+    const detailElem = $.details_jql(
+      {data: {toc: 1}},
+      $.summary(chapter.textContent)
+    );
+    
+    $.nodes(`h3[id^=${lemmaX}]`)
+      .forEach( lemma => {
+        let text = lemma.textContent;
+        text = /\(/.test(text) ? lemma.textContent.slice(0, text.indexOf(`(`)+1).trim() + `...)` : text;
+        detailElem.append($.a_jql({class: "lemma", textContent: text, href: `#${lemma.id}`}))
+      });
+    
+    toc.push(detailElem);
+  });
+  
+  const tocElem = $($.node(`#codeVwr`).closest(`li`).querySelector(`div`))
+    .append($.h2({id: "TOCElem", class: `head code`}, `Content`));
+  toc.forEach(chapter => tocElem.append(chapter));
+}
+
 function initStyling() {
   // style rules are stored in the JQL style element (head)style#JQLStylesheet
+  const arrowRepeat = $S` ⬇ `.repeat(5).enclose(`"`);
   $.editCssRules(
     `:root {
       --grey-default: rgb(112, 92, 92);
@@ -1184,6 +1320,32 @@ function initStyling() {
       &:before {
         content: '✓ '; 
       }
+      .toc {
+        display: inline-block;
+        float: right;
+        cursor: pointer;
+        &:before {
+          content: "☝";
+          font-size: 1.2em;
+        }
+      }
+    }`,
+    `div .toc {
+        float: right;
+        cursor: pointer;
+        font-family: monospace;
+        color: rgb(98 109 147);
+        padding: 0.2em;
+        font-weight: normal;
+        
+        &:before {
+          content: " ☝ ";
+        }
+        
+        &:hover:after {
+          content: 'back to table of contents';
+          margin: -0.3rem 0px 0px -12rem;
+        }
     }`,
     `h3.head.between { 
         margin-top: 0.4rem;
@@ -1206,16 +1368,23 @@ function initStyling() {
       summary {
         cursor: pointer;
         
-        .head { 
+        div.special {
           display: inline-block;
-          margin: 0; 
+          width: 98%;
+        }
+        
+        .head {
+          margin: 0;
+          div {
+            display: block;
+          } 
         }
       }
     }`,
     `a.ExternalLink {
       background-color: transparent;
     }`,
-    `a.ExternalLink.arrow:hover::after { 
+    `a.ExternalLink.arrow:hover::after, .toc:hover::after { 
         fontSize: 0.7rem;
         position: absolute;
         zIndex: 2;
@@ -1230,11 +1399,65 @@ function initStyling() {
     `a.ExternalLink[data-backto].arrow:hover::after {
       content: ' navigates back to 'attr(data-backto);
     }`,
-    `a.ExternalLink[target="_top"]:not([data-backto]).arrow:hover::after {
+    `a.ExternalLink[data-internal].arrow:hover::after {
+      content: ' navigate to 'attr(data-internal);
+    }`,
+    `a.ExternalLink[target="_top"]:not([data-backto], [data-internal]).arrow:hover::after {
       content: ' navigates back to 'attr(href);
     }`,
     `a.ExternalLink[target="_blank"].arrow:hover::after {
       content: ' Opens in new tab/window';
+    }`,
+    `a.lemma {
+      text-decoration: none;
+      color: #777;
+      margin-left: 1rem;
+      display: block;
+      &:hover {
+        text-decoration: underline;
+      }
+      &:before {
+        content: "✓ ";
+      }
+      &[data-active='1'] {
+        background-color: #eee;
+        color: red;
+      }
+    }`,
+    `table {
+      margin: 1rem 0;
+      font-family: verdana;
+      font-size: 0.9rem;
+      border-collapse: collapse;
+      max-width: 100%;
+     }`,
+    `table caption {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      font-size: 14px;
+      white-space: nowrap;
+     }`,
+    `table tbody tr:nth-child(even) { background-color: #eee; }`,
+    `table td, table th { padding: 2px 4px; font-size: 14px; height: 18px}`,
+    `table th { backgroundColor: #999; color: #FFF; }`,
+    `table tr td:first-child,
+     table tr th:first-child {text-align: right; padding-right: 0.5rem; width:50%}`,
+    `th { 
+      font-weight: bold;
+      text-align: left;
+      border-bottom: 1px solid #999; 
+    }`,
+    `.largeArrowDown:before{
+      content: ${arrowRepeat};
+      color: #555; 
+    }`,
+    `.notifyHeader { 
+      color: #555;
+      &:before {
+        content: '* ';} 
+    }`,
+    `.bottomSpacer {
+      min-height: 100vh;
     }`,
   );
 }
