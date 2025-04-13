@@ -981,7 +981,7 @@ function truncateEx() {
      ex4: testStr.clone.truncate({at: 20, html: true, wordBoundary: true}),
      ex5: testStr.clone.truncate({at: 28, html: true, wordBoundary: true}),
      ex6: testStr.clone.truncate({at: 355, html: true}),
-     ex7: testStr.clone.truncate({at: 350, html: true, wordBoundary: true}),
+     ex7: testStr.clone.truncate({at: 340, html: true, wordBoundary: true}),
      ex8: testStr.clone.truncate({at: 27, wordBoundary: true})  
   };
   
