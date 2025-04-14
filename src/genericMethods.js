@@ -38,13 +38,9 @@ function isNumber(value) {
 function isMutating(descriptor) {
   return /wrap\(|undo.*/i.test(descriptor.toString())
 }
-
+ 
 function getSWInformation() {
-  const firstLines = xString`For the record:
-    ✔ chainable getters/methods modify the instance string
-    ✔ indexOf overrides return [undefined] if nothing was found (so one can use [lastI]indexOf([some string value]) ?? 0
-    ✔ includes information for custom methods/getters if applicable`
-    .trimAll;
+  const firstLines = xString(decode());
   return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
@@ -125,8 +121,11 @@ function createExtendedCTOR(ctor, customMethods) {
 }
 
 function escapeRE(reString, modifiers) {
-  
   return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
+}
+
+function decode() {
+  return atob`Rm9yIHRoZSByZWNvcmQ6CltjbV0gY2hhaW5hYmxlIGdldHRlcnMvbWV0aG9kcyBtb2RpZnkgdGhlIGluc3RhbmNlIHN0cmluZwpbY21dIGluZGV4T2Ygb3ZlcnJpZGVzIHJldHVybiBbdW5kZWZpbmVkXSBpZiBub3RoaW5nIHdhcyBmb3VuZCAoc28gb25lIGNhbiB1c2UgW2xhc3RJXWluZGV4T2YoW3NvbWUgc3RyaW5nIHZhbHVlXSkgPz8gMApbY21dIGluY2x1ZGVzIGluZm9ybWF0aW9uIGZvciBjdXN0b20gbWV0aG9kcy9nZXR0ZXJzIGlmIGFwcGxpY2FibGU=`.replace(/\[cm\]/g, `\u2714`);
 }
 
 function defineQuotingStyles() {
