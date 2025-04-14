@@ -4,28 +4,26 @@
   "version": "1.0.0",
   "private": false,
   "main": "./index.js",
-  "description": "conkat, stringfuse",
+  "description": "A JS stringbuilder utility",
   "keywords": [
-    "ECMAScript",
+    "JS",
+    "ES20xx",
+    "String",
+    "Stringbuilder",
     "String",
     "Utilities",
-    "ES20xx",
     "Classfree Object Oriented"
   ],
-  "exports": {
-    "./Bundle": {
-      "require": "./index.cjs.min.js",
-      "import": "./index.esm.min.js",
-      "browser": "./index.browser.min.js"
-    }
-  },
   "author": "KooiInc",
-  "license": "GNU General Public License v3.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KooiInc/es-date-fiddler"
+    "url": "https://github.com/KooiInc/js-stringweaver"
+  },
+  "devDependencies": {
+    "esbuild": "latest"
   },
   "bugs": {
-    "url": "https://github.com/KooiInc/es-date-fiddler/issues"
+    "url": "https://github.com/KooiInc/js-stringweaver/issues"
   }
 }
