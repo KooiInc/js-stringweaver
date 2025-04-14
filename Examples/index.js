@@ -6,7 +6,7 @@ let codeOverlay;
 initStyling();
 window.$S = $S; // try it out in the console
 const {log, logTop} = logFactory();
-
+let performanceText;
 demonstrate();
 
 // An alternative for .trimAll
@@ -27,6 +27,7 @@ function trimAllAlternative(string) {
 }
 
 function demonstrate() {
+  const startTime = performance.now();
   setDelegates();
   createCodeElement().then(_ => Promise.resolve(`ok`));
   addCustomized();
@@ -38,6 +39,13 @@ function demonstrate() {
   createTOC();
   $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
   Prism.highlightAll();
+  const time = +((performance.now() - startTime)/1000).toFixed(3);
+  performanceText = $S`Performance`.toTag(`b`, `b5`)
+    .append(
+        $S`Nearly all elements on this page were created using <code>StringWeaver</code>
+          <br>(click 'Display code' to inspect the code).`.asDiv,
+        $S`Creating the page took <b>${time.toLocaleString()}</b> seconds`.asDiv)
+    .value;
 }
 
 function printInitializationExamples() {
@@ -1070,8 +1078,9 @@ function undoLastEx() {
 
 function printHeader() {
   logTop(
-    $S`<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
-      .toTag(`div`, `normal`).value,
+    $S`<button id="performance">Page performance</button>
+       &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
+      .append($S`&nbsp;`).toTag(`div`, `normal`).value,
     $S`js-stringweaver: a stringbuilder utility`.toTag(`h1`, `head`)
       .append($S`
       In many other languages, a programmer can choose to explicitly use a string view or a
@@ -1164,7 +1173,10 @@ async function fetchTemplates() {
 }
 
 function setDelegates() {
-  $.delegate(`click`, `#codeVwr`, evt => {
+  $.delegate(`click`, `#codeVwr, #performance`, evt => {
+    if (evt.target.id === "performance") {
+      return $.Popup.show({ content: performanceText });
+    }
     const bttn = evt.target;
     const parentLi = bttn.closest(`li`);
     const isVisible = bttn.dataset?.codeVisible === `visible`;
