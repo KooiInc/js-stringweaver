@@ -1,9 +1,10 @@
 {
   "name": "stringweaver",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "main": "./index.js",
+  "sideEffects": false,
   "description": "A JS stringbuilder utility",
   "keywords": [
     "JS",
