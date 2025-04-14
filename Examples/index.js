@@ -103,7 +103,7 @@ function printStaticConstructorFunctionExamples() {
       .toTag(`div`, `normal`)
       .value,
     
-      $S`${h3("$S.info", "static-quoteinfo")}`
+      $S`${h3("$S.quoteInfo", "static-quoteinfo")}`
       .toTag(`summary`)
       .append($S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`))
       .toTag(`details`, 'in-content')
