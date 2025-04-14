@@ -1,12 +1,12 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import {default as $S} from "../index.js";
+//import {default as $S} from "../index.js";
+import $S from "../Bundle/index.min.js";
 const exampleCode = await fetchTemplates();
-let codeOverlay;
+let codeOverlay, performanceText;
 initStyling();
 window.$S = $S; // try it out in the console
 const {log, logTop} = logFactory();
-let performanceText;
 demonstrate();
 
 // An alternative for .trimAll
@@ -83,6 +83,12 @@ function printInitializationExamples() {
 }
 
 function printStaticConstructorFunctionExamples() {
+  const isBundled = $S.constructor.name !== `CustomStringConstructor`;
+  // when minified from an online source, this is a possibility
+  const constructorLine = isBundled
+    ? $S`imported from bundle (minified) =&gt;`.asNote.append(`<code>function ${
+        $S.constructor.name}(str, ...args) {...}</code>`)
+    : $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
   const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
   log(
     $S`Static constructor properties/methods`
@@ -112,7 +118,7 @@ function printStaticConstructorFunctionExamples() {
     
     $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
       .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append($S`function ${$S.constructor.name}(str, ...args) {...}`.toCode)
+      .append(constructorLine)
       .toTag(`div`, `normal`)
       .value,
   );
