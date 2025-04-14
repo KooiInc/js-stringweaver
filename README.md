@@ -8,4 +8,4 @@
 
 A "stringbuilder" library
 
-<a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Examples</a>
+Documentation by <a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Example</a>
