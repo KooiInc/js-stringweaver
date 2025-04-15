@@ -1216,6 +1216,7 @@ function setDelegates() {
   $.delegate(`click`, `.lemma`, (_, me) => {
     $(`.lemma[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
+    setTimeout(_ => document.body.scrollTop -= 16);
   });
 }
 
