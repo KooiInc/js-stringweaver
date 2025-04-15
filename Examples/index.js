@@ -1,10 +1,8 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-//import {default as $S} from "../index.js";
-import $S from "../Bundle/index.min.js";
+import $S from "../../Bundle/index.min.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
-initStyling();
 window.$S = $S; // try it out in the console
 const {log, logTop} = logFactory();
 demonstrate();
@@ -27,8 +25,9 @@ function trimAllAlternative(string) {
 }
 
 function demonstrate() {
-  const startTime = performance.now();
+  initStyling();
   setDelegates();
+  const startTime = performance.now();
   createCodeElement().then(_ => Promise.resolve(`ok`));
   addCustomized();
   printInitializationExamples();
@@ -38,7 +37,6 @@ function demonstrate() {
   printHeader();
   createTOC();
   $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
-  Prism.highlightAll();
   const time = +((performance.now() - startTime)/1000).toFixed(3);
   performanceText = $S`Performance`.toTag(`b`, `b5`)
     .append(
@@ -46,6 +44,7 @@ function demonstrate() {
           <br>(click 'Display code' to inspect the code).`.asDiv,
         $S`Creating the page took <b>${time.toLocaleString()}</b> seconds`.asDiv)
     .value;
+  hljs.highlightAll(`javascript`);
 }
 
 function printInitializationExamples() {
@@ -429,7 +428,7 @@ function kebabCaseEx() {
 
 function trimAllEx() {
   const [cleanupStr1, cleanupStr2] = [
-    `<pre><code>$S\`clean me
+    `<pre class="codebox"><code>$S\`clean me
             
             
             please! \`.trimAll</code></pre>`,
@@ -455,7 +454,7 @@ function trimAllEx() {
              please!   `.trimAll.qcd.prefix(`=> `)}</pre>`.asDiv)
       .append(
         $S`Example 2`.toTag(`h3`, `head between`),
-        $S`<pre><code>$S\`clean me
+        $S`<pre class="codebox"><code>$S\`clean me
         
             up    ,
         
@@ -467,9 +466,10 @@ function trimAllEx() {
         $S`Example 2a`.toTag(`h3`, `head between`),
         $S("We created a custom getter called <code>trimEverything</code> with a " +
           "different approach to this").asDiv,
-        $S`(go to the <a href="#top">page top</a>, click 'Display code' and scroll to line 11).
-            It's pretty convoluted and<br>still not perfect, but hey, it's an idea ...`.asDiv,
-        $S`<pre><code>$S\`clean me
+        $S`(go to the <a href="#top">page top</a>, click 'Display code' and scroll to 
+            <code>function trimAllAlternative</code>...).
+            It's pretty convoluted and<br>not perfect, but hey, it's an idea ...`.asDiv,
+        $S`<pre class="codebox"><code>$S\`clean me
         
             up    ,
         
@@ -482,7 +482,7 @@ function trimAllEx() {
 }
 
 function trimAllKeepLFEx() {
-  const cleanupStr = `<pre><code>$S\`clean me
+  const cleanupStr = `<pre class="codebox"><code>$S\`clean me
             
             
             please! \`.trimAllKeepLF</code></pre>`;
@@ -556,6 +556,7 @@ function valueEx() {
   empty2.value = 'hello ';
   empty2.value += 'world';
   const emptyClone = empty2.clone;
+  emptyClone.append({hello: 1, world: 2})   // nothing happens
   emptyClone.value += {hello: 1, world: 2}; // stringified
 
   log(
@@ -1107,8 +1108,8 @@ function printHeader() {
     $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
         target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
     .value,
-    `<a id="top"></a>`,
   );
+  $(`#log2screen`).beforeMe($.div({id: `top`}));
 }
 
 async function createCodeElement() {
@@ -1116,8 +1117,9 @@ async function createCodeElement() {
     .then(res => res.text());
   codeOverlay = $.div_jql(
     {id: "codeOverlay"},
-    $.pre({class: "language-javascript line-numbers"},
-      $.code({class: "language-javascript"}, code) ) )
+    $.pre({class: "codebox", id: "overlayed"},
+      $.code({class: "hljs language-javascript"}, 
+        code.replace(/</g, `&lt;`).replace(/>/g, `&gt;`)) ) )
     .hide();
 }
 
@@ -1157,7 +1159,7 @@ function getStringValue(string) {
 }
 
 function toCodeBlock(str) {
-  return `<pre class="line-numbers language-javascript"><code class="language-javascript">${
+  return `<pre class="codebox"><code>${
     str.trim()}</code></pre>`;
 }
 
@@ -1166,7 +1168,7 @@ function getCodeblocks(templates) {
   
   return [...exampleBlocks].reduce( (acc, block) => {
     const codeTemplate = 
-      $S`<pre class="language-javascript line-numbers"><code class="language-javascript">{code}</code></pre>`;
+      $S`<pre class="codebox"><code class="language-javascript">{code}</code></pre>`;
     return {
       ...acc, 
       [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
@@ -1194,7 +1196,7 @@ function setDelegates() {
     
     if (!parentLi.querySelector(`#codeOverlay`)) {
       codeOverlay.toDOM(parentLi).appendTo($(bttn).parent);
-      Prism.highlightAll();
+      hljs.highlightElement($.node(`#overlayed code`));
     }
     
     codeOverlay.show();
@@ -1202,12 +1204,13 @@ function setDelegates() {
   });
   $.delegate(`click`, `.toc, details .toc`, evt => {
     const fromDetailsElement = evt.target.closest(`details.in-content`);
-    $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
+    $.node(`#top`).scrollIntoView({behavior: "smooth"});
     
     if (fromDetailsElement) {
       evt.preventDefault();
       $(`.in-content`).each(el => el.open = false);
     }
+    setTimeout(_ => document.body.scrollTop = 0, 400);
     return;
   });
   $.delegate(`click`, `.lemma`, (_, me) => {
@@ -1294,13 +1297,22 @@ function initStyling() {
       position: absolute;
       display: inline-block;
       color: #c0c0c0; }`,
+    `pre.codebox {
+      box-shadow: 2px 2px 6px #555;
+      border-radius: 6px;
+      max-height: 500px;
+      overflow: auto;
+    }`,
+    `code.hljs {
+      background-color: #343636;
+    }`,
     `code {
       color: revert;
       background-color: revert;
       padding: revert;
       font-family: revert;
     }`,
-    `code:not(.codeblock, .language-javascript) {
+    `code:not(.codeblock, .hljs) {
         background-color: rgb(227, 230, 232);
         color: var(--code-color);
         padding: 0 4px;
@@ -1312,23 +1324,11 @@ function initStyling() {
         color: rgb(12, 13, 14);
         border: none;
         border-radius: 4px;
-        max-width: 80vw;
         padding: 4px;
       }`,
     `h2 {font-size: 1.3rem; line-height: 1.4rem}`,
-    `pre:not(.language-javascript) {
-        font-weight: normal;
-        max-width: 400px;
-        margin: 0.3rem 0px 0.5rem;;
-        code {
-          padding: 5px;
-        }
-    }`,
-    `pre:not(.language-javascript).syntax {
+    `pre:not(.codebox).syntax {
       margin-top: 0.2rem;
-    }`,
-    `pre.language-javascript {
-      max-height: 500px;
     }`,
     `b.note { color: red; }`,
     `.normal {
@@ -1354,32 +1354,20 @@ function initStyling() {
       &:before {
         content: '✓ '; 
       }
-      .toc {
-        display: inline-block;
-        float: right;
-        cursor: pointer;
-        &:before {
-          content: "☝";
-          font-size: 1.2em;
-        }
-      }
     }`,
     `div .toc {
-        float: right;
-        cursor: pointer;
-        font-family: monospace;
-        color: rgb(98 109 147);
-        padding: 0.2em;
-        font-weight: normal;
-        
-        &:before {
-          content: " ☝ ";
-        }
-        
-        &:hover:after {
-          content: 'back to table of contents';
-          margin: -0.3rem 0px 0px -12rem;
-        }
+      position: relative;
+      display: inline-block;
+      float: right;
+      cursor: pointer;
+      &:before {
+        content: "☝";
+        font-size: 1.2em;
+      }
+      &:hover::after {
+        content: 'back to top';
+        margin: -0.3rem 0px 0px -7rem;
+      }
     }`,
     `h3.head.between { 
         margin-top: 0.4rem;
@@ -1471,11 +1459,11 @@ function initStyling() {
       font-size: 14px;
       white-space: nowrap;
      }`,
-    `table tbody tr:nth-child(even) { background-color: #eee; }`,
-    `table td, table th { padding: 2px 4px; font-size: 14px; height: 18px}`,
-    `table th { backgroundColor: #999; color: #FFF; }`,
-    `table tr td:first-child,
-     table tr th:first-child {text-align: right; padding-right: 0.5rem; width:50%}`,
+    `table:not(.hljs-ln) tbody tr:nth-child(even) { background-color: #eee; }`,
+    `table:not(.hljs-ln) td, table th { padding: 2px 4px; font-size: 14px; height: 18px}`,
+    `table:not(.hljs-ln) th { backgroundColor: #999; color: #FFF; }`,
+    `table:not(.hljs-ln) tr td:first-child,
+     table:not(.hljs-ln) tr th:first-child {text-align: right; padding-right: 0.5rem; width:50%}`,
     `th { 
       font-weight: bold;
       text-align: left;

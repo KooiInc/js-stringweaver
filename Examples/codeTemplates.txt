@@ -5,9 +5,9 @@ $S`hello ${wrld}`;
 
 <template id="customGetterSyntax">
 $S.addCustom({
-  name, /*string*/,
-  method, /*function(me, /* the current stringweaver instance, ...args) => { ... }*/
-  isGetter, /*boolean = false*/
+  name,       /*string*/,
+  method,     /*function(me, /* the current stringweaver instance, ...args) => { ... }*/
+  isGetter,   /*boolean = false*/
   enumerable, /*boolean = false*/
   // ↳ true: visible in Object.keys([instance])
 })
@@ -40,11 +40,11 @@ const result = $S`Hurray!`.toTag("i", "green").toTag("b");
 
 <template id="randomStringSyntax">
 $S.randomString( {
-  len, /*number = 12*/
+  len,              /*number = 12*/
   includeUppercase, /*boolean = true*/
-  includeNumbers, /*boolean*/
-  includeSymbols, /*boolean*/
-  startAlphabetic /*boolean*/ } 
+  includeNumbers,   /*boolean*/
+  includeSymbols,   /*boolean*/
+  startAlphabetic   /*boolean*/ } 
 )
 </template>
 
@@ -79,7 +79,8 @@ const empty = $S("");
 empty.value = 'hello ';
 empty.value += 'world';
 const emptyClone = empty.clone;
-emptyClone.value += {hello: 1, world: 2}; // stringified
+emptyClone.append({hello: 1, world: 2});  // nothing happens
+emptyClone.value += {hello: 1, world: 2}; // {hello: 1, world: 2} stringified
 </template>
 
 
@@ -171,7 +172,6 @@ const examples = {
   //                                  ↳ equals [instance].undoAll
 };
 </template>
-
 
 <template id="formatExample">
 const tableTemplate = $S(
