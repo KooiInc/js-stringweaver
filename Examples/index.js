@@ -1,6 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../Bundle/index.min.js";
+import $S from "../index.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
@@ -1130,7 +1130,8 @@ function addCustomized() {
   $S.addCustom({name: "festive", method: me => me.enclose("\u{1F389}"), isGetter: true});
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
-      className = className?.length ? $S(className).quote.double.prefix($S(" class=")) : "";
+      className = $S(className);
+      className.length && className.quote.double.prefix($S(" class="));
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
