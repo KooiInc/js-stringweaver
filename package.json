@@ -21,9 +21,6 @@
     "type": "git",
     "url": "https://github.com/KooiInc/js-stringweaver"
   },
-  "devDependencies": {
-    "esbuild": "latest"
-  },
   "bugs": {
     "url": "https://github.com/KooiInc/js-stringweaver/issues"
   }
