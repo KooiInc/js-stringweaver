@@ -1,6 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../../Bundle/index.min.js";
+import $S from "../Bundle/index.min.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
