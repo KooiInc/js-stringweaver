@@ -5,12 +5,17 @@ $S`hello ${wrld}`;
 
 <template id="customGetterSyntax">
 $S.addCustom({
-  name,       /*string*/,
-  method,     /*function(me, /* the current stringweaver instance, ...args) => { ... }*/
-  isGetter,   /*boolean = false*/
-  enumerable, /*boolean = false*/
+  name,       // string,
+  method,     // function
+  isGetter,   // boolean = false
+  enumerable, // boolean = false
   // ↳ true: visible in Object.keys([instance])
-})
+});
+// method syntax
+function(
+  me, // the StringWeaver instance
+  [, ...arguments]
+) { }
 </template>
 
 <template id="festiveExample">
