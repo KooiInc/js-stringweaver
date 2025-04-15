@@ -31,7 +31,7 @@ const result = $S`Hurray!`.festive;
 $S.addCustom( { 
     name: "toTag", 
     method: (me, tagName, className) => {
-    className = className?.length
+    className = className?.constructor === String && className.length
       ? $S(className).quote.double.prefix($S(" class="))
       : "";
 
