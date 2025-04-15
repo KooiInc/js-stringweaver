@@ -13,6 +13,8 @@ export {
   escapeRE,
 };
 
+const immutables =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
+
 function resolveTemplateString(str, ...args) {
   return str.raw ?  String.raw({ raw: str }, ...args) : str;
 }
@@ -35,29 +37,26 @@ function isNumber(value) {
   return value?.constructor === Number && !Number.isNaN(value);
 }
 
-function isMutating(descriptor) {
-  return /wrap\(|undo.*/i.test(descriptor.toString())
-}
- 
 function getSWInformation() {
   const firstLines = xString(decode());
   return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
+      const isChainable = !immutables.find(k => k === key);
       return `${key} (${
         key === `value` 
           ? `getter/setter`
           : key === `clone`
             ? `chainable getter`
             : key in String.prototype 
-              ? `method, String override` 
+              ? `method (override)` 
               : descriptr.value && descriptr.value.constructor === Function
-                ? (isMutating(descriptr.value) 
+                ? (isChainable 
                   ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
                 : descriptr.value
                   ? `property`
-                  : descriptr.get ? (isMutating(descriptr.get) 
+                  : descriptr.get ? (isChainable 
                     ? `chainable getter${key in customMethods ? ` *custom*` : ``}` 
                     : `getter`) : `-`})`; })
     .sort( (a,b) => a.localeCompare(b) ) 
