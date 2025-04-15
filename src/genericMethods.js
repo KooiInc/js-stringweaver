@@ -16,7 +16,9 @@ export {
 const immutables =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
 
 function resolveTemplateString(str, ...args) {
-  return str.raw ?  String.raw({ raw: str }, ...args) : str;
+  return str?.raw
+      ? String.raw({ raw: str }, ...args)
+      :  getStringValue(str).length ? str : "";
 }
 
 function getStringValue(string) {
