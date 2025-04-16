@@ -379,6 +379,24 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       assert.strictEqual($S`Hello world`.enclose(`**`, "<").value, `**Hello world<`);
     });
     
+    describe(`.empty as expected`, () => {
+        it(`parameter null`, () => {
+          assert.strictEqual($S(null).empty, true);
+        });
+        
+        it(`no parameter`, () => {
+          assert.strictEqual($S().empty, true);
+        });
+        
+        it(`parameter string 1`, () => {
+          assert.strictEqual($S`{a:1, b: 2}`.empty, false);
+        });
+        
+        it(`parameter string 2`, () => {
+          assert.strictEqual($S("hello world").empty, false);
+        });
+    });
+    
     it(`enclose with start value === instance as expected`, () => {
       assert.strictEqual($S`Hello world`.enclose($S`**`).value, `**Hello world**`);
     });
