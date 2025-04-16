@@ -28,6 +28,36 @@ describe(`Basics constructor`, () => {
       assert.strictEqual(Object.keys(hi).length, 0);
       assert.strictEqual(JSON.stringify(hi), `{}`);
     });
+    
+    describe(`Always returns a string`, () => {
+      it(`parameter null => empty string`, () => {
+        assert.strictEqual($S(null).value, "");
+      });
+      
+      it(`no parameter => empty string`, () => {
+        assert.strictEqual($S().value, "");
+      });
+      
+      it(`parameter Object => empty string`, () => {
+        assert.strictEqual($S({a:1, b: 2}).value, "");
+      });
+      
+      it(`parameter RegExp => empty string`, () => {
+        assert.strictEqual($S(/[a-z]/g).value, "");
+      });
+      
+      it(`parameter Map instance => empty string`, () => {
+        assert.strictEqual($S(new Map()).value, "");
+      });
+      
+      it(`parameter Array instance => empty string`, () => {
+        assert.strictEqual($S([1,2,3]).value, "");
+      });
+      
+      it(`parameter new String => empty string`, () => {
+        assert.strictEqual($S(new String()).value, "");
+      });
+    });
   });
   
   describe(`Constructor static methods`, () => {
@@ -70,21 +100,21 @@ describe(`Basics constructor`, () => {
         'append (chainable method)',
         'camelCase (chainable getter)',
         'clone (chainable getter)',
-        'constructor (method, String override)',
+        'constructor (method (override))',
         'enclose (chainable method)',
         'firstUp (chainable getter)',
         'format (chainable method)',
         'history (getter)',
-        'indexOf (method, String override)',
+        'indexOf (method (override))',
         'insert (chainable method)',
         'interpolate (chainable method)',
         'kebabCase (chainable getter)',
-        'lastIndexOf (method, String override)',
+        'lastIndexOf (method (override))',
         'prefix (chainable method)',
         'quote (Object. See [constructor].quoteInfo)',
         'replaceWords (chainable method)',
         'snakeCase (chainable getter)',
-        'toString (method, String override)',
+        'toString (method (override))',
         'trimAll (chainable getter)',
         'trimAllKeepLF (chainable getter)',
         'truncate (chainable method)',
@@ -92,7 +122,7 @@ describe(`Basics constructor`, () => {
         'undoAll (chainable getter)',
         'undoLast (chainable method)',
         'value (getter/setter)',
-        'valueOf (method, String override)',
+        'valueOf (method (override))',
         'wordsUCFirst (chainable getter)'
       ];
       const info = $S.info;
