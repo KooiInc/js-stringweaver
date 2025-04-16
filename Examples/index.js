@@ -1139,8 +1139,10 @@ function addCustomized() {
     name: "toIdTag", method: (me, {tag, id, className} = {}) => {
       tag = getStringValue(tag);
       if (!tag) { return me; }
-      className = getStringValue(className) ? $S(className).quote.double.prefix($S(" class=")) : "";
-      id = getStringValue(id) ? $S`${id}`.quote.double.prefix(" id=") : "";
+      className = $S(className);
+      id = $S(id);
+      className.length && className.quote.double.prefix($S(" class="));
+      id.length && id.quote.double.prefix(" id=");
       return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
     }
   });
