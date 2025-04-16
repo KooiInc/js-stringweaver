@@ -52,7 +52,7 @@ function printInitializationExamples() {
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
       .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote).asDiv
-      .append($S`output string values in this document are intentionally`
+      .append($S`output string values in this document are intentionally `
         .append($S`quoted`.qcd)
         .append(` where applicable`)
         .asNote
