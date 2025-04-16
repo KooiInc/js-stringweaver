@@ -34,8 +34,9 @@ $S.addCustom( {
     className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? "";
     
     return me.enclose(
-      $S(tagName).append(className).enclose("<", ">"),
-      $S(tagName).enclose("&lt;/", "&gt;") );
+      $S(tagName).append(className).enclose("&amp;lt;", "&amp;gt;"),
+      $S(tagName).enclose("&amp;lt;/", "&amp;gt;")
+    );
   }
 } );
 const result = $S`Hurray!`.toTag("i", "green").toTag("b");
