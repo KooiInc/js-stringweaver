@@ -64,7 +64,7 @@ function getSWInformation(notChainable) {
 }
 
 function createExtendedCTOR(ctor, customMethods) {
-  const notChainable =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
+  const notChainable =  `constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`);
   Object.defineProperties(ctor, {
     constructor: {
       get() { return ctor; },
