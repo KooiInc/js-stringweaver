@@ -49,16 +49,18 @@ function getSWInformation(notChainable) {
           ? `getter/setter`
           : key === `clone`
             ? `chainable getter`
-            : key in String.prototype 
-              ? `method (override)` 
-              : descriptr.value && descriptr.value.constructor === Function
-                ? (isChainable 
-                  ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
-                : descriptr.value
-                  ? `property`
-                  : descriptr.get ? (isChainable 
-                    ? `chainable getter${key in customMethods ? ` *custom*` : ``}` 
-                    : `getter`) : `-`})`; })
+            : key === `notEmpty` 
+              ? `chainable getter|undefined`
+              : key in String.prototype 
+                ? `method (override)` 
+                : descriptr.value && descriptr.value.constructor === Function
+                  ? (isChainable 
+                    ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
+                  : descriptr.value
+                    ? `property`
+                    : descriptr.get ? (isChainable 
+                      ? `chainable getter${key in customMethods ? ` *custom*` : ``}` 
+                      : `getter`) : `-`})`; })
     .sort( (a,b) => a.localeCompare(b) ) 
   );
 }
