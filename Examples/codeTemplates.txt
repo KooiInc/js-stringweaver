@@ -31,7 +31,7 @@ const result = $S`Hurray!`.festive;
 $S.addCustom( { 
     name: "toTag", 
     method: (me, tagName, className) => {
-    className = $(className);
+    className = $S(className);
     className.length && className.quote.double.prefix($S(" class="));
 
     return me.enclose(
