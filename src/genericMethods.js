@@ -109,7 +109,7 @@ function createExtendedCTOR(ctor, customMethods) {
       }
     },
     uuid4: {
-      get() { return uuid4(); }
+      get() { return xString(uuid4()); }
     },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
