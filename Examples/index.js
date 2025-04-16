@@ -51,7 +51,13 @@ function printInitializationExamples() {
   log(
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
-      .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.toTag(`div`, `normal`))
+      .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote).asDiv
+      .append($S`output string values in this document are intentionally`
+        .append($S`quoted`.qcd)
+        .append(` where applicable`)
+        .asNote
+      )
+      .asDiv
       .value,
     
     $S`As tagged template`.toIdTag({tag: "h3", id: "initialization-astt", className: "head code"})
@@ -96,6 +102,45 @@ function printInitializationExamples() {
         `<br>=> `,
         $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward)
       .value,
+    
+    $S`toString/valueOf is overridden`
+      .toIdTag({tag: "h3", id: "initialization-native-tostringvalueof", className: "head code"})
+      .append( $S`To retrieve the instance string value one can use its <code>value</code> property
+          or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
+          `.toTag("div", "normal b5") )
+      
+      .append(
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").value`.toCode,
+        `<br>=> `,
+        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.value)
+      .asDiv
+      
+      .append(
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").toString()`.toCode,
+        `<br>=> `,
+        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.toString())
+      .asDiv
+      
+      .append(
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").valueOf()`.toCode,
+        `<br>=> `,
+        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.valueOf())
+      .asDiv
+      
+      .append($S`Implicit <code>toString/valueOf</code> use`.asNote).toTag("div", "normal b5")
+      
+      .append(
+        $S`String( $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE") )`.toCode,
+        `<br>=> `,
+        String($S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd))
+      .asDiv
+      
+      .append(
+        $S`\`\${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE") }\``.toCode,
+        `<br>=> `,
+        `${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd} `)
+      .asDiv
+    .value,
   );
 }
 
@@ -238,7 +283,7 @@ function uuid4Ex() {
     .append(
       $S`$S.uuid4`.toCode,
       ` => `,
-      $S`${$S.uuid4}`.qcd
+      $S.uuid4.qcd
     )
     .asDiv
     .value
