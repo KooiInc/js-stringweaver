@@ -426,9 +426,9 @@ function notEmptyEx() {
         instance value is an empty string, the instance if not.`)
       .asDiv
 
-      .append(`This means one can use <a target="_blank" 
+      .append(`This means one can use <a target="_blank" class="ExternalLink arrow"
         href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
-        >optional chaining</a> in combination with the <a target="_blank"
+        >optional chaining</a> in combination with the <a target="_blank" class="ExternalLink arrow"
         href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
         >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
       .asDiv
