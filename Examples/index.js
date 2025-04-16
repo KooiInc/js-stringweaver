@@ -747,7 +747,7 @@ function encloseEx() {
             .asDiv
         )
         .append(
-          $S('$S`Hello world`.enclose("=&gt;", $S("&lt;")').toCode
+          $S('$S`Hello world`.enclose("=&gt;", $S("&lt;=")').toCode
             .append(
               ` => `,
               $S`Hello world`.enclose("=&gt;", $S("&lt;=")).qcd)
