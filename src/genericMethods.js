@@ -13,12 +13,12 @@ export {
   escapeRE,
 };
 
-const immutables =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
+const notChainable =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
 
 function resolveTemplateString(str, ...args) {
   return str?.raw
       ? String.raw({ raw: str }, ...args)
-      :  getStringValue(str).length ? str : "";
+      : getStringValue(str).length ? str : "";
 }
 
 function getStringValue(string) {
@@ -45,7 +45,7 @@ function getSWInformation() {
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
-      const isChainable = !immutables.find(k => k === key);
+      const isChainable = !notChainable.find(k => k === key);
       return `${key} (${
         key === `value` 
           ? `getter/setter`
