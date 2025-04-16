@@ -433,7 +433,7 @@ function notEmptyEx() {
         >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
       .asDiv
         
-      .append(`See the <a target="_top" href="#static-addcustom"> .addCustum</a> user defined
+      .append(`See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
           <code>toTag</code> method for a use case`)
       .toTag("div", "normal b5") )
 
