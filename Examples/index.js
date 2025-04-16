@@ -70,7 +70,7 @@ function printInitializationExamples() {
       .append($S`$S("hello world")`.toCode)
       .append($S(`hello world`).qcd.prefix(` => `)).value,
     
-    $S`Instance is always a string`.toIdTag({tag: "h3", id: "initialization-alwaysstring", className: "head code"})
+    $S`Instantiation always returns an instance with a string`.toIdTag({tag: "h3", id: "initialization-alwaysstring", className: "head code"})
       .append( $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
         is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5") )
       
