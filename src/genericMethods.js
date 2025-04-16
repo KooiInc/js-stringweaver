@@ -13,8 +13,6 @@ export {
   escapeRE,
 };
 
-const notChainable =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
-
 function resolveTemplateString(str, ...args) {
   return str?.raw
       ? String.raw({ raw: str }, ...args)
@@ -39,7 +37,7 @@ function isNumber(value) {
   return value?.constructor === Number && !Number.isNaN(value);
 }
 
-function getSWInformation() {
+function getSWInformation(notChainable) {
   const firstLines = xString(decode());
   return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
@@ -66,6 +64,7 @@ function getSWInformation() {
 }
 
 function createExtendedCTOR(ctor, customMethods) {
+  const notChainable =  `constructor,history,indexOf,toString,value,valueOf`.split(`,`);
   Object.defineProperties(ctor, {
     constructor: {
       get() { return ctor; },
@@ -87,7 +86,7 @@ function createExtendedCTOR(ctor, customMethods) {
       }
     },
     info: {
-      get() { return getSWInformation(); }
+      get() { return getSWInformation(notChainable); }
     },
     keys: {
       get() { 
