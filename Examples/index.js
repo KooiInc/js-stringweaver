@@ -1,6 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../Bundle/index.min.js";
+import $S from "../index.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
@@ -63,6 +63,24 @@ function printInitializationExamples() {
     $S`As function call`.toIdTag({tag: "h3", id: "initialization-asfn", className: "head code"})
       .append($S`$S("hello world")`.toCode)
       .append($S(`hello world`).qcd.prefix(` => `)).value,
+    
+    $S`Instance is always a string`.toIdTag({tag: "h3", id: "initialization-alwaysstring", className: "head code"})
+      .append( $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
+        is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5") )
+      
+      .append($S`$S()`.toCode)
+      .append($S().qcd.prefix(` => `))
+      .asDiv
+      
+      .append($S`$S("hello world")`.toCode)
+      .append($S(`hello world`).qcd.prefix(` => `))
+      .asDiv
+      
+      .append($S`$S([1,2,3])`.toCode)
+      .append($S([1,2,3]).qcd.prefix(` => `))
+      .asDiv
+      
+      .value,
     
     $S`Instance methods are chainable`
       .toIdTag({tag: "h3", id: "initialization-instance-chainable", className: "head code"})
@@ -135,6 +153,7 @@ function printGetterExamples() {
   firstUpEx();
   historyEx();
   kebabCaseEx();
+  notEmptyEx();
   snakeCaseEx();
   trimAllEx();
   trimAllKeepLFEx();
@@ -185,6 +204,7 @@ function addCustomEx() {
         $S`Using `
           .append($S`$S.addCustom`.toCode, ` one can add ones own getters or methods`)
           .toTag(`div`, `normal`))
+
       .append(
         $S`Syntax`.toTag(`i`)
           .append(`: `, exampleCode.customGetterSyntax))
@@ -356,6 +376,8 @@ function historyEx() {
 function emptyEx() {
   log(
     $S`.empty`.toIdTag({tag: "h3", id: "getter-empty", className: "head code"})
+      .append( $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") )
+      
       .append(
         $S`$S(null).empty`.toCode,
         ` => `,
@@ -371,9 +393,61 @@ function emptyEx() {
       .asDiv
       
       .append(
+        $S`$S(new String()).empty`.toCode,
+        ` => `,
+        $S`${$S(new String()).empty}`
+      )
+      .asDiv
+      
+      .append(
+        $S`$S(new String("hello!")).empty`.toCode,
+        ` => `,
+        $S`${$S(new String("hello!")).empty}`
+      )
+      .asDiv
+      
+      .append(
         $S`$S("hello!").empty`.toCode,
         ` => `,
         $S`${$S("hello!").empty}`
+      )
+      .asDiv
+      .value);
+}
+
+function notEmptyEx() {
+  log(
+    $S`.notEmpty`.toIdTag({tag: "h3", id: "getter-notempty", className: "head code"})
+      .append( $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> when
+          that value is not empty (not "")`
+      .asDiv
+
+      .append(`In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
+        instance value is an empty string, the instance if not.`)
+      .asDiv
+
+      .append(`This means one can use <a target="_blank" 
+        href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
+        >optional chaining</a> in combination with the <a target="_blank"
+        href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+        >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
+      .asDiv
+        
+      .append(`See the <a target="_top" href="#static-addcustom"> .addCustum</a> user defined
+          <code>toTag</code> method for a use case`)
+      .toTag("div", "normal b5") )
+
+      .append(
+        $S`$S(null).notEmpty?.append("hello!") ?? $S()`.toCode,
+        ` => `,
+        ($S(null).notEmpty?.append("hello!") ?? $S()).qcd
+      )
+      .asDiv
+      
+      .append(
+        $S(`$S\`hello\`.notEmpty?.append(" ", "world!") ?? $S()`).toCode,
+        ` => `,
+        ($S`hello`.notEmpty?.append(" ", "world!") ?? $S()).qcd
       )
       .asDiv
       .value);
@@ -1157,8 +1231,7 @@ function addCustomized() {
   $S.addCustom({name: "festive", method: me => me.enclose("\u{1F389}"), isGetter: true});
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
-      className = $S(className);
-      !className.empty && className.quote.double.prefix($S(" class="));
+      className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? ``;
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
@@ -1166,10 +1239,8 @@ function addCustomized() {
     name: "toIdTag", method: (me, {tag, id, className} = {}) => {
       tag = getStringValue(tag);
       if (!tag) { return me; }
-      className = $S(className);
-      id = $S(id);
-      !className.empty && className.quote.double.prefix($S(" class="));
-      !id.empty && id.quote.double.prefix(" id=");
+      className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? ``;
+      id = $S(id).notEmpty?.quote.double.prefix(" id=") ?? ``;
       return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
     }
   });

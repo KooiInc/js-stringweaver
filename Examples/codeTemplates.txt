@@ -28,12 +28,11 @@ const result = $S`Hurray!`.festive;
 </template>
 
 <template id="toTagExample">
-$S.addCustom( { 
+$S.addCustom( {
     name: "toTag", 
     method: (me, tagName, className) => {
-    className = $S(className);
-    !className.empty && className.quote.double.prefix($S(" class="));
-
+    className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? "";
+    
     return me.enclose(
       $S(tagName).append(className).enclose("<", ">"),
       $S(tagName).enclose("&lt;/", "&gt;") );
