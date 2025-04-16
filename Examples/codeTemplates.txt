@@ -84,7 +84,7 @@ empty.value = 'hello ';
 empty.value += 'world';
 const emptyClone = empty.clone;
 emptyClone.append({hello: 1, world: 2});  // nothing happens
-emptyClone.value += {hello: 1, world: 2}; // {hello: 1, world: 2} stringified
+emptyClone.value += {hello: 1, world: 2}; // {hello: 1, world: 2} will be stringified
 </template>
 
 
