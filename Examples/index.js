@@ -103,7 +103,7 @@ function printInitializationExamples() {
         $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward)
       .value,
     
-    $S`toString/valueOf is overridden`
+    $S`Native .toString/.valueOf are overridden`
       .toIdTag({tag: "h3", id: "initialization-native-tostringvalueof", className: "head code"})
       .append( $S`To retrieve the instance string value one can use its <code>value</code> property
           or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
