@@ -77,6 +77,7 @@ describe(`Basics constructor`, () => {
         'interpolate',
         'kebabCase',
         'lastIndexOf',
+        'notEmpty',
         'prefix',
         'quote',
         'replaceWords',
@@ -112,6 +113,7 @@ describe(`Basics constructor`, () => {
         'interpolate (chainable method)',
         'kebabCase (chainable getter)',
         'lastIndexOf (method (override))',
+        'notEmpty (chainable getter|undefined)',
         'prefix (chainable method)',
         'quote (Object. See [constructor].quoteInfo)',
         'replaceWords (chainable method)',
@@ -513,6 +515,17 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.lastIndexOf(`z`), undefined);
   });
   
+  describe(`.notEmpty as expected`, () => {
+    it(`instance empty string value as expected`, () => {
+      assert.strictEqual(($S()
+        .notEmpty?.append(`hello!`) ?? $S()).value, "");  
+    });
+    it(`instance string value as expected`, () => {
+      assert.strictEqual(($S("hithere and ")
+        .notEmpty?.append(`hello!`) ?? $S()).value, "hithere and hello!");
+    });
+  });
+  
   describe(`prefix/prepend`, () => {
     it(`prefix no arguments as expected`, () => {
       const hi = $S`Hi`.prefix();
@@ -619,11 +632,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       assert.strictEqual(tooMuch.trimAllKeepLF.value, "stringified with too\nmuch\n\nwhitespace characters");
     });
     
-    if (`trimAll empty input string as expected`, () => {
+    it(`trimAll empty input string as expected`, () => {
       assert.strictEqual($S``.trimAll.value, ``);
     });
     
-    if (`trimAllKeppLF empty input string as expected`, () => {
+    it(`trimAllKeppLF empty input string as expected`, () => {
       assert.strictEqual($S``.trimAllKeepLF.value, ``);
     });
   });
