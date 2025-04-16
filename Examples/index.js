@@ -1,6 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../index.js";
+import $S from "../Bundle/index.min.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
@@ -131,6 +131,7 @@ function printGetterExamples() {
   log($S("Instance getters").toIdTag({tag: "h2", id: "chapter-getter", className: "head code"}).value);
   camelCaseEx();
   cloneEx();
+  emptyEx();
   firstUpEx();
   historyEx();
   kebabCaseEx();
@@ -350,6 +351,32 @@ function historyEx() {
         $S` => `.append(historyEx)).asDiv
       .value,
   );
+}
+
+function emptyEx() {
+  log(
+    $S`.empty`.toIdTag({tag: "h3", id: "getter-empty", className: "head code"})
+      .append(
+        $S`$S(null).empty`.toCode,
+        ` => `,
+        $S`${$S(null).empty}`
+      )
+      .asDiv
+      
+      .append(
+        $S`$S().empty`.toCode,
+        ` => `,
+        $S`${$S(null).empty}`
+      )
+      .asDiv
+      
+      .append(
+        $S`$S("hello!").empty`.toCode,
+        ` => `,
+        $S`${$S("hello!").empty}`
+      )
+      .asDiv
+      .value);
 }
 
 function snakeCaseEx() {
@@ -1131,7 +1158,7 @@ function addCustomized() {
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
       className = $S(className);
-      className.length && className.quote.double.prefix($S(" class="));
+      !className.empty && className.quote.double.prefix($S(" class="));
       return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
     }
   });
@@ -1141,8 +1168,8 @@ function addCustomized() {
       if (!tag) { return me; }
       className = $S(className);
       id = $S(id);
-      className.length && className.quote.double.prefix($S(" class="));
-      id.length && id.quote.double.prefix(" id=");
+      !className.empty && className.quote.double.prefix($S(" class="));
+      !id.empty && id.quote.double.prefix(" id=");
       return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
     }
   });
