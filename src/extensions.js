@@ -13,53 +13,53 @@ function instanceCreator({initialstring, customMethods} = {}) {
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = initialstring?.constructor === String ? initialstring : ``;
   let history = [actualValue];
-  const enumerable = false;
+  const enumerable = false, configurable = false;
   
   Object.defineProperties(customStringExtensions, { 
-    append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable },
-    enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable },
-    format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
-    indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable },
-    interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable },
+    append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable, configurable },
+    enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable, configurable },
+    format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable, configurable },
+    indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable, configurable },
+    interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable, configurable },
     insert: { value({ value, values, at } = {}) { 
         return wrap(insert(actualValue, { value, values, at })); 
       }, enumerable 
     },
-    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable },
-    prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable },
+    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable, configurable },
+    prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable, configurable },
     replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
       return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
-    }, enumerable },
-    toString: { value() { return actualValue; }, enumerable },
+    }, enumerable, configurable },
+    toString: { value() { return actualValue; }, enumerable, configurable },
     truncate: { value({at, html = false, wordBoundary = false} = {}) {
-      return wrap(truncate(actualValue, {at, html, wordBoundary})); }, enumerable },
-    valueOf: { value() { return actualValue; }, enumerable },
-    undoLast: { value(nSteps) { return undoSteps(nSteps); }, enumerable },
+      return wrap(truncate(actualValue, {at, html, wordBoundary})); }, enumerable, configurable },
+    valueOf: { value() { return actualValue; }, enumerable, configurable },
+    undoLast: { value(nSteps) { return undoSteps(nSteps); }, enumerable, configurable },
 
-    camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable },    
-    clone: { get() { return clone(); }, enumerable },
-    constructor: { get() { return $S.constructor; }, enumerable },
-    firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable },
+    camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable, configurable },    
+    clone: { get() { return clone(); }, enumerable, configurable },
+    constructor: { get() { return $S.constructor; }, enumerable, configurable },
+    firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable, configurable },
     history: { 
       get() { return history; },
       set(value) { history = value; },
-      enumerable },
+      enumerable, configurable },
     empty: { get() { return actualValue.length < 1; } },
     notEmpty: { get() { return actualValue.length < 1 ? undefined: instance; } },
-    kebabCase: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable },
+    kebabCase: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable, configurable },
     quote: quotGetters(instance, wrap),
     snakeCase: { get() { return wrap(toSnakeCase(getStringValue(actualValue))); } },
-    trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable },
-    trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); }, enumerable },
-    undoAll: { get() { return undoAll(); }, enumerable },
-    undo: { get() { return undoLast(); }, enumerable },
-    wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); }, enumerable },
+    trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable, configurable },
+    trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); }, enumerable, configurable },
+    undoAll: { get() { return undoAll(); }, enumerable, configurable },
+    undo: { get() { return undoLast(); }, enumerable, configurable },
+    wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); }, enumerable, configurable },
     value: { 
       get() { return actualValue; }, 
       set(value) { 
         actualValue = getStringValue(value).length ? value : actualValue;
         history.push(actualValue);
-      }, enumerable },
+      }, enumerable, configurable },
   });
   
   injectCustomMethods(customMethods);
@@ -137,7 +137,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
     Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
       const {enumerable, method, isGetter} = methodContainer;
       const descriptor = isGetter
-        ? { get() { return wrap(method(instance).value); }, enumerable }
+        ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
         : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, };
       
       Object.defineProperty(customStringExtensions, methodName, descriptor);
