@@ -42,7 +42,17 @@ function demonstrate() {
     .append(
         $S`Nearly all elements on this page were created using <code>StringWeaver</code>
           <br>(click 'Display code' to inspect the code).`.asDiv,
-        $S`Creating the page took <b>${time.toLocaleString()}</b> seconds`.asDiv)
+        $S`Creating the page took <b>${time.toLocaleString()}</b> seconds`)
+    .toTag(`div`, `normal b5`)
+    .append(
+      $S`using StringWeaver instances for string manipulation for sure will be slower 
+        than using native Strings. This is mainly due to the fact that every instance is a`
+        .append(`<a target="_blank" class="ExternalLink arrow" 
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"
+          >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
+            href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
+            Still, if one does't need to manipulate hundreds of thousands of strings, 
+            StringWeaver's performance should be fine.`).asNote.asDiv )
     .value;
   hljs.highlightAll(`javascript`);
 }
