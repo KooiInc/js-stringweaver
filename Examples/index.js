@@ -1,6 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../index.js";
+import $S from "../Bundle/index.min.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
@@ -48,7 +48,7 @@ function demonstrate() {
 }
 
 function printInitializationExamples() {
-  log(
+  const allExamples = [
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
       .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote).asDiv
@@ -60,13 +60,13 @@ function printInitializationExamples() {
       .asDiv
       .value,
     
-    $S`As tagged template`.toIdTag({tag: "h3", id: "initialization-astt", className: "head code"})
+    $S`Initialize using tagged template function`.toIdTag({tag: "h3", id: "initialization-astt", className: "head code"})
       .append($S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
         .append($S`hello world`.qcd))
       .value,
     
-    $S`As function call`.toIdTag({tag: "h3", id: "initialization-asfn", className: "head code"})
+    $S`Initialize using function call`.toIdTag({tag: "h3", id: "initialization-asfn", className: "head code"})
       .append($S`$S("hello world")`.toCode)
       .append($S(`hello world`).qcd.prefix(` => `)).value,
     
@@ -140,8 +140,8 @@ function printInitializationExamples() {
         `<br>=> `,
         `${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd} `)
       .asDiv
-    .value,
-  );
+    .value,];
+  log(...allExamples);
 }
 
 function printStaticConstructorFunctionExamples() {
@@ -1249,7 +1249,10 @@ function printHeader() {
         <b>js-stringweaver</b> is programmed as a <a target="_blank"
           class="ExternalLink arrow"
           href="https://depth-first.com/articles/2019/03/04/class-free-object-oriented-programming"
-        >class free object oriented</a> module.`.toTag(`p`, `normal`) )
+          >class free object oriented</a> module (<a class="ExternalLink arrow"
+          href="https://www.researchgate.net/publication/347727033_How_JavaScript_Works#pf83"
+          >See also</a> (chapter 17))`
+        .toTag(`p`, `normal`) )
       .value,
     $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
         target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
