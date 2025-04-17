@@ -102,7 +102,7 @@ describe(`Basics constructor`, () => {
         'append (chainable method)',
         'camelCase (chainable getter)',
         'clone (chainable getter)',
-        'constructor (method (override))',
+        'constructor (getter (override))',
         'empty (getter)',
         'enclose (chainable method)',
         'firstUp (chainable getter)',

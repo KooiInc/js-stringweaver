@@ -44,6 +44,7 @@ function getSWInformation(notChainable) {
     .map(([key, descriptr]) => {
       if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
       const isChainable = !notChainable.find(k => k === key);
+       
       return `${key} (${
         key === `value` 
           ? `getter/setter`
@@ -52,7 +53,7 @@ function getSWInformation(notChainable) {
             : key === `notEmpty` 
               ? `chainable getter|undefined`
               : key in String.prototype 
-                ? `method (override)` 
+                ? `${descriptr.get ? `getter` : `method`} (override)` 
                 : descriptr.value && descriptr.value.constructor === Function
                   ? (isChainable 
                     ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
