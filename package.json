@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KooiInc/js-stringweaver"
+    "url": "git+https://github.com/KooiInc/js-stringweaver.git"
   },
   "bugs": {
     "url": "https://github.com/KooiInc/js-stringweaver/issues"
