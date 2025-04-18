@@ -13,53 +13,54 @@ function instanceCreator({initialstring, customMethods} = {}) {
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = initialstring?.constructor === String ? initialstring : ``;
   let history = [actualValue];
-  const enumerable = false, configurable = false;
+  const descriptorProps = {configurable: false, enumerable: false};
   
-  Object.defineProperties(customStringExtensions, { 
-    append: { value(...strings) { return wrap(append(actualValue, ...strings)); }, enumerable, configurable },
-    enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); }, enumerable, configurable },
-    format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable, configurable },
-    indexOf: { value(str) { return indexOf(actualValue, str); }, enumerable, configurable },
-    interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); }, enumerable, configurable },
-    insert: { value({ value, values, at } = {}) { 
+  Object.defineProperties( customStringExtensions, {
+    append: { ...descriptorProps, value(...strings) { return wrap(append(actualValue, ...strings)); } },
+    enclose: { ...descriptorProps, value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
+    format: { ...descriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    indexOf: { ...descriptorProps, value(str) { return indexOf(actualValue, str); } },
+    interpolate: { ...descriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    insert: { ...descriptorProps, value({ value, values, at } = {}) { 
         return wrap(insert(actualValue, { value, values, at })); 
-      }, enumerable 
+      } 
     },
-    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); }, enumerable, configurable },
-    prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); }, enumerable, configurable },
-    replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
+    lastIndexOf: { ...descriptorProps, value(str) { return lastIndexOf(actualValue, str); } },
+    prefix: { ...descriptorProps, value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
+    replaceWords: { ...descriptorProps, value({caseSensitive = false, replacements = {}} = {}) {
       return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
-    }, enumerable, configurable },
-    toString: { value() { return actualValue; }, enumerable, configurable },
-    truncate: { value({at, html = false, wordBoundary = false} = {}) {
-      return wrap(truncate(actualValue, {at, html, wordBoundary})); }, enumerable, configurable },
-    valueOf: { value() { return actualValue; }, enumerable, configurable },
-    undoLast: { value(nSteps) { return undoSteps(nSteps); }, enumerable, configurable },
+    } },
+    toString: { ...descriptorProps, value() { return actualValue; } },
+    truncate: { ...descriptorProps, value({at, html = false, wordBoundary = false} = {}) {
+      return wrap(truncate(actualValue, {at, html, wordBoundary})); } },
+    valueOf: { ...descriptorProps, value() { return actualValue; } },
+    undoLast: { ...descriptorProps, value(nSteps) { return undoSteps(nSteps); } },
 
-    camelCase: { get() { return wrap(toCamelcase(getStringValue(actualValue))); }, enumerable, configurable },    
-    clone: { get() { return clone(); }, enumerable, configurable },
-    constructor: { get() { return $S.constructor; }, enumerable, configurable },
-    firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); }, enumerable, configurable },
-    history: { 
-      get() { return history; },
-      set(value) { history = value; },
-      enumerable, configurable },
-    empty: { get() { return actualValue.length < 1; } },
-    notEmpty: { get() { return actualValue.length < 1 ? undefined: instance; } },
-    kebabCase: { get() { return wrap(toDashedNotation(getStringValue(actualValue))); }, enumerable, configurable },
+    camelCase: { ...descriptorProps, get() { return wrap(toCamelcase(getStringValue(actualValue))); } },    
+    clone: { ...descriptorProps, get() { return clone(); } },
+    constructor: { ...descriptorProps, get() { return $S.constructor; } },
+    firstUp: { ...descriptorProps, get() { return wrap(ucFirst(getStringValue(actualValue))); } },
+    history: { ...descriptorProps, get() { return history; }, set(value) { history = value; } },
+    empty: { ...descriptorProps, get() { return actualValue.length < 1; } },
+    notEmpty: { ...descriptorProps, get() { return actualValue.length < 1 ? undefined: instance; } },
+    kebabCase: { ...descriptorProps, get() { return wrap(toDashedNotation(getStringValue(actualValue))); } },
     quote: quotGetters(instance, wrap),
-    snakeCase: { get() { return wrap(toSnakeCase(getStringValue(actualValue))); } },
-    trimAll: { get() { return wrap(trimAll(actualValue)); }, enumerable, configurable },
-    trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); }, enumerable, configurable },
-    undoAll: { get() { return undoAll(); }, enumerable, configurable },
-    undo: { get() { return undoLast(); }, enumerable, configurable },
-    wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); }, enumerable, configurable },
-    value: { 
+    snakeCase: { ...descriptorProps, get() { return wrap(toSnakeCase(getStringValue(actualValue))); } },
+    trimAll: { ...descriptorProps, get() { return wrap(trimAll(actualValue)); } },
+    trimAllKeepLF: { ...descriptorProps, get() { return wrap(trimAll(actualValue, true)); } },
+    undoAll: { ...descriptorProps, get() { return undoAll(); } },
+    undo: { ...descriptorProps, get() { return undoLast(); } },
+    wordsUCFirst: { ...descriptorProps, get() { return wrap(wordsFirstUp(getStringValue(actualValue))); } },
+    value: { ...descriptorProps, 
       get() { return actualValue; }, 
-      set(value) { 
-        actualValue = getStringValue(value).length ? value : actualValue;
-        history.push(actualValue);
-      }, enumerable, configurable },
+      set(value) {
+        const nwValue = getStringValue(value);
+        if (nwValue.length) {
+          actualValue = nwValue;
+          history.push(nwValue);  
+        }
+      }
+    },
   });
   
   injectCustomMethods(customMethods);
@@ -137,8 +138,8 @@ function instanceCreator({initialstring, customMethods} = {}) {
     Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
       const {enumerable, method, isGetter} = methodContainer;
       const descriptor = isGetter
-        ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
-        : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, };
+        ? { ...descriptorProps, get() { return wrap(method(instance).value); } }
+        : { ...descriptorProps, value(...args) { return wrap(method(instance, ...args).value); } };
       
       Object.defineProperty(customStringExtensions, methodName, descriptor);
     });
