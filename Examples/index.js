@@ -159,11 +159,6 @@ function printInitializationExamples() {
 function printStaticConstructorFunctionExamples() {
   const isBundled = $S.constructor.name !== `CustomStringConstructor`;
   const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode; 
-  // when minified from an online source, this is a possibility
-  // const constructorLine = isBundled
-  //   ? $S`imported from bundle (minified) =&gt;`.asNote.append(`<code>function ${
-  //       $S.constructor.name}(str, ...args) {...}</code>`)
-  //   : $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
   const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
   log(
     $S`Static constructor properties/methods`
