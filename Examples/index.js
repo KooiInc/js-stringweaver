@@ -53,7 +53,8 @@ function demonstrate() {
           >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
             href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
             Still, if one does't need to manipulate hundreds of thousands of strings, 
-            StringWeaver's performance should be fine.`).asNote.asDiv )
+            StringWeaver's performance should not get in the way of anything 
+            (instantiating takes 0.03-0.04 <b>milli</b>seconds).`).asNote.asDiv )
     .value;
   hljs.highlightAll(`javascript`);
 }
