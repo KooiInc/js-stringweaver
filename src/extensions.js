@@ -138,8 +138,8 @@ function instanceCreator({initialstring, customMethods} = {}) {
     Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
       const {enumerable, method, isGetter} = methodContainer;
       const descriptor = isGetter
-        ? { ...descriptorProps, get() { return wrap(method(instance).value); } }
-        : { ...descriptorProps, value(...args) { return wrap(method(instance, ...args).value); } };
+        ? { get() { return wrap(method(instance).value); }, enumerable, configurable: false }
+        : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable: false };
       
       Object.defineProperty(customStringExtensions, methodName, descriptor);
     });
