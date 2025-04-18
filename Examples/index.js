@@ -1,6 +1,7 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-import $S from "../Bundle/index.min.js";
+//import $S from "../Bundle/index.min.js";
+import $S from "../index.js";
 const exampleCode = await fetchTemplates();
 let codeOverlay, performanceText;
 window.$S = $S; // try it out in the console
@@ -156,11 +157,12 @@ function printInitializationExamples() {
 
 function printStaticConstructorFunctionExamples() {
   const isBundled = $S.constructor.name !== `CustomStringConstructor`;
+  const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode; 
   // when minified from an online source, this is a possibility
-  const constructorLine = isBundled
-    ? $S`imported from bundle (minified) =&gt;`.asNote.append(`<code>function ${
-        $S.constructor.name}(str, ...args) {...}</code>`)
-    : $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
+  // const constructorLine = isBundled
+  //   ? $S`imported from bundle (minified) =&gt;`.asNote.append(`<code>function ${
+  //       $S.constructor.name}(str, ...args) {...}</code>`)
+  //   : $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
   const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
   log(
     $S`Static constructor properties/methods`
@@ -1375,7 +1377,14 @@ function setDelegates() {
   $.delegate(`click`, `.lemma`, (_, me) => {
     $(`.lemma[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
-    setTimeout(_ => document.body.scrollTop -= 16);
+    const href = me.prop(`href`);
+    
+    if (/(keys|info|quoteInfo)$/i.test(href)) {
+      const nodeId = `#${href.split(`#`).pop()}`;
+      $.node(nodeId).closest(`details.in-content`).open = true;
+    }
+    
+    return setTimeout(_ => document.body.scrollTop -= 16);
   });
 }
 
