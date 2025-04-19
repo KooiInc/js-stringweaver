@@ -1,12 +1,19 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers 
-//import $S from "../Bundle/index.min.js";
-import $S from "../index.js";
-const exampleCode = await fetchTemplates();
-let codeOverlay, performanceText;
-window.$S = $S; // try it out in the console
+let codeOverlay, performanceText, $S, exampleCode;
+let debug = false; // set to true to use the unbundled version
 const {log, logTop} = logFactory();
-demonstrate();
+
+import(debug ? "../index.js" : "../Bundle/index.min.js").then(async module => {
+  $S = module.default;
+  window.$S = $S; // try out in the console
+  initStyling($S);
+  exampleCode = await fetchTemplates();
+  createCodeElement().then(_ => Promise.resolve(`ok`));
+  setDelegates();
+  addCustomized();
+  return demonstrate();
+});
 
 // An alternative for .trimAll
 function trimAllAlternative(string) {
@@ -26,36 +33,14 @@ function trimAllAlternative(string) {
 }
 
 function demonstrate() {
-  initStyling();
-  setDelegates();
   const startTime = performance.now();
-  createCodeElement().then(_ => Promise.resolve(`ok`));
-  addCustomized();
   printInitializationExamples();
   printStaticConstructorFunctionExamples();
   printGetterExamples();
   printMethodExamples();
   printHeader();
+  setPerformanceText(+((performance.now() - startTime)/1000).toFixed(5));
   createTOC();
-  $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
-  const time = +((performance.now() - startTime)/1000).toFixed(3);
-  performanceText = $S`Performance`.toTag(`b`, `b5`)
-    .append(
-        $S`Nearly all elements on this page were created using <code>StringWeaver</code>
-          <br>(click 'Display code' to inspect the code).`.asDiv,
-        $S`Creating the page took <b>${time.toLocaleString()}</b> seconds`)
-    .toTag(`div`, `normal b5`)
-    .append(
-      $S`using StringWeaver instances for string manipulation for sure will be slower 
-        than using native Strings. This is mainly due to the fact that every instance is a`
-        .append(`<a target="_blank" class="ExternalLink arrow" 
-          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"
-          >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
-            href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
-            Still, if one does't need to manipulate hundreds of thousands of strings, 
-            StringWeaver's performance should not get in the way of anything 
-            (instantiating takes 0.03-0.04 <b>milli</b>seconds).`).asNote.asDiv )
-    .value;
   hljs.highlightAll(`javascript`);
 }
 
@@ -158,7 +143,8 @@ function printInitializationExamples() {
 
 function printStaticConstructorFunctionExamples() {
   const isBundled = $S.constructor.name !== `CustomStringConstructor`;
-  const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode; 
+  const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`
+    .toCode; 
   const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
   log(
     $S`Static constructor properties/methods`
@@ -188,7 +174,7 @@ function printStaticConstructorFunctionExamples() {
     
     $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
       .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append(constructorLine)
+      .append(constructorLine.prefix($S`${!debug ? `this is constructor from the bundled code => ` : ``}`.asNote))
       .toTag(`div`, `normal`)
       .value,
   );
@@ -1410,9 +1396,32 @@ function createTOC() {
   const tocElem = $($.node(`#codeVwr`).closest(`li`).querySelector(`div`))
     .append($.h2({id: "TOCElem", class: `head code`}, `Content`));
   toc.forEach(chapter => tocElem.append(chapter));
+  $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
 }
 
-function initStyling() {
+function setPerformanceText(time) {
+  performanceText = $S`Performance`.toTag(`b`, `b5`)
+    .append(
+      $S`Nearly all elements on this page were created using <code>StringWeaver</code>
+          <br>(click 'Display code' to inspect the code).`.asDiv,
+      $S`Creating the page took <b>${time.toLocaleString()}</b> seconds.`)
+    .toTag(`div`, `normal b5`)
+    .append($S`This includes the overhead from creating (and printing) all html.`.asNote)
+    .toTag(`div`, `normal b5`)
+    .append(
+      $S`using StringWeaver instances for string manipulation for sure will be slower 
+        than using native Strings. This is mainly due to the fact that every instance is a`
+        .append(`<a target="_blank" class="ExternalLink arrow" 
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"
+          >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
+            href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
+            Still, if one does't need to manipulate hundreds of thousands of strings, 
+            StringWeaver's performance should not get in the way of anything 
+            (instantiating takes 0.03-0.04 <b>milli</b>seconds).`).asNote.asDiv )
+    .value;
+}
+
+function initStyling($S) {
   // style rules are stored in the JQL style element (head)style#JQLStylesheet
   const arrowRepeat = $S` ⬇ `.repeat(5).enclose(`"`);
   $.editCssRules(
