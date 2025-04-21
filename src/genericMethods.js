@@ -22,7 +22,7 @@ function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
   Object.defineProperties(
     instance, {
-      constructor: {value: CustomStringConstructor, enumerable: false},
+      constructor: { get() { return CustomStringConstructor; }, enumerable: false},
     });
   return Object.freeze(instance);
 }
