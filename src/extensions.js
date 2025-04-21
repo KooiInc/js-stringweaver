@@ -72,11 +72,16 @@ function instanceCreator({initialstring, customMethods} = {}) {
       get( target, key ) {
         return key in extensions
           ? extensions[key]
-          : key in String.prototype
+          : canWrapNative(String(key))
             ? wrapNative(key)
             : undefined;
       },
     };
+  }
+  
+  function canWrapNative(key) {
+    return !/anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i.test(key)
+      && key in String.prototype;
   }
   
   function clone() {
