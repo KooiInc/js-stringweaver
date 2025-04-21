@@ -1,6 +1,6 @@
 import interpolate from "./Factories/interpolateFactory.js";
 
-import {isArrayOf, isNumber, defineQuotingStyles, getStringValue, escapeRE} from "./genericMethods.js";
+import {isArrayOf, isNumber, defineQuotingStyles, getStringValue, escapeRE, customMethods, clone} from "./genericMethods.js";
 const quotingStyles = defineQuotingStyles();
 
 export {
@@ -9,6 +9,7 @@ export {
   isNumber, prefix, getStringValue, toCamelcase,
   wordsFirstUp, toDashedNotation, quotGetters,
   surroundWith, defineQuotingStyles, toSnakeCase,
+  customMethods, clone,
 };
 
 function checkAndRun(string, fn, or) {

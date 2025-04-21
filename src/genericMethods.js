@@ -1,17 +1,37 @@
-import xString, {CustomStringConstructor, customMethods} from "../index.js";
+//import xString, {CustomStringConstructor, customMethods} from "../index.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
+import createInstance from "./extensions.js";
+const customMethods = {};
+const defaultStringCTOR = createExtendedCTOR(CustomStringConstructor, customMethods);
 
 export {
+  customMethods,
+  CustomStringConstructor,
   createExtendedCTOR, 
   resolveTemplateString, 
-  xString, 
   isNumber, 
   isArrayOf,
   defineQuotingStyles,
   getStringValue,
   escapeRE,
+  clone,
 };
+
+function CustomStringConstructor(str, ...args) {
+  const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
+  Object.defineProperties(
+    instance, {
+      constructor: {value: CustomStringConstructor, enumerable: false},
+    });
+  return Object.freeze(instance);
+}
+
+function clone(instance) {
+  const newInstance = CustomStringConstructor(instance.value);
+  newInstance.history = [...instance.history];
+  return newInstance;
+}
 
 function resolveTemplateString(str, ...args) {
   return str?.raw
@@ -38,7 +58,7 @@ function isNumber(value) {
 }
 
 function getSWInformation(notChainable) {
-  const firstLines = xString(decode());
+  const firstLines = CustomStringConstructor(decode());
   return firstLines.value.split(/\n/).concat(
     Object.entries(Object.getOwnPropertyDescriptors(firstLines))
     .map(([key, descriptr]) => {
@@ -75,12 +95,12 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     format: {
       value(str, ...tokens) {
-        return xString(str).format(...tokens);
+        return CustomStringConstructor(str).format(...tokens);
       }
     },
     addCustom: {
       value( { name, method, enumerable = false, isGetter = false } = {} ) {
-        if (xString``[name]) {
+        if (CustomStringConstructor``[name]) {
           return console.error(`addCustom: the property "${name}" exists and can not be redefined`);
         }
         if (name?.constructor === String && method?.constructor === Function && method.length > 0) {
@@ -93,7 +113,7 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     keys: {
       get() { 
-        return Object.keys(Object.getOwnPropertyDescriptors(xString``)).sort( (a,b) => a.localeCompare(b) )
+        return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``)).sort( (a,b) => a.localeCompare(b) )
           .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v); 
       }
     },
@@ -110,11 +130,11 @@ function createExtendedCTOR(ctor, customMethods) {
       }
     },
     uuid4: {
-      get() { return xString(uuid4()); }
+      get() { return CustomStringConstructor(uuid4()); }
     },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
-        return xString(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic})); 
+        return CustomStringConstructor(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic})); 
       }
     },
     regExp: { value: createRegExp }

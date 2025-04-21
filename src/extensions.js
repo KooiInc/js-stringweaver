@@ -3,12 +3,14 @@ import {
   indexOf, lastIndexOf, insert, append, prefix,
   getStringValue, quotGetters, surroundWith,
   toCamelcase, wordsFirstUp, toDashedNotation, toSnakeCase,
+  customMethods, isNumber, clone,
 } from "./instanceMethods.js";
 
-import {xString as $S, isNumber} from "./genericMethods.js";
 export default instanceCreator;
 
-function instanceCreator({initialstring, customMethods} = {}) {
+const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i
+
+function instanceCreator({initialstring} = {}) {
   let customStringExtensions = { };
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = initialstring?.constructor === String ? initialstring : ``;
@@ -37,8 +39,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
     undoLast: { ...descriptorProps, value(nSteps) { return undoSteps(nSteps); } },
 
     camelCase: { ...descriptorProps, get() { return wrap(toCamelcase(getStringValue(actualValue))); } },    
-    clone: { ...descriptorProps, get() { return clone(); } },
-    constructor: { ...descriptorProps, get() { return $S.constructor; } },
+    clone: { ...descriptorProps, get() { return clone(instance, customMethods); } },
     firstUp: { ...descriptorProps, get() { return wrap(ucFirst(getStringValue(actualValue))); } },
     history: { ...descriptorProps, get() { return history; }, set(value) { history = value; } },
     empty: { ...descriptorProps, get() { return actualValue.length < 1; } },
@@ -65,7 +66,7 @@ function instanceCreator({initialstring, customMethods} = {}) {
   
   injectCustomMethods(customMethods);
   
-  return Object.freeze(instance);
+  return instance;
   
   function getTraps(extensions) {
     return {
@@ -80,15 +81,15 @@ function instanceCreator({initialstring, customMethods} = {}) {
   }
   
   function canWrapNative(key) {
-    return !/anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i.test(key)
+    return !deprecatedRE.test(key)
       && key in String.prototype;
   }
   
-  function clone() {
-    const newInstance = $S(actualValue);
-    newInstance.history = [...history];
-    return newInstance;
-  }
+  // function clone(instance) {
+  //   const newInstance = instanceCreator(instance.value);
+  //   newInstance.history = [...history];
+  //   return newInstance;
+  // }
   
   function wrapNative(key) {
     return actualValue[key] instanceof Function
