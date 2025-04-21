@@ -1,45 +1,27 @@
 import {logFactory, $} from "./DOMhelpers.js";
-// ↳ see https://github.com/KooiInc/SBHelpers 
-let codeOverlay, performanceText, $S, exampleCode;
+// ↳ see https://github.com/KooiInc/SBHelpers
+import $S from "../Bundle/index.min.js";
+const codeOverlay = await createCodeElement();
+const exampleCode = await fetchTemplates();
 let debug = false; // set to true to use the unbundled version
 const {log, logTop} = logFactory();
 
-import(debug ? "../index.js" : "../Bundle/index.min.js").then(async module => {
-  $S = module.default;
-  window.$S = $S; // try out in the console
-  initStyling($S);
-  exampleCode = await fetchTemplates();
-  createCodeElement().then(_ => Promise.resolve(`ok`));
+main();
+
+function main() {
+  window.$S = $S; // try out in console
+  initStyling();
   setDelegates();
   addCustomized();
-  return demonstrate();
-});
-
-// An alternative for .trimAll
-function trimAllAlternative(string) {
-  return string
-    .trim()
-    .split(/\n/)
-    .map( l => l.replace(/\s{2,}/g, ` `).trim() )
-    .filter(l => l.length)
-    .map( l => l
-      .replace(/(\p{Ps})\s/gu, a => a.trim())
-      .replace(/\s(\p{Pe})/gu, (_,b) => b.trim())
-      .replace(/(\p{S})\s/gu, a => a.trim())
-      .replace(/\s(\p{S})/gu, (_,b) => b.trim())
-      .replace(/\s(\p{Po})/gu, (_,b) => b.trim())
-      .replace(/([;,.:])(\S)/g, (a,b,c) => b + ` ` + c) )
-    .join(`\n`);
+  demonstrate();
 }
 
 function demonstrate() {
-  const startTime = performance.now();
   printInitializationExamples();
   printStaticConstructorFunctionExamples();
   printGetterExamples();
   printMethodExamples();
   printHeader();
-  setPerformanceText(+((performance.now() - startTime)/1000).toFixed(5));
   createTOC();
   hljs.highlightAll(`javascript`);
 }
@@ -174,7 +156,7 @@ function printStaticConstructorFunctionExamples() {
     
     $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
       .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append(constructorLine.prefix($S`${!debug ? `this is constructor from the bundled code => ` : ``}`.asNote))
+      .append(constructorLine.prefix($S`${!debug ? `this is the constructor from the bundled code => ` : ``}`.asNote))
       .toTag(`div`, `normal`)
       .value,
   );
@@ -1225,7 +1207,7 @@ function undoLastEx() {
 
 function printHeader() {
   logTop(
-    $S`<button id="performance">Page performance</button>
+    $S`<button id="performance">Performance</button>
        &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
       .append($S`&nbsp;`).toTag(`div`, `normal`).value,
     $S`js-stringweaver: a stringbuilder utility`.toTag(`h1`, `head`)
@@ -1256,14 +1238,30 @@ function printHeader() {
 }
 
 async function createCodeElement() {
-  const code = await(fetch("./index.js"))
-    .then(res => res.text());
-  codeOverlay = $.div_jql(
+  const code = await(fetch("./index.js")).then(res => res.text());
+  return $.div_jql(
     {id: "codeOverlay"},
     $.pre({class: "codebox", id: "overlayed"},
       $.code({class: "hljs language-javascript"}, 
-        code.replace(/</g, `&lt;`).replace(/>/g, `&gt;`)) ) )
-    .hide();
+        code.replace(/</g, `&lt;`).replace(/>/g, `&gt;`)) ) 
+    ).hide();
+}
+
+// An alternative for .trimAll
+function trimAllAlternative(string) {
+  return string
+    .trim()
+    .split(/\n/)
+    .map( l => l.replace(/\s{2,}/g, ` `).trim() )
+    .filter(l => l.length)
+    .map( l => l
+      .replace(/(\p{Ps})\s/gu, a => a.trim())
+      .replace(/\s(\p{Pe})/gu, (_,b) => b.trim())
+      .replace(/(\p{S})\s/gu, a => a.trim())
+      .replace(/\s(\p{S})/gu, (_,b) => b.trim())
+      .replace(/\s(\p{Po})/gu, (_,b) => b.trim())
+      .replace(/([;,.:])(\S)/g, (a,b,c) => b + ` ` + c) )
+    .join(`\n`);
 }
 
 function addCustomized() {
@@ -1320,13 +1318,18 @@ function getCodeblocks(templates) {
 
 async function fetchTemplates() {
   $.allowTag(`template`);
-  return getCodeblocks($.virtual(`<div>${await fetch(`./codeTemplates.txt`).then(r => r.text())}</div>`));
+  return getCodeblocks(
+    $.div_jql(
+      await fetch(`./codeTemplates.txt`)
+        .then(r => r.text()) )
+  );
 }
 
 function setDelegates() {
   $.delegate(`click`, `#codeVwr, #performance`, evt => {
     if (evt.target.id === "performance") {
-      return $.Popup.show({ content: performanceText });
+      $.Popup.show({content: `working ...`});
+      return setTimeout(runAndReportPerformance);
     }
     const bttn = evt.target;
     const parentLi = bttn.closest(`li`);
@@ -1353,8 +1356,7 @@ function setDelegates() {
       evt.preventDefault();
       $(`.in-content`).each(el => el.open = false);
     }
-    setTimeout(_ => document.body.scrollTop = 0, 400);
-    return;
+      setTimeout(_ => document.body.scrollTop = 0, 400);
   });
   $.delegate(`click`, `.lemma`, (_, me) => {
     $(`.lemma[data-active='1']`).data.set({active: "0"});
@@ -1399,29 +1401,40 @@ function createTOC() {
   $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
 }
 
-function setPerformanceText(time) {
-  performanceText = $S`Performance`.toTag(`b`, `b5`)
+function runPerformanceTest() {
+  let i = 10_000;
+  const me = $S`hello`;
+  const now = performance.now();
+  while (i--) { me.clone; }
+  return ((performance.now() - now)/10_000);
+}
+
+function runAndReportPerformance(time) {
+  const testResults = [...Array(10)].map(_ => runPerformanceTest())
+  const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
+  const perSecond = Math.round(1000/mean);
+  $.Popup.show({content: $S`Performance`.toTag(`b`, `b5`)
     .append(
-      $S`Nearly all elements on this page were created using <code>StringWeaver</code>
-          <br>(click 'Display code' to inspect the code).`.asDiv,
-      $S`Creating the page took <b>${time.toLocaleString()}</b> seconds.`)
+      $S`Created 10 time ${10_000..toLocaleString()} StringWeaver instances (total ${
+        100_000..toLocaleString()} instances).`.asDiv
+      .append($S`Mean time per iteration was <b>${mean.toFixed(5)}</b> <i><b>milli</b></i>seconds.`).asDiv
+      .append($S`That is (mean) <b>${perSecond.toLocaleString()}</b> instances per second.`)
+    )
     .toTag(`div`, `normal b5`)
-    .append($S`This includes the overhead from creating (and printing) all html.`.asNote)
-    .toTag(`div`, `normal b5`)
+    .append($S`this value is hardware/JS engine dependent.`.asNote.asDiv)
     .append(
-      $S`using StringWeaver instances for string manipulation for sure will be slower 
-        than using native Strings. This is mainly due to the fact that every instance is a`
-        .append(`<a target="_blank" class="ExternalLink arrow" 
+        $S`using StringWeaver instances for string manipulation for sure will be slower 
+        than using native Strings. This is mainly due to the fact that every instance is a 
+          <a target="_blank" class="ExternalLink arrow" 
           href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"
           >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
             href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
             Still, if one does't need to manipulate hundreds of thousands of strings, 
-            StringWeaver's performance should not get in the way of anything 
-            (instantiating takes 0.03-0.04 <b>milli</b>seconds).`).asNote.asDiv )
-    .value;
+            StringWeaver's performance should not get in the way`.asNote.asDiv)
+    .value});
 }
 
-function initStyling($S) {
+function initStyling() {
   // style rules are stored in the JQL style element (head)style#JQLStylesheet
   const arrowRepeat = $S` ⬇ `.repeat(5).enclose(`"`);
   $.editCssRules(
