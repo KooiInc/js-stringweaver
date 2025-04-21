@@ -1402,9 +1402,9 @@ function createTOC() {
 
 function runPerformanceTest() {
   let i = 10_000;
-  let me;
+  let me = $S`hello`;
   const now = performance.now();
-  while (i--) { me = $S`hello` }
+  while (i--) { me.clone.append(` world!`); }
   return ((performance.now() - now)/10_000);
 }
 
@@ -1415,8 +1415,8 @@ function runAndReportPerformance(time) {
   const perSecond = Math.round(1000/mean);
   $.Popup.show({content: $S`Performance`.toTag(`b`, `b5`)
     .append(
-      $S`Created 10 times ${10_000..toLocaleString()} StringWeaver instances (\u03A3 ${
-        100_000..toLocaleString()} instances).`.asDiv
+      $S`Created 10 * ${10_000..toLocaleString()} StringWeaver instance <code>clone</code>s, 
+        <code>append</code>ing a string to each (\u03A3 ${100_000..toLocaleString()} instances).`.asDiv
       .append($S`Mean time per iteration was <b>${+(mean.toFixed(5)).toLocaleString()}</b> 
           <i><b>milli</b></i>seconds (\u00B1 ${(+(sd.toFixed(5)).toLocaleString())}).`).asDiv
       .append($S`That is a mean of <b>${perSecond.toLocaleString()}</b> instances per second.`)
@@ -1668,15 +1668,6 @@ function initStyling() {
     }`,
     `.bottomSpacer {
       min-height: 100vh;
-    }`,
-    `.working {
-      text-align: center;
-      font-size: 1.5rem;
-      color: red;
-      padding: 0.3rem;
-      &:before {
-        content: 'Working...';
-      }
     }`,
     `.spin {
       display: block;
