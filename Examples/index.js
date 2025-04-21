@@ -5,7 +5,6 @@ const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
 const {log, logTop} = logFactory();
-
 main();
 
 function main() {
@@ -13,17 +12,17 @@ function main() {
   initStyling();
   setDelegates();
   addCustomized();
-  demonstrate();
+  printExamples();
+  hljs.highlightAll(`javascript`);
+  createTOC();
 }
 
-function demonstrate() {
+function printExamples() {
   printInitializationExamples();
   printStaticConstructorFunctionExamples();
   printGetterExamples();
   printMethodExamples();
   printHeader();
-  createTOC();
-  hljs.highlightAll(`javascript`);
 }
 
 function printInitializationExamples() {
@@ -1328,7 +1327,7 @@ async function fetchTemplates() {
 function setDelegates() {
   $.delegate(`click`, `#codeVwr, #performance`, evt => {
     if (evt.target.id === "performance") {
-      $.Popup.show({content: `working ...`});
+      $.Popup.show({content: `<b class="spin">Working</b>`, modal: true});
       return setTimeout(runAndReportPerformance);
     }
     const bttn = evt.target;
@@ -1416,10 +1415,10 @@ function runAndReportPerformance(time) {
   const perSecond = Math.round(1000/mean);
   $.Popup.show({content: $S`Performance`.toTag(`b`, `b5`)
     .append(
-      $S`Created 10 times ${10_000..toLocaleString()} StringWeaver instances (total ${
+      $S`Created 10 times ${10_000..toLocaleString()} StringWeaver instances (\u03A3 ${
         100_000..toLocaleString()} instances).`.asDiv
-      .append($S`Mean time per iteration was <b>${mean.toFixed(5)}</b> <i><b>milli</b></i>seconds (±${
-        sd.toFixed(5)}).`).asDiv
+      .append($S`Mean time per iteration was <b>${+(mean.toFixed(5)).toLocaleString()}</b> 
+          <i><b>milli</b></i>seconds (\u00B1 ${(+(sd.toFixed(5)).toLocaleString())}).`).asDiv
       .append($S`That is a mean of <b>${perSecond.toLocaleString()}</b> instances per second.`)
     )
     .toTag(`div`, `normal b5`)
@@ -1670,5 +1669,32 @@ function initStyling() {
     `.bottomSpacer {
       min-height: 100vh;
     }`,
+    `.working {
+      text-align: center;
+      font-size: 1.5rem;
+      color: red;
+      padding: 0.3rem;
+      &:before {
+        content: 'Working...';
+      }
+    }`,
+    `.spin {
+      display: block;
+      animation: spinner 1.5s linear infinite;
+      color: red;
+      text-align: center;
+    }`,
+    `@keyframes spinner  {
+      from {
+        -moz-transform: rotateY(0deg);
+        -ms-transform: rotateY(0deg);
+        transform: rotateY(0deg);
+      }
+      to {
+        -moz-transform: rotateY(-360deg);
+        -ms-transform: rotateY(-360deg);
+        transform: rotateY(-360deg);
+      }
+    }`
   );
 }
