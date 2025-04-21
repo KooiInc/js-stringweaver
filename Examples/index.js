@@ -1,9 +1,9 @@
 import {logFactory, $} from "./DOMhelpers.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import $S from "../Bundle/index.min.js";
+const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
-let debug = false; // set to true to use the unbundled version
 const {log, logTop} = logFactory();
 
 main();
@@ -156,7 +156,7 @@ function printStaticConstructorFunctionExamples() {
     
     $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
       .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append(constructorLine.prefix($S`${!debug ? `this is the constructor from the bundled code => ` : ``}`.asNote))
+      .append(constructorLine.prefix($S`${!fromUnbundled ? `this is the constructor from the bundled code => ` : ``}`.asNote))
       .toTag(`div`, `normal`)
       .value,
   );
@@ -1403,22 +1403,24 @@ function createTOC() {
 
 function runPerformanceTest() {
   let i = 10_000;
-  const me = $S`hello`;
+  let me;
   const now = performance.now();
-  while (i--) { me.clone; }
+  while (i--) { me = $S`hello` }
   return ((performance.now() - now)/10_000);
 }
 
 function runAndReportPerformance(time) {
   const testResults = [...Array(10)].map(_ => runPerformanceTest())
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
+  const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
   $.Popup.show({content: $S`Performance`.toTag(`b`, `b5`)
     .append(
-      $S`Created 10 time ${10_000..toLocaleString()} StringWeaver instances (total ${
+      $S`Created 10 times ${10_000..toLocaleString()} StringWeaver instances (total ${
         100_000..toLocaleString()} instances).`.asDiv
-      .append($S`Mean time per iteration was <b>${mean.toFixed(5)}</b> <i><b>milli</b></i>seconds.`).asDiv
-      .append($S`That is (mean) <b>${perSecond.toLocaleString()}</b> instances per second.`)
+      .append($S`Mean time per iteration was <b>${mean.toFixed(5)}</b> <i><b>milli</b></i>seconds (±${
+        sd.toFixed(5)}).`).asDiv
+      .append($S`That is a mean of <b>${perSecond.toLocaleString()}</b> instances per second.`)
     )
     .toTag(`div`, `normal b5`)
     .append($S`this value is hardware/JS engine dependent.`.asNote.asDiv)
