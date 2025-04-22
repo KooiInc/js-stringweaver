@@ -1,16 +1,37 @@
 import interpolate from "./Factories/interpolateFactory.js";
-
-import {isArrayOf, isNumber, defineQuotingStyles, getStringValue, escapeRE, customMethods, clone} from "./genericMethods.js";
-const quotingStyles = defineQuotingStyles();
+import {
+  isArrayOf,
+  isNumber,
+  defineQuotingStyles,
+  getStringValue,
+  escapeRE,
+  customMethods,
+  clone } from "./genericMethods.js";
 
 export {
-  format, ucFirst, truncate, trimAll, replaceWords,
-  indexOf, lastIndexOf, insert, append,
-  isNumber, prefix, getStringValue, toCamelcase,
-  wordsFirstUp, toDashedNotation, quotGetters,
-  surroundWith, defineQuotingStyles, toSnakeCase,
-  customMethods, clone,
+  format,
+  ucFirst,
+  truncate,
+  trimAll,
+  replaceWords,
+  indexOf,
+  lastIndexOf,
+  insert,
+  append,
+  isNumber,
+  prefix,
+  getStringValue,
+  toCamelcase,
+  wordsFirstUp,
+  toDashedNotation,
+  quotGetters,
+  surroundWith,
+  toSnakeCase,
+  customMethods,
+  clone,
 };
+
+const quotingStyles = defineQuotingStyles();
 
 function checkAndRun(string, fn, or) {
   string = getStringValue(string);

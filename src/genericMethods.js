@@ -1,22 +1,21 @@
-//import xString, {CustomStringConstructor, customMethods} from "../index.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import createInstance from "./extensions.js";
 const customMethods = {};
-const defaultStringCTOR = createExtendedCTOR(CustomStringConstructor, customMethods);
 
 export {
   customMethods,
   CustomStringConstructor,
-  createExtendedCTOR, 
-  resolveTemplateString, 
   isNumber, 
   isArrayOf,
   defineQuotingStyles,
   getStringValue,
   escapeRE,
+  resolveTemplateString,
   clone,
 };
+
+createExtendedCTOR(CustomStringConstructor, customMethods);
 
 function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});

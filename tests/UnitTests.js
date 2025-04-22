@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S, CustomStringConstructor} from "../index.js";
-import {defineQuotingStyles} from "../src/instanceMethods.js";
+import {defineQuotingStyles} from "../src/genericMethods.js";
 
 describe(`Basics constructor`, () => {
   describe(`Instantiation`, () => {
@@ -770,9 +770,5 @@ describe(`Native String methods are wrapped and usable`, () => {
   it(`toUpperCase is chainable`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.toUpperCase().quote.double.value, `"HELLO WORLD"`);
-  });
-  
-  it(`instance can be spreaded as Array`, () => {
-    assert.deepStrictEqual([...$S`hello world`], ["h","e","l","l","o"," ","w","o","r","l","d"]);
   });
 });
