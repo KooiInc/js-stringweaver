@@ -1,4 +1,3 @@
-import interpolate from "./Factories/interpolateFactory.js";
 import {
   isArrayOf,
   isNumber,
@@ -6,6 +5,7 @@ import {
   getStringValue,
   escapeRE,
   customMethods,
+  interpolate,
   clone } from "./genericMethods.js";
 
 export {

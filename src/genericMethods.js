@@ -1,4 +1,5 @@
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
+import interpolate from "./Factories/interpolateFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import createInstance from "./extensions.js";
 const customMethods = {};
@@ -13,6 +14,7 @@ export {
   escapeRE,
   resolveTemplateString,
   clone,
+  interpolate,
 };
 
 createExtendedCTOR(CustomStringConstructor, customMethods);
