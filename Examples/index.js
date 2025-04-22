@@ -1419,10 +1419,10 @@ function runAndReportPerformance(time) {
         <code>append</code>ing a string to each (\u03A3 ${100_000..toLocaleString()} instances).`.asDiv
       .append($S`Mean time per iteration was <b>${+(mean.toFixed(5)).toLocaleString()}</b> 
           <i><b>milli</b></i>seconds (\u00B1 ${(+(sd.toFixed(5)).toLocaleString())}).`).asDiv
-      .append($S`That is a mean of <b>${perSecond.toLocaleString()}</b> instances per second.`)
+      .append($S`That is an average of <b>${perSecond.toLocaleString()}</b> instances per second.`)
     )
     .toTag(`div`, `normal b5`)
-    .append($S`the values above are hardware/JS engine dependent.`.asNote.asDiv)
+    .append($S`the values above may vary according to the hardware/JS engine used.`.asNote.asDiv)
     .append(
         $S`using StringWeaver instances for string manipulation for sure will be slower 
         than using native Strings. This is mainly due to the fact that every instance is a 
