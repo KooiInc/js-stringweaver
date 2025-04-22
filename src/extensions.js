@@ -100,12 +100,6 @@ function instanceCreator({initialstring} = {}) {
       && key in String.prototype;
   }
   
-  // function clone(instance) {
-  //   const newInstance = instanceCreator(instance.value);
-  //   newInstance.history = [...history];
-  //   return newInstance;
-  // }
-  
   function wrapNative(key) {
     return actualValue[key] instanceof Function
       ? function(...args) {
