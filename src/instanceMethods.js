@@ -113,11 +113,11 @@ function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
 
 function trimAll(string,  keepLines) {
   return checkAndRun(string, () => {
-    const lines = string.replace(/\n/g, `#LF#`)
-      .split(`#LF#`)
-      .map(line => line.trim().replace(/\s{2,}/g, ` `));
+    const lines = string.replace(/\n/gm, `#LF#`)
+      .split(/#LF#/)
+      .map(line => line.trim().replace(/\s{2,}/g, a => a[0]) );
     return keepLines 
-      ? lines.join('#LF#').replace(/#LF#/g, `\n`) 
+      ? lines.join(`#LF#`).replace(/#LF#/g, `\n`).trim()
       : lines.filter(l => l.length > 0).join(`\n`);
   });
 }
