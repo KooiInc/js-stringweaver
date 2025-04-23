@@ -4,6 +4,7 @@ import $S from "../Bundle/index.min.js";
 const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
+const spaceIndicator = `<span style="color:#AAA">&lt;space&gt;</span>`;
 const {log, logTop} = logFactory();
 main();
 
@@ -29,135 +30,138 @@ function printInitializationExamples() {
   const allExamples = [
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
-      .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote).asDiv
-      .append($S`output string values in this document are intentionally `
+      .appendDiv(``, $S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote)
+      .appendDiv(``, $S`output string values in this document are intentionally `
         .append($S`quoted`.qcd)
         .append(` where applicable`)
         .asNote
-      )
-      .asDiv
-      .value,
+      ).value,
     
-    $S`Initialize using tagged template function`.toIdTag({tag: "h3", id: "initialization-astt", className: "head code"})
-      .append($S`${exampleCode.asTaggedTemplateExample}`
+    createLemma(
+      $S`Initialize using tagged template function`.toIdTag({tag: "h3", className: "head code"}),
+      $S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
-        .append($S`hello world`.qcd))
-      .value,
+        .append($S`hello world`.qcd),
+      "initialization-astt"
+    ),
     
-    $S`Initialize using function call`.toIdTag({tag: "h3", id: "initialization-asfn", className: "head code"})
-      .append($S`$S("hello world")`.toCode)
-      .append($S(`hello world`).qcd.prefix(` => `)).value,
+    createLemma(
+      $S`Initialize using function call`.toIdTag({tag: "h3", className: "head code"}),
+      $S`$S("hello world")`.toCode
+        .append($S(`hello world`).qcd.prefix(` => `)),
+      "initialization-asfn"
+    ),
     
-    $S`Instantiation always returns an instance with a string`.toIdTag({tag: "h3", id: "initialization-alwaysstring", className: "head code"})
-      .append( $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
-        is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5") )
-      
-      .append($S`$S()`.toCode)
-      .append($S().qcd.prefix(` => `))
-      .asDiv
-      
-      .append($S`$S("hello world")`.toCode)
-      .append($S(`hello world`).qcd.prefix(` => `))
-      .asDiv
-      
-      .append($S`$S([1,2,3])`.toCode)
-      .append($S([1,2,3]).qcd.prefix(` => `))
-      .asDiv
-      
-      .value,
+    createLemma(
+      $S`Instantiation always returns an instance with a string`
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
+        is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5")
+      .appendDiv(``, $S`$S()`.toCode.append($S().qcd.prefix(` => `)))
+      .appendDiv(``, $S`$S("hello world")`.toCode.append($S(`hello world`).qcd.prefix(` => `)))
+      .appendDiv(``, $S`$S([1,2,3])`.toCode.append($S([1,2,3]).qcd.prefix(` => `))),
+      "initialization-alwaysstring"
+    ),
     
-    $S`Instance methods are chainable`
-      .toIdTag({tag: "h3", id: "initialization-instance-chainable", className: "head code"})
-      .append($S`$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode)
-      .append(`<br> => `)
-      .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd)
-      .value,
+    createLemma(
+      $S`Instance methods are chainable`
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode
+      .appendDiv(``, `=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd),
+      "initialization-instance-chainable"
+    ),
     
-    $S`Native string function results are chainable`
-      .toIdTag({tag: "h3", id: "initialization-native-chainable", className: "head code"})
-      .append(
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward`.toCode,
-        `<br>=> `,
-        $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward)
-      .value,
+    createLemma(
+      $S`Native string function results are chainable`
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S`<code>\$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward</code>`
+        .appendDiv(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward),
+      "initialization-native-chainable"
+    ),
     
-    $S`Native .toString/.valueOf are overridden`
-      .toIdTag({tag: "h3", id: "initialization-native-tostringvalueof", className: "head code"})
-      .append( $S`To retrieve the instance string value one can use its <code>value</code> property
+    createLemma(
+      $S`Native .toString/.valueOf are overridden`
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S`To retrieve the instance string value one can use its <code>value</code> property
           or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
-          `.toTag("div", "normal b5") )
+          `.toTag("div", "normal b5") 
       
-      .append(
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").value`.toCode,
-        `<br>=> `,
-        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.value)
-      .asDiv
+      .appendDiv(``, 
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").value`.toCode
+          .appendDiv(`b5`, `=> `,
+            $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.value)
+        )
       
-      .append(
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").toString()`.toCode,
-        `<br>=> `,
-        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.toString())
-      .asDiv
+      .appendDiv(``, 
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").toString()`.toCode
+          .appendDiv(`b5`, `=> `,
+            $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.toString())
+      )
       
-      .append(
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").valueOf()`.toCode,
-        `<br>=> `,
-        $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.valueOf())
-      .asDiv
+      .appendDiv(``, 
+        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").valueOf()`.toCode
+          .appendDiv(`b5`, `=> `,
+            $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.valueOf())
+      )
+        
+      .appendDiv(`b5`, $S`implicit <code>toString/valueOf</code>`.asNote)
       
-      .append($S`Implicit <code>toString/valueOf</code> use`.asNote).toTag("div", "normal b5")
+      .appendDiv(``, 
+        $S`String( $S("hello world").toUpperCase().replace(/world/i, "galaxy") )`.toCode
+        .appendDiv(`b5`, `=> `, String($S("hello world").toUpperCase().replace(/world/i, "galaxy").qcd))
+      )
       
-      .append(
-        $S`String( $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE") )`.toCode,
-        `<br>=> `,
-        String($S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd))
-      .asDiv
+      .appendDiv(``, 
+        $S`\`\${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE") }\``.toCode
+        .appendDiv( `b5`, `=> `, $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd )
+      )
       
-      .append(
-        $S`\`\${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE") }\``.toCode,
-        `<br>=> `,
-        `${ $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd} `)
-      .asDiv
-    .value,];
+      .appendDiv(``,
+        $S("$S([ $S(\"hello\"), $S(\"world\") ].join(\" \")).firstUp.append(\"!\")").toCode
+        .appendDiv(`b5`, `=> `, $S([$S("hello"), $S("world")].join(" ")).firstUp.append("!").qcd )
+      ),
+      "initialization-native-tostringvalueof"
+    )];
+  
   log(...allExamples);
 }
 
 function printStaticConstructorFunctionExamples() {
-  const isBundled = $S.constructor.name !== `CustomStringConstructor`;
   const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`
-    .toCode; 
-  const h3 = (text, id) => `<div class="special"><h3 id="${id}" class="head code">${text}</h3></div>`;
+    .toCode;
+  
+  const h3 = (text, id) => `<h3 class="head code">${text}</h3>`;
   log(
-    $S`Static constructor properties/methods`
-      .toIdTag({tag: "h2", id: "chapter-static", className: "head code"}).value,
-      $S`${h3("$S.keys", "static-keys")}`
-      .toTag(`summary`)
-      .append($S`includes user defined custom property/method keys`.asNote)
-      .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`))
-      .toTag(`details`, 'in-content')
-      .toTag(`div`, `normal`)
-      .value,
+      $S`Static constructor properties/methods`
+        .toIdTag({tag: "h2", id: "chapter-static", className: "head code"}).value,
+      
+      createLemma(
+        $S`${h3("$S.keys")}`,
+        $S`includes user defined custom property/method keys`.asNote
+        .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`)),
+        "static-keys"
+      ),
     
-      $S`${h3("$S.info", "static-info")}`
-      .toTag(`summary`)
-      .append($S`includes user defined custom properties/methods`.asNote)
-      .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`))
-      .toTag(`details`, 'in-content')
-      .toTag(`div`, `normal`)
-      .value,
+      createLemma(
+        $S`${h3("$S.info")}`,
+        $S`includes user defined custom properties/methods`.asNote
+        .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`)),
+        "static-info"
+      ),
+      
+      createLemma(
+        $S`${h3("$S.quoteInfo")}`,
+        $S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`),
+        "static-quoteinfo"
+      ),
     
-      $S`${h3("$S.quoteInfo", "static-quoteinfo")}`
-      .toTag(`summary`)
-      .append($S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`))
-      .toTag(`details`, 'in-content')
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S` $S.constructor`.toIdTag({tag: "h3", id: "static-constructor", className: "head code"})
-      .append($S`Result: `.prefix(`=> `).toTag(`b`))
-      .append(constructorLine.prefix($S`${!fromUnbundled ? `this is the constructor from the bundled code => ` : ``}`.asNote))
-      .toTag(`div`, `normal`)
-      .value,
+    createLemma(
+      $S` $S.constructor`.toIdTag({tag: "h3", className: "head code"}),
+      $S`Result: `.prefix(`=> `).toTag(`b`)
+        .append(constructorLine.prefix($S`${
+          !fromUnbundled ? $S`this is the constructor from the bundled code => `.asNote : ``}`)),
+      "static-constructor"
+    )
   );
   regExpEx();
   addCustomEx();
@@ -208,275 +212,275 @@ function regExpEx() {
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
   log(
-    $S` $S.regExp`.toIdTag({tag: "h3", id: "static-regexp", className: "head code"})
-      .append(exampleCode.regExpExample)
-      .append($S`Result`.toTag(`b`).prefix(`=> `)
-        .append(`: `, $S(reDemo.toString()).toCode).toTag(`div`, `normal`))
-      .value,
+    createLemma(
+      $S`$S.regExp`.toIdTag({tag: "h3", className: "head code"}),
+      $S`$S.regExp`.toCode
+      .appendDiv(`b5`, $S` can only be used as tagged template function`.asNote)
+      .appendDiv(``,
+        $S(exampleCode.regExpExample)
+        .append($S`Result`.toTag(`b`).prefix(`=> `)
+        .append(`: `, $S(reDemo.toString()).toCode))
+      ),
+      "static-regexp"
+    ),
   );
 }
 
 function addCustomEx() {
   log(
-    $S` $S.addCustom`
-      .toIdTag({tag: "h3", id: "static-addcustom", className: "head code"})
-      .append(
-        $S`Using `
-          .append($S`$S.addCustom`.toCode, ` one can add ones own getters or methods`)
-          .toTag(`div`, `normal`))
-
-      .append(
-        $S`Syntax`.toTag(`i`)
-          .append(`: `, exampleCode.customGetterSyntax))
-      .toTag(`div`, `normal`)
-      .value,
-    
-    $S`Examples`.toTag(`h3`, `head`)
-      .append($S`<b>User defined <i>getter</i> <code>.festive</code></b>`.asDiv).value,
-    
-    $S`${exampleCode.festiveExample}`
-      .append($S`=&gt; `
-        .append($S`result`.toCode, `: `, $S("Hurray!").festive.qcd).asDiv)
-      .asDiv
-      .value,
-    
-    $S`<b>User defined <i>method</i> <code>.toTag</code></b>`.asDiv.value,
-    
-    $S`${exampleCode.toTagExample}`
-      .append(
-        $S`result`.toCode.prefix(`=> `).append(
-          ` `,
-          $S`Hurray!`.toTag("i", "green").toTag("b").qcd).asDiv)
-      .asDiv
-      .value,
+    createLemma(
+      $S` $S.addCustom({name, method, isGetter, enumerable})`
+      .toIdTag({tag: "h3", className: "head code"}),
+       $S``
+       .appendDiv(``, `Use `, $S`$S.addCustom`.toCode.append(` `,`to define custom instance getters and/or methods`))
+       .appendDiv(``, $S`Syntax`.toTag(`i`).append(`: `, exampleCode.customGetterSyntax))
+       .append(
+          $S`Examples`.toTag(`h3`, `head`)
+          .appendDiv(`b5`, 
+            $S`<b>User defined <i>getter</i> <code>.festive</code></b>`,
+            $S`${exampleCode.festiveExample}`
+            .append($S`=&gt; `,
+              $S`result`.toCode, `: `, $S("Hurray!").festive.qcd)
+          )
+          .appendDiv(`b5`,
+            $S`<b>User defined <i>method</i> <code>.toTag</code></b>`,
+            $S`${exampleCode.toTagExample}`
+            .appendDiv(``,
+              $S`result`.toCode.prefix(`=> `).append(` `,
+              $S`Hurray!`.toTag("i", "green").toTag("b").qcd)
+          ))
+       ),
+      "static-addcustom"
+    )
   );
 }
 
 function uuid4Ex() {
   log(
-    $S` $S.uuid4`.toIdTag({tag: "h3", id: "static-uuid4", className: "head code"})
-    .append(
-      $S`$S.uuid4`.toCode,
-      ` => `,
-      $S.uuid4.qcd
+    createLemma(
+      $S` $S.uuid4`.toIdTag({tag: "h3", className: "head code"}),
+      $S`$S.uuid4`.toCode
+        .append(
+          ` => `,
+          $S.uuid4.qcd
+        ).asDiv,
+      "static-uuid4"
     )
-    .asDiv
-    .value
   );
 }
 
 function randomStringEx() {
   log(
-    $S` $S.randomString`.toIdTag({tag: "h3", id: "static-randomstring", className: "head code"})
-      .append($S`Syntax: `.toTag(`i`))
-      .append($S`${exampleCode.randomStringSyntax}`)
+    createLemma(
+      $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S`Syntax: `.toTag(`i`)
+      .appendDiv(`b5`, $S`${exampleCode.randomStringSyntax}`)
       .append($S`Examples`.toTag(`h3`, `head`).value,)
-      .append(
+      .appendDiv(`b5`,
         $S`$S.randomString()`.toCode
-          .append(
-            `<br>=> `,
-            $S.randomString().qcd)
-          .toTag(`div`, `normal b5`)
+        .appendDiv(`b5`, `=> `, $S.randomString().qcd)
       )
-      .append(
+      .appendDiv(`b5`,
         $S`$S.randomString({len: 24})`.toCode
-          .append(
-            `<br>=> `,
-            $S.randomString({len: 24}).qcd)
-          .toTag(`div`, `normal b5`)
+        .appendDiv(`b5`, `=> `, $S.randomString({len: 24}).qcd)
       )
-      .append(
+      .appendDiv(`b5`,
         $S`$S.randomString({len: 16, includeNumbers: true})`.toCode
-          .append(
-            `<br>=> `,
-            $S.randomString({
+          .appendDiv(`b5`, `=> `, $S.randomString({
               len: 16,
               includeNumbers: true
             }).qcd)
-          .toTag(`div`, `normal b5`)
       )
-      .append(
+      .appendDiv(`b5`,
         $S`$S.randomString({includeNumbers: true, includeSymbols: true})`.toCode
-          .append(
-            `<br>=> `,
-            $S.randomString({
+        .appendDiv(`b5`,
+            `=> `, $S.randomString({
               includeNumbers: true,
               includeSymbols: true
             }).qcd)
-          .toTag(`div`, `normal b5`)
       )
-      .append(
+      .appendDiv(`b5`,
         $S`$S.randomString({len: 32, includeUppercase: false})`.toCode
-          .append(
-            `<br>=> `,
-            $S.randomString({
+          .appendDiv(`b5`, `=> `, $S.randomString({
               len: 32,
               includeUppercase: false
             }).qcd)
-          .toTag(`div`, `normal b5`)
-      )
-      .value );
+      ),
+      "static-randomstring"
+    )
+  )
 }
 /* endregion static constructor function examples */
 
 /* region getter examples */
 function camelCaseEx() {
   log(
-    $S(" .camelCase").toIdTag({tag: "h3", id: "getter-camelcase", className: "head code"})
-      .append( $S`Tries converting the instance string 
+    createLemma(
+      $S(".camelCase").toIdTag({tag: "h3", className: "head code"}),
+      $S`Tries converting the instance string 
           to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Camel_case"
-            >Camel case</a>`.toTag("div", "normal b5") )
-      .append(
+            >Camel case</a>`.toTag("div", "normal b5")
+      .appendDiv(`b5`,
         $S("$S`convert-me`.camelCase").toCode
           .append( $S`convert-me`
-            .camelCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .camelCase.qcd.prefix(" => ")) )
+      .appendDiv(`b5`,
         $S("$S`convert me please`.camelCase").toCode
           .append( $S`convert me please`
-            .camelCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .camelCase.qcd.prefix(" => ")) )
+      .appendDiv(`b5`,
         $S("you -- should convert &nbsp;&nbsp;&nbsp;-me &nbsp;&nbsp;&nbsp;too.camelCase").toCode
           .append( $S`you -- should convert    -me    too`
-            .camelCase.qcd.prefix(" => ")).asDiv )
-      .value,
+            .camelCase.qcd.prefix(" => ")) ),
+      "getter-camelcase",
+    )
   );
 }
 
 function cloneEx() {
   const toClone = $S("I shall be ").append("cloned");
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
-  
   log(
-    $S(" .clone").toIdTag({tag: "h3", id: "getter-clone", className: "head code"})
-      .append( $S`Clone the instance.`.asDiv )
-      .append( $S("the history of the originating instance is also cloned")
-        .asNote
-        .toTag("div", "normal b5"))
+    createLemma(
+      $S(" .clone").toIdTag({tag: "h3", className: "head code"}),
+      $S`Clone the instance.`.toTag("div", "normal b5")
+        
+      .appendDiv(`b5`, $S("the history of the originating instance is also cloned").asNote )
+        
       .append( exampleCode.cloneExample )
+        
       .append(
-        $S`toClone.history`.toCode.append($S`${JSON.stringify(toClone.history)}`.prefix("=>")).asDiv,
-        $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")).asDiv,
-        $S`cloned`.toCode.append(cloned.qcd.prefix("=>")).asDiv,
-        $S`toClone`.toCode.append(toClone.qcd.prefix("=>")).asDiv
-      ).value,
+        $S``
+        .appendDiv(`b5`, $S`toClone.history`.toCode.append($S`${JSON.stringify(toClone.history)}`.prefix("=>")))
+        .appendDiv(`b5`, $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")))
+        .appendDiv(`b5`, $S`cloned`.toCode.append(cloned.qcd.prefix("=>")))
+        .appendDiv(`b5`, $S`toClone`.toCode.append(toClone.qcd.prefix("=>")))
+      ),
+      "getter-clone",
+    ),
   );
 }
 
 function firstUpEx() {
   log(
-    $S(" .firstUp").toIdTag({tag: "h3", id: "getter-firstup", className: "head code"})
-      .append( $S`Converts the first letter of the instance string to upper case`
-        .toTag("div", "normal b5") )
-      .append(
+    createLemma(
+      $S(" .firstUp").toIdTag({tag: "h3", className: "head code"}),
+      $S`Converts the first letter of the instance string to upper case`
+        .toTag("div", "normal b5")
+      .appendDiv(`b5`,
         $S("$S`hello world`.firstUp").toCode,
-        $S`hello world`.firstUp.qcd.prefix(" => ")).asDiv
-      .append(
+        $S`hello world`.firstUp.qcd.prefix(" => "))
+      .appendDiv(`b5`,
         $S("$S`   hello world`.trim().firstUp").toCode,
-        $S`hello world`.trim().firstUp.qcd.prefix(" => ")).asDiv
-      .value,
+        $S`hello world`.trim().firstUp.qcd.prefix(" => ")),
+      "getter-firstup")
   );
 }
 
 function historyEx() {
   const historyEx = JSON.stringify($S``.prefix("hello").append(` `, `world`).history);
   log(
-    $S(" .history").toIdTag({tag: "h3", id: "getter-history", className: "head code"})
-      .append( $S`Every instance records its history, which may be retrieved using 
-            <code>.history</code>.`.asDiv
-        .append(`The history enables undoing things for an instance 
-            (see <code>undo/undoLast/undoAll</code>).`).toTag("div", "normal b5") )
-      .append(
+    createLemma(
+      $S(" .history").toIdTag({tag: "h3", className: "head code"}),
+      $S`Every instance records its history, which may be retrieved using 
+            <code>.history</code>.`
+        .appendDiv(`b5`, `The history enables undoing things for an instance 
+            (see <code>undo/undoLast/undoAll</code>).`) 
+      .appendDiv(``,
         $S("$S``.prefix('hello').append(` `, `world`).history").toCode,
-        $S` => `.append(historyEx)).asDiv
-      .value,
+        $S` => `.append(historyEx)),
+      "getter-history"
+    ),
   );
 }
 
 function emptyEx() {
   log(
-    $S`.empty`.toIdTag({tag: "h3", id: "getter-empty", className: "head code"})
-      .append( $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") )
+    createLemma(
+      $S`.empty`.toIdTag({tag: "h3", className: "head code"}),
       
-      .append(
+      $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") 
+      
+      .appendDiv(`b5`,
         $S`$S(null).empty`.toCode,
         ` => `,
         $S`${$S(null).empty}`
       )
-      .asDiv
-      
-      .append(
+        
+      .appendDiv(`b5`,
         $S`$S().empty`.toCode,
         ` => `,
         $S`${$S(null).empty}`
       )
-      .asDiv
-      
-      .append(
+        
+      .appendDiv(`b5`,
         $S`$S(new String()).empty`.toCode,
         ` => `,
         $S`${$S(new String()).empty}`
       )
-      .asDiv
-      
-      .append(
+        
+      .appendDiv(`b5`,
         $S`$S(new String("hello!")).empty`.toCode,
         ` => `,
         $S`${$S(new String("hello!")).empty}`
       )
-      .asDiv
-      
-      .append(
+        
+      .appendDiv(`b5`,
         $S`$S("hello!").empty`.toCode,
         ` => `,
         $S`${$S("hello!").empty}`
-      )
-      .asDiv
-      .value);
+      ),
+      "getter-empty"
+      .value
+    )
+  );
 }
 
 function notEmptyEx() {
   log(
-    $S`.notEmpty`.toIdTag({tag: "h3", id: "getter-notempty", className: "head code"})
-      .append( $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> when
-          that value is not empty (not "")`
-      .asDiv
-
-      .append(`In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
+    createLemma(
+      $S`.notEmpty`.toIdTag({tag: "h3", className: "head code"}),
+      $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> 
+          if that value is not empty (not "")`
+        
+      .appendDiv(`b5`,
+        `In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
         instance value is an empty string, the instance if not.`)
-      .asDiv
-
-      .append(`This means one can use <a target="_blank" class="ExternalLink arrow"
+        
+      .appendDiv(`b5`,
+        `This means one can use <a target="_blank" class="ExternalLink arrow"
         href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
         >optional chaining</a> in combination with the <a target="_blank" class="ExternalLink arrow"
         href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
         >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
-      .asDiv
         
-      .append(`See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
+      .appendDiv(`b5`,
+          `See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
           <code>toTag</code> method for a use case`)
-      .toTag("div", "normal b5") )
-
-      .append(
-        $S`$S(null).notEmpty?.append("hello!") ?? $S()`.toCode,
+        
+      .appendDiv(`b5`,
+          $S`$S(null).notEmpty?.append("hello!") ?? $S()`.toCode,
         ` => `,
         ($S(null).notEmpty?.append("hello!") ?? $S()).qcd
       )
-      .asDiv
-      
-      .append(
-        $S(`$S\`hello\`.notEmpty?.append(" ", "world!") ?? $S()`).toCode,
+        
+      .appendDiv(`b5`,
+          $S(`$S\`hello\`.notEmpty?.append(" ", "world!") ?? $S()`).toCode,
         ` => `,
         ($S`hello`.notEmpty?.append(" ", "world!") ?? $S()).qcd
-      )
-      .asDiv
-      .value);
+      ),
+      "getter-notempty"
+    )
+  );
 }
 
 function snakeCaseEx() {
   log(
-    $S(" .snakeCase").toIdTag({tag: "h3", id: "getter-snakecase", className: "head code"})
-      .append( $S`Tries converting 
+    createLemma(
+      $S(" .snakeCase").toIdTag({tag: "h3", className: "head code"}),
+      $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
             >Snake case</a>, meaning that all words of a string 
@@ -484,36 +488,42 @@ function snakeCaseEx() {
             (all not a-z <i>including diacriticals</i>) 
             will be removed and the converted words will be concatenated 
             with underscore ('_'). May be useful for cleaning up property names.`
-        .toTag("div", "normal b5") )
-      .append(
-        $S("$S`convertMe`.snakeCase").toCode
+      .toTag("div", "normal b5")
+      .appendDiv(`b5`,
+          $S("$S`convertMe`.snakeCase").toCode
           .append( $S`convertMe`
-            .snakeCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .snakeCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert-Me Please`.snakeCase").toCode
           .append( $S`Convert Me Please`
-            .snakeCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .snakeCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
           .append( $S`Convert Me _    Please`
-            .snakeCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .snakeCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
           .append( $S`Convert Me, PlËase $#!`.snakeCase
             .replace("plase", "<b class='red'>plase</b>")
-            .qcd.prefix(" => ")).asDiv )
-      .append(
+            .qcd.prefix(" => ")))
+        
+      .appendDiv(`b5`,
         $S("$S`42 Convert Me, please`.snakeCase").toCode
           .append( $S`42 Convert Me, Please`
-            .snakeCase.qcd.prefix(" => ")).asDiv )
-      .value,
+            .snakeCase.qcd.prefix(" => ")) ),
+      "getter-snakecase"
+    ),
   );
 }
 
 function kebabCaseEx() {
   log(
-    $S(" .kebabCase").toIdTag({tag: "h3", id: "getter-kebabcase", className: "head code"})
-      .append( $S`Tries converting 
+    createLemma(
+      $S(" .kebabCase").toIdTag({tag: "h3", className: "head code"}),
+      $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
             >Kebab case</a> (aka 'dashed notation'), 
@@ -522,28 +532,34 @@ function kebabCaseEx() {
             (<b>not</b> a-z, A-Z <i>including diacriticals</i>) 
             will be removed and the converted words will be concatenated 
             with hyphens. May be useful for css- or data-attributes.`
-        .toTag("div", "normal b5") )
-      .append(
+      .toTag("div", "normal b5")
+        
+      .appendDiv(`b5`,
         $S("$S`ConvertMe`.kebabCase").toCode
-          .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")).asDiv )
-      .append(
+          .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert-Me _Please`.kebabCase").toCode
           .append( $S`Convert Me _Please`
-            .kebabCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .kebabCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
           .append( $S`Convert Me --    Please`
-            .kebabCase.qcd.prefix(" => ")).asDiv )
-      .append(
+            .kebabCase.qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`Convert Me, _pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
           .append( $S`Convert Me, _Plëase $#!`.kebabCase
             .replace("plase", "<b class='red'>plase</b>")
-            .qcd.prefix(" => ")).asDiv )
-      .append(
+            .qcd.prefix(" => ")) )
+        
+      .appendDiv(`b5`,
         $S("$S`42 Convert Me, &Please`.kebabCase").toCode
           .append( $S`42 Convert Me, &Please`
-            .kebabCase.qcd.prefix(" => ")).asDiv )
-      .value,
+            .kebabCase.qcd.prefix(" => ")) ),
+      "getter-kebabcase"
+    )
   );
 }
 
@@ -562,18 +578,22 @@ function trimAllEx() {
     `];
   
   log(
-    $S(" .trimAll").toIdTag({tag: "h3", id: "getter-trimall", className: "head code"})
-      .append($S`Tries to trim all superfluous white space from the instance string. 
+    createLemma(
+      $S(" .trimAll").toIdTag({tag: "h3", className: "head code"}),
+      $S`Tries to trim all superfluous white space from the instance string. 
           So multiple spaces, tabs, linefeeds are reduced to single white space or no
           white space if after a line feed. This is a fairly simple and certainly not
-          a failsafe method (see second example)`.toTag("div", "normal b5") )
-      .append(
+          a failsafe method (see second example)`
+      .toTag("div", "normal b5")
+      .appendDiv(`b5`,$S`for clarity the spaces in the result are marked as ${spaceIndicator}`.asNote)  
+        
+      .appendDiv(`b5`,
         $S`Example 1`.toTag(`h3`, `head between`),
         cleanupStr1,
         $S`<pre>${$S`clean    me
           
-             please!   `.trimAll.qcd.prefix(`=> `)}</pre>`.asDiv)
-      .append(
+             please!   `.trimAll.qcd.replace(/ /g, spaceIndicator).prefix(`=> `)}</pre>`)
+      .appendDiv(`b5`,
         $S`Example 2`.toTag(`h3`, `head between`),
         $S`<pre class="codebox"><code>$S\`clean me
         
@@ -582,49 +602,63 @@ function trimAllEx() {
             ( please !  )   
           {  ok  ? }
           \`.trimAll</code></pre>`
-          .append( `<pre>${$S`${cleanupStr2}`.trimAll.qcd.prefix(" => ")}</pre>`).asDiv )
-      .append(
+        .append( `<pre>${$S`${cleanupStr2}`.trimAll.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`) )
+        
+      .appendDiv(`b5`,
         $S`Example 2a`.toTag(`h3`, `head between`),
-        $S("We created a custom getter called <code>trimEverything</code> with a " +
-          "different approach to this").asDiv,
-        $S`(go to the <a href="#top">page top</a>, click 'Display code' and scroll to 
-            <code>function trimAllAlternative</code>...).
-            It's pretty convoluted and<br>not perfect, but hey, it's an idea ...`.asDiv,
-        $S`<pre class="codebox"><code>$S\`clean me
+        $S`we created a custom getter called <code>trimEverything</code> with a 
+          different approach to this. (go to the <a href="#top">page top</a>, click 'Display code' and scroll to 
+          <code>function trimAllAlternative</code>...).
+          It's pretty convoluted and not perfect, but hey, it's an idea ...`.asNote)
+        
+        .append($S`<pre class="codebox"><code>$S\`clean me
         
             up    ,
         
             ( please !  )   
           {  ok  ? }
           \`.trimEverything</code></pre>`
-          .append( `<pre>${$S`${cleanupStr2}`.trimEverything.qcd.prefix(" => ")}</pre>`).asDiv )
-      .value,
+          .append( `<pre>${$S`${cleanupStr2}`.trimEverything.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`).asDiv ),
+      "getter-trimall"
+    )
   );
 }
 
 function trimAllKeepLFEx() {
+  const lfIndicator = spaceIndicator.replace(/space/g, "\\n");
   const cleanupStr = `<pre class="codebox"><code>$S\`clean me
+            
+            
             
             
             please! \`.trimAllKeepLF</code></pre>`;
   log(
-    $S(" .trimAllKeepLF").toIdTag({tag: "h3", id: "getter-trimallkeeplf", className: "head code"})
-    .append(
-      $S`Tries to trim all superfluous white space <i>except line feeds</i> 
+    createLemma(
+    $S(" .trimAllKeepLF").toIdTag({tag: "h3", className: "head code"}),
+    $S`Tries to trim all superfluous white space <i>except line feeds</i> 
         from the instance string. So multiple whitespace are reduced to single 
         white space or no white space if after a line feed. 
         As stated and demonstrated for <code>.trimAll</code>: this is a
         fairly simple and certainly not a failsafe method.`
-      .toTag("div", "normal b5") )
-    .append(
+    .toTag("div", "normal b5")
+    .appendDiv(`b5`,$S`for clarity the line feeds in the result are marked as ${lfIndicator}
+      and spaces as ${spaceIndicator}`.asNote)
+      
+    .appendDiv(`b5`,
       $S(cleanupStr)
-      .append(
-        $S`<pre>${$S`clean    me
+      .append($S`<pre>${$S`clean    me
+      
+              
+      
             
-               please!   `.trimAllKeepLF.qcd.prefix(`=> `)}</pre>`
-        .asDiv
-      )
-    ).value
+               please!   `
+        .trimAllKeepLF
+        .replace(/[\t\v\f ]/g, spaceIndicator)
+        .replace(/\n/g, `\n${lfIndicator}`)
+        .qcd.prefix(`=> `)}</pre>`.asDiv ) 
+      ),
+      "getter-trimallkeeplf"
+    )
   );
 }
 
@@ -632,20 +666,21 @@ function undoEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase(); 
   
   log(
-    $S(" .undo").toIdTag({tag: "h3", id: "getter-undo", className: "head code"})
-    .append(
+    createLemma(
+      $S(" .undo").toIdTag({tag: "h3", className: "head code"}),
       $S`Sets the instance string value to the previous string value 
           (from the history, see <code>$S.history</code>`
-        .toTag("div", "normal b5") )
-    .append(
-      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
+        .toTag("div", "normal b5")
+      .append(
+        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
+          .toCode
+          .append(` => `, $S(initial.value).qcd) ) 
+      .append(
+        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
         .toCode
-        .append(` => `, $S(initial.value).qcd).asDiv ) 
-    .append(
-      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
-      .toCode
-      .append(` => `, $S(initial.undo.value).qcd).asDiv ) 
-    .value
+        .append(` => `, $S(initial.undo.value).qcd) ),
+      "getter-undo"
+    )
   );
 }
 
@@ -653,20 +688,22 @@ function undoAllEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase();
   
   log(
-    $S(" .undoAll").toIdTag({tag: "h3", id: "getter-undoall", className: "head code"})
-      .append(
-        $S`Sets the instance string value to the initial string value 
+    createLemma(
+      $S(" .undoAll").toIdTag({tag: "h3", className: "head code"}),
+      $S`Sets the instance string value to the initial string value 
           (from the history, see <code>$S.history</code>`
-          .toTag("div", "normal b5") )
-      .append(
+      .toTag("div", "normal b5")
+      .appendDiv(`b5`,
         $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
-          .toCode
-          .append(` => `, $S(initial.value).qcd).asDiv )
-      .append(
+        .toCode
+        .append(` => `, $S(initial.value).qcd))
+        
+      .appendDiv(`b5`,
         $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undoAll")
-          .toCode
-          .append(` => `, $S(initial.undoAll.value).qcd).asDiv )
-      .value
+        .toCode
+        .append(` => `, $S(initial.undoAll.value).qcd) ),
+      "getter-undoall"
+    )
   );
 }
 
@@ -681,40 +718,47 @@ function valueEx() {
   emptyClone.value += {hello: 1, world: 2}; // stringified
 
   log(
-    $S(" .value").toIdTag({tag: "h3", id: "getter-value", className: "head code"})
-    .append(
-      `<br>`,
-      $S`<code>.value</code> is a getter and a setter for the instance string value.`,
-      `<br>`,
-      $S`if the given value is not a string, setting it will do nothing`.asNote )
-    .toTag("div", "normal b5")
-    .append(exampleCode.valueExample1) 
-    .append(`<code>empty.value</code> => `, $S(empty.value).qcd).asDiv
-    .append(
-      `<br>`,
-      $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
-      .append($S`be aware that non string values will be stringified here`.asNote)
-      .asDiv
+    createLemma(
+      $S(" .value").toIdTag({tag: "h3", className: "head code"}),
+      $S`<code>.value</code> is a getter and a setter for the instance string value.`
+      .appendDiv(`b5`,
+        $S`if the given value is not a string, setting it will do nothing`.asNote)
+      
+      .append(exampleCode.valueExample1)
+          
+      .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty.value).qcd)
+          
+      .appendDiv(`b5`,
+        $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
+        .append($S`be aware that non string values will be stringified here`.asNote)
+      )
+          
+      .append(exampleCode.valueExample2)
+          
+      .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty2.value).qcd)
+          
+      .appendDiv(`b5`,`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd),
+      "getter-value"
     )
-    .append(exampleCode.valueExample2)
-    .append(`<code>empty.value</code> => `, $S(empty2.value).qcd).asDiv
-    .append(`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd).asDiv
-    .value
   );
 }
 
 function wordsFirstUpEx() {
   log(
-    $S(" .wordsUCFirst").toIdTag({tag: "h3", id: "getter-wordsucfirst", className: "head code"})
-      .append( $S`Converts the first letter of every word of the instance string to upper case.`
-        .toTag("div", "normal b5") )
-      .append(
+    createLemma(
+      $S(" .wordsUCFirst").toIdTag({tag: "h3", className: "head code"}),
+      $S`Converts the first letter of every word of the instance string to upper case.`
+        .toTag("div", "normal b5")
+        
+      .appendDiv(`b5`,
         $S("$S`hello world`.wordsUCFirst").toCode,
-        $S`hello world`.wordsUCFirst.qcd.prefix(" => ")).asDiv
-      .append(
+        $S`hello world`.wordsUCFirst.qcd.prefix(" => "))
+        
+      .appendDiv(`b5`,
         $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
-        $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")).asDiv
-      .value,
+        $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")),
+      "getter-wordsucfirst"
+    )
   );
 }
 /* endregion getter examples */
@@ -722,77 +766,79 @@ function wordsFirstUpEx() {
 /* region method examples */
 function appendEx() {
   log(
-    $S(" .append(...values:[string|instance])").toIdTag({tag: "h3", id: "method-append", className: "head code"})
-      .append( 
-        $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
-        .append(
-          $S('$S`Hello`.append(" ","world.", " ", "Here is a random string: ", $S.randomString())').toCode,
-          `<br>=> `,
+    createLemma(
+      $S(".append(...values:[string|instance])").toIdTag({tag: "h3", className: "head code"}).value,
+      $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
+      .appendDiv(`b5`,
+        $S('$S`Hello`.append(" ","world.", " ", "Here is a random string: ", $S.randomString())').toCode
+        .appendDiv(`b5`,
+          `=> `,
           $S`Hello`.append(" ", "world.", " ", "Here is a random string: ", $S.randomString()).qcd
         )
-      )
-      .asDiv
-      .value
+      ),
+      "method-append"
+    )
   );
 }
 
 function encloseEx() {
   log(
-    $S(" .enclose(start:string|instance[, end:string|instance])")
-      .toIdTag({tag: "h3", id: "method-enclose", className: "head code"})
-      .append(
-        $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
-          ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
-       .toTag("div", "normal b5")
-          
-        .append(
-          $S('$S`Hello world`.enclose("--- ", "  ---")').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose("--- ", "  ---").qcd
-            ).asDiv
-        )
-        .append(
-          $S('$S`Hello world`.enclose("**")').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose("**").qcd
-            ).asDiv
-        )
-        .append(
-          $S('$S`Hello world`.enclose($S("=&gt;"), "&lt;=")').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose($S("=&gt;"), "&lt;=").qcd)
-            .asDiv
-        )
-        .append(
-          $S('$S`Hello world`.enclose("=&gt;", $S("&lt;=")').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose("=&gt;", $S("&lt;=")).qcd)
-            .asDiv,
-          `<br>`
-        )
-        .append($S`if one of the values is not a string or instance, 
-          the instance value will not change`.asNote.asDiv)
-        .append(
-          $S('$S`Hello world`.enclose([1,2,3], "&lt;")').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose([1,2,3]).qcd)
-            .asDiv
-        )
-        .append(
-          $S('$S`Hello world`.enclose("hithere", {hi: 1})').toCode
-            .append(
-              ` => `,
-              $S`Hello world`.enclose("hithere", {hi: 1}).qcd)
-            .asDiv
-        )
+    createLemma(
+      $S(" .enclose(start:string|instance[, end:string|instance])").toIdTag({tag: "h3", className: "head code"}),
+      $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
+        ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
+      .toTag("div", "normal b5")
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose("--- ", "  ---")').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose("--- ", "  ---").qcd
+          )
       )
-      .asDiv
-      .value
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose("**")').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose("**").qcd
+          )
+      )
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose($S("=&gt;"), "&lt;=")').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose($S("=&gt;"), "&lt;=").qcd)
+      )
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose("=&gt;", $S("&lt;=")').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose("=&gt;", $S("&lt;=")).qcd)
+      )
+        
+      .appendDiv(`b5`,
+        $S`if one of the values is not a string or instance, 
+        the instance value will not change`.asNote
+      )
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose([1,2,3], "&lt;")').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose([1,2,3]).qcd)
+      )
+        
+      .appendDiv(`b5`,
+        $S('$S`Hello world`.enclose("hithere", {hi: 1})').toCode
+          .append(
+            ` => `,
+            $S`Hello world`.enclose("hithere", {hi: 1}).qcd)
+      ),
+      "method-enclose"
+    )
   );
 }
 
@@ -842,19 +888,26 @@ function formatEx() {
     caption: `<code>tableRowTemplate.format(...)</code> using <code>theNames</code>`,
     rows: tableRows.value } );
   
-  const allInOne = $S(" .format(...token:object&lt;string, string>)")
-    .toIdTag({tag: "h3", id: "method-format", className: "head code"})
-    .append(
-      $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
-        <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.asDiv,
+  const allInOne = createLemma(
+    $S(".format(...token:object&lt;string, string>)").toIdTag({tag: "h3", className: "head code"}),
+    $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
+      <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.toTag("div", "normal b5")
+      
+    .appendDiv(`b5`,
       $S`Visit the <a target="_blank" class="externalLink arrow" href="https://github.com/KooiInc/StringInterpolator"
-        >StringInterpolator</a>  module to learn more.`.asDiv
-    ).toTag("div", "normal b5")
+      >StringInterpolator</a>  module to learn more.`)
+    
     .append(exampleCode.formatExample)
-    .append($S`exampleTable`.toCode).append(` =>`).toTag("div", "normal b5")
-    .append(exampleTable);
+      
+    .appendDiv(`b5`,
+      $S`exampleTable`.toCode.append(` =>`)
+    )
+      
+    .append(exampleTable),
+    "method-format"
+  );
   
-  log(allInOne.value);
+  log(allInOne);
 }
 
 function indexOfEx() {
@@ -866,123 +919,127 @@ function indexOfEx() {
   word2Universe(initial);
   
   log(
-    $S(" .indexOf(str2Find:string,[ fromIndex:number])")
-      .toIdTag({tag: "h3", id: "method-indexof", className: "head code"})
-      .append(
+    createLemma(
+      $S(" .indexOf(str2Find:string,[ fromIndex:number])")
+        .toIdTag({tag: "h3", className: "head code"}),
+      $S``.append(
         $S("indexOf").toCode,
         " (as well as ",
         $S("lastIndexOf)").toCode,
         " overrides the native ",
         $S("String.prototype.indexOf").toCode,
         $S` method`
-          .append(
-            ` (see <a target="_blank"
-            href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
-            >MDN</a>).`
-          )
-      ).toTag("div", "normal b5")
-      
-      .append(
+        .append(
+          ` (see <a target="_blank"
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+          >MDN</a>).`
+        )
+      .toTag("div", "normal b5")
+          
+      .appendDiv(``, 
         $S("The override returns "),
         $S("undefined").toCode,
         " if the string to search was not found, instead of ",
         $S("-1").toCode,
-        ".").asDiv
-      .value
-  );
-  
-  log($S(exampleCode.indexOfExample).asDiv
-    .append(
-      $S`String(initial)`.toCode,
-      " => ",
-      initial.qcd.value
-    ).asDiv.value
+        ".",
+        $S(exampleCode.indexOfExample)))
+        
+      .appendDiv(``, 
+        $S`String(initial)`.toCode,
+        " (see code above) => ",
+        initial.qcd
+      ),
+      "method-indexof"
+    )
   );
 }
 
 function insertEx() {
   log(
-    $S(" .insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
-      .toIdTag({tag: "h3", id: "method-insert", className: "head code"})
+    createLemma(
+      $S(".insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
+        .toIdTag({tag: "h3", className: "head code"}),
       
-    .append(
       $S`Inserts either <code>[value]</code> or <code>[values]</code> into the instance string value
-       at position <code>[at]</code>. <code>at</code> may be negative. For an <code>at</code>-value 
-        exceeding the instance string length, the value(s) will be appended. 
-        If <code>at</code> is not given, the value(s) will be prefixed to the instance value.
-        if <code>value</code> or one of the <code>values</code> is not a string or instance,
-        will do nothing.` 
-    ).toTag("div", "normal b5")
-
-    .append(
-      $S('$S("hello world").insert({values: "dear ", at: 6})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).qcd.value)
-    ).asDiv
-
-    .append(
-      $S('$S("hello world").insert({values: ["oh", " ", "dear", " "] , at: 6})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).qcd.value)
-    ).asDiv
-    
-    .append(
-      $S('$S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "] , at: 6})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).qcd.value)
-    ).asDiv
+         at position <code>[at]</code>. <code>at</code> may be negative. For an <code>at</code>-value 
+          exceeding the instance string length, the value(s) will be appended. 
+          If <code>at</code> is not given, the value(s) will be prefixed to the instance value.
+          if <code>value</code> or one of the <code>values</code> is not a string or instance,
+          will do nothing.` 
+      .toTag("div", "normal b5")
+  
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: "dear ", at: 6})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).qcd.value)
+      )
+  
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: ["oh", " ", "dear", " "] , at: 6})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).qcd.value)
+      )
       
-    .append(
-      $S('$S("hello world").insert({value: $S("I say").festive})')
-        .toCode
-        .append(` => `, $S("hello world").insert({value: $S("I say").festive}).qcd.value)
-    ).asDiv
-      
-    .append(
-      $S('$S("hello world").insert({values: "So, i said: "' +
-        '<span class="cmmt">// Note: valueS may also be single string</span>"})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: "So, i said: "}).qcd.value)
-    ).asDiv
-      
-    .append(
-      $S('$S("hello world").insert({values: ["42"], at: 100})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).qcd.value)
-    ).asDiv
-      
-    .append(
-      $S('$S("hello world").insert({values: [42]})')
-        .toCode
-        .append(` => `, $S("hello world").insert({values: [42]}).qcd.value)
-    ).asDiv
-      
-    .append(
-      $S('$S("hello world").insert({value: {value: 1}})')
-        .toCode
-        .append(` => `, $S("hello world").insert({value: 1}).qcd.value)
-    ).asDiv
-      
-    .append(
-      $S('$S("hello world").insert()')
-        .toCode
-        .append(` => `, $S("hello world").insert().qcd.value)
-    ).asDiv
-      
-    .value
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "] , at: 6})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert({value: $S("I say").festive})')
+          .toCode
+          .append(` => `, $S("hello world").insert({value: $S("I say").festive}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: "So, i said: "' +
+          '<span class="cmmt">// Note: valueS may also be single string</span>"})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: "So, i said: "}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: ["42"], at: 100})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert({values: [42]})')
+          .toCode
+          .append(` => `, $S("hello world").insert({values: [42]}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert({value: {value: 1}})')
+          .toCode
+          .append(` => `, $S("hello world").insert({value: 1}).qcd.value)
+      )
+        
+      .appendDiv(``, 
+        $S('$S("hello world").insert()')
+          .toCode
+          .append(` => `, $S("hello world").insert().qcd.value)
+      ),
+      "method-insert"
+    )
   );
 }
 
 function interpolateEx() {
-  log($S(" .interpolate(...token:object&lt;string, string>)")
-    .toIdTag({tag: "h3", id: "method-interpolate", className: "head code"})
-    .append(
+  log(
+    createLemma(
+      $S(" .interpolate(...token:object&lt;string, string>)")
+        .toIdTag({tag: "h3", className: "head code"}),
       $S`Alias for <code><a
         class="externalLink arrow"
         target="_top"
-        data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`.asDiv
-    ).toTag("div", "normal b5").value
-  ) 
+        data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`
+      .toTag("div", "normal b5"),
+      "method-interpolate"
+    )
+  );
 }
 
 function lastIndexOfEx() {
@@ -993,9 +1050,11 @@ function lastIndexOfEx() {
   lastWord2Universe(initial);
   
   log(
-    $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])")
-      .toIdTag({tag: "h3", id: "method-lastindexof", className: "head code"})
-      .append(
+    createLemma(
+      $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])")
+        .toIdTag({tag: "h3", className: "head code"}),
+      
+      $S(exampleCode.lastIndexOfExample).append(
         $S("lastIndexOf").toCode,
         " (as well as ",
         $S("indexOf)").toCode,
@@ -1007,61 +1066,62 @@ function lastIndexOfEx() {
             href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf"
             >MDN</a>).`
           )
-      ).toTag("div", "normal b5")
-      .append(
-        $S("The override returns "),
-        $S("undefined").toCode,
-        " if the string to search was not found, instead of ",
-        $S("-1").toCode,
-        ".").asDiv
-      .value
-  );
-  
-  log($S(exampleCode.lastIndexOfExample).asDiv
-    .append(
-      $S`initial.value`.toCode,
-      " => ",
-      initial.qcd.value
-    ).asDiv.value
+     ).toTag("div", "normal b5") 
+     
+    .appendDiv(`b5`,
+      $S("The override returns "),
+      $S("undefined").toCode,
+      " if the string to search was not found, instead of ",
+      $S("-1").toCode, ".")
+        
+      .appendDiv(`b5`,
+        $S`initial.value`.toCode,
+        " (see code above) => ",
+        initial.qcd.value
+      ),
+      "method-lastindexof"
+    )
   );
 }
 
 function prefixEx() {
   log(
-    $S(" .prefix(...strings2Prefix:[string])")
-      .toIdTag({tag: "h3", id: "method-prefix", className: "head code"})
+    createLemma(
+      $S(" .prefix(...strings2Prefix:[string])")
+        .toIdTag({tag: "h3", className: "head code"}),
       
-    .append(
       $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
           order of the strings from <code>strings2Prefix</code>.
           Will do nothing if one of the given <code>strings2Prefix</code> is not a string or instance.`
-    ).toTag("div", "normal b5")
+      .toTag("div", "normal b5")
+        
+      .appendDiv(`b5`,
+        $S`$S("world").prefix("hello", " ")`.toCode
+          .append(` => `, $S("world").prefix("hello", " ").qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`$S("world").prefix("hello", " and", " ", "then again ... bye ")`.toCode
+          .append(` => `, $S("world").prefix("hello", " and", " ", "then again ... bye ").qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`$S("world").prefix()`.toCode
+          .append(` => `, $S("world").prefix().qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`$S("world").prefix(42, "Hello ")`.toCode
+          .append(` => `, $S("world").prefix(42, "Hello ").qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`$S("world").prefix($S\`Hello! \`.toTag("b").toTag("i", "green"), "hello ").festive`.toCode
+          .append(` => `, $S("world").prefix($S`Hello! `.toTag(`b`).toTag(`i`, `green`), "hello ").festive.value)
+      ),
       
-    .append(
-      $S`$S("world").prefix("hello", " ")`.toCode
-        .append(` => `, $S("world").prefix("hello", " ").qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`$S("world").prefix("hello", " and", " ", "then again ... bye ")`.toCode
-        .append(` => `, $S("world").prefix("hello", " and", " ", "then again ... bye ").qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`$S("world").prefix()`.toCode
-        .append(` => `, $S("world").prefix().qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`$S("world").prefix(42, "Hello ")`.toCode
-        .append(` => `, $S("world").prefix(42, "Hello ").qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`$S("world").prefix($S\`Hello! \`.toTag("b").toTag("i", "green"), "hello ").festive`.toCode
-        .append(` => `, $S("world").prefix($S`Hello! `.toTag(`b`).toTag(`i`, `green`), "hello ").festive.value)
-    ).asDiv
-   .value
+      "method-prefix"
+    )
   );
 }
 
@@ -1081,42 +1141,41 @@ function replaceWordsEx() {
     replacements: {"🎉": "😋"} });
   
   log(
-    $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})")
-      .toIdTag({tag: "h3", id: "method-replacewords", className: "head code"})
+    createLemma(
+      $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})")
+        .toIdTag({tag: "h3", className: "head code"}),
     
-    .append(
       $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
-    ).toTag("div", "normal b5")
-      
-    .append(exampleCode.replaceWordsExample)
-      
-    .append(
-        $S`ex1`.toCode.append(` => `, ex1.qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`ex2`.toCode.append(` => `, ex2.qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`ex2a`.toCode.append(` => `, ex2a.qcd.value)
-    ).asDiv
-
-    .append(
-      $S`ex3`.toCode.append(` => `, ex3.qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`ex4`.toCode.append(` => `, ex4.qcd.value)
-    ).asDiv
-      
-    .append(
-      $S`ex5`.toCode.append(` => `, ex5.qcd.value)
-    ).asDiv
-      
-    .value
+      .toTag("div", "normal b5")
+        
+      .append(exampleCode.replaceWordsExample)
+        
+      .appendDiv(`b5`,
+          $S`ex1`.toCode.append(` => `, ex1.qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`ex2`.toCode.append(` => `, ex2.qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`ex2a`.toCode.append(` => `, ex2a.qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`ex3`.toCode.append(` => `, ex3.qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`ex4`.toCode.append(` => `, ex4.qcd.value)
+      )
+        
+      .appendDiv(`b5`,
+        $S`ex5`.toCode.append(` => `, ex5.qcd.value)
+      ),
+      "method-replacewords"
+    )
   );
-  
 }
 
 function truncateEx() {
@@ -1137,26 +1196,28 @@ function truncateEx() {
      ex8: testStr.clone.truncate({at: 27, wordBoundary: true})  
   };
   
-  const allInOne = $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
-    .toIdTag({tag: "h3", id: "method-truncate", className: "head code"})
-    .append(
-      $S`Truncates the instance string value at position <code>[at]</code> and append 
+  const allInOne = 
+     $S`Truncates the instance string value at position <code>[at]</code> and append 
         either three dots ("..." <code>html: false</code>) or "&amp;hellip; (&hellip;)" <code>html: true</code>.
         If <code>wordBoundary</code> is true truncation is done at the nearest possible word boundary (of the
         the truncated string). Word boundaries are for example ;, ), }, &lt;space>, &lt;tab> ... etc.`
-    ).toTag("div", "normal b5")
+    .toTag("div", "normal b5")
     .append(exampleCode.truncateExample);
   
-  const exLen = Object.keys(examples).length;
   
-  for (let i = 0; i < exLen; i += 1) {
-    allInOne.append(
-      $S`ex${i+1}`
-        .toCode
-        .append(` => `, examples[`ex${i+1}`].qcd).value).asDiv;
+  const exLen = Object.keys(examples).length + 1;
+  
+  for (let i = 1; i < exLen; i += 1) {
+    allInOne.appendDiv(`b5`,
+      $S`ex${i}`.toCode.append(`b5`,` => `, examples[`ex${i}`].qcd));
   }
   
-  log(allInOne.value);
+  log(createLemma(
+    $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
+      .toIdTag({tag: "h3", className: "head code"}),
+    allInOne,
+    "method-truncate"
+  ));
 }
 
 function undoLastEx() {
@@ -1174,35 +1235,49 @@ function undoLastEx() {
     get ex3() { return undoExample.undoLast(2); },
     get ex4() { return undoExample.undoLast(10); },
     get ex5() { return cloned.undoLast(1); },
-    get ex6() { return cloned.undoLast(-3); },
+    get ex6() { return cloned.undoLast(-3); }
   };
   
-  const allInOne = $S(" .undoLast(nSsteps:number)")
-    .toIdTag({tag: "h3", id: "method-undolast", className: "head code"})
-    .append(
-      $S`Sets the instance value back to <code>nSteps</code> in its history` )
+  const allInOne = 
+    $S`Sets the instance value back to <code>nSteps</code> in its history`
     .toTag("div", "normal b5")
     
     .append(exampleCode.undoLastExample)
       
-    .append($S`<code>undoExample.history</code>`
-      .append(" => ", `[${undoExample.history.join(`, `)}]`).asDiv)
-    
-    .append($S`<code>cloned.history</code>`
-      .append(" => ", `[${cloned.history.join(`, `)}]`).asDiv);
+    .appendDiv(`b5`,
+      $S`<code>undoExample.history</code>`
+      .append(" => ", `[${undoExample.history.join(`, `)}]`) )
+      
+      .appendDiv(`b5`,
+        $S`<code>cloned.history</code>`
+        .append(" => ", `[${cloned.history.join(`, `)}]`) );
   
-  const exLen = Object.keys(examples).length;
+  const exLen = Object.keys(examples).length + 1;
   
-  for (let i = 0; i < exLen; i += 1) {
-    allInOne.append(
-      $S`ex${i+1}`
-        .toCode
-        .append(` => `, $S`${examples[`ex${i+1}`]}`.qcd)).asDiv;
+  for (let i = 1; i < exLen; i += 1) {
+    allInOne.appendDiv(`b5`, $S`ex${i}`.toCode.append(` => `, $S`${examples[`ex${i}`]}`.qcd));
   }
   
-  log(allInOne.value);
+  log(
+    createLemma(
+      $S(".undoLast(nSsteps:number)")
+        .toIdTag({tag: "h3", className: "head code"}),
+      allInOne,
+      "method-undolast"
+    )
+  );
 }
 /* endregion method examples */
+
+function createLemma(header, content, id) {
+  return $S(`
+    <details class="in-content" id="${id}">
+      <summary>${header}</summary>
+      <div class="lemmaContent">${content}</div>
+    </details>`)
+  .toTag("div", "normal b5")
+  .value;
+}
 
 function printHeader() {
   logTop(
@@ -1285,6 +1360,7 @@ function addCustomized() {
   });
   $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
   $S.addCustom({name: `asDiv`, method(me) { return me.toTag("div", "normal"); }, isGetter: true});
+  $S.addCustom({name: `appendDiv`, method: (me, classNames, ...strings) => me.append($S(strings.join(``)).toTag("div", `normal${classNames ? ` ${classNames} ` : ``}`))});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
   $S.addCustom({
     name: `asNote`, method: me =>
@@ -1296,11 +1372,6 @@ function addCustomized() {
 
 function getStringValue(string) {
   return string?.value || (string?.constructor === String && string);
-}
-
-function toCodeBlock(str) {
-  return `<pre class="codebox"><code>${
-    str.trim()}</code></pre>`;
 }
 
 function getCodeblocks(templates) {
@@ -1325,6 +1396,7 @@ async function fetchTemplates() {
 }
 
 function setDelegates() {
+  const backLink = `<span class='toc'></span>`;
   $.delegate(`click`, `#codeVwr, #performance`, evt => {
     if (evt.target.id === "performance") {
       $.Popup.show({content: `<b class="spin">Working</b>`, modal: true});
@@ -1347,34 +1419,40 @@ function setDelegates() {
     codeOverlay.show();
     return bttn.dataset.codeVisible = `visible`;
   });
+  
   $.delegate(`click`, `.toc, details .toc`, evt => {
     const fromDetailsElement = evt.target.closest(`details.in-content`);
     $.node(`#top`).scrollIntoView({behavior: "smooth"});
     
     if (fromDetailsElement) {
       evt.preventDefault();
+      $(`.toc`, fromDetailsElement).remove();
       $(`.in-content`).each(el => el.open = false);
     }
-      setTimeout(_ => document.body.scrollTop = 0, 400);
+    return setTimeout(_ => document.body.scrollTop = 0, 300);
   });
+  
   $.delegate(`click`, `.lemma`, (_, me) => {
     $(`.lemma[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
-    const href = me.prop(`href`);
+  });
+  
+  $.delegate(`click`, `a[href^='#'], details.in-content`, (_, me) => {
+    const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`) ?? me;
+    $(`details.in-content`).each(el => el !== me[0] && (el.open = false));
+    $(`span.toc`).remove();
     
-    if (/(keys|info|quoteInfo)$/i.test(href)) {
-      const nodeId = `#${href.split(`#`).pop()}`;
-      $.node(nodeId).closest(`details.in-content`).open = true;
+    if (referredInternalLink) {
+      referredInternalLink.open = true;
+      $(`summary`, referredInternalLink).append(backLink);
+      return setTimeout(_ => {
+        document.body.scrollTop -= 10;
+      });
     }
-    
-    return setTimeout(_ => document.body.scrollTop -= 16);
   });
 }
 
 function createTOC() {
-  $.nodes(`h3.head.code`).forEach(head => {
-    $(head).append(`<span class='toc'></span>`);
-  })
   const chapters = $.nodes(`[id^=chapter]`);
   const toc = [];
   chapters.forEach((chapter) => {
@@ -1384,10 +1462,10 @@ function createTOC() {
       $.summary(chapter.textContent)
     );
     
-    $.nodes(`h3[id^=${lemmaX}]`)
+    $.nodes(`details[id^=${lemmaX}]`)
       .forEach( lemma => {
-        let text = lemma.textContent;
-        text = /\(/.test(text) ? lemma.textContent.slice(0, text.indexOf(`(`)+1).trim() + `...)` : text;
+        let text = $.node(`summary h3`, lemma).textContent;
+        text = /\(/.test(text) ? text.slice(0, text.indexOf(`(`)+1).trim() + `...)` : text;
         detailElem.append($.a_jql({class: "lemma", textContent: text, href: `#${lemma.id}`}))
       });
     
@@ -1408,7 +1486,7 @@ function runPerformanceTest() {
   return ((performance.now() - now)/10_000);
 }
 
-function runAndReportPerformance(time) {
+function runAndReportPerformance() {
   const testResults = [...Array(10)].map(_ => runPerformanceTest())
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
@@ -1522,7 +1600,7 @@ function initStyling() {
     `.normal {
        font-family: system-ui, sans-serif;
        color: var(--grey-default);
-       margin: 3px 0;
+       margin: 3px auto;
      }`,
     `.b5 { margin-bottom: 0.5rem; }`,
     `h1.head, h2.head, h3.head {
@@ -1543,9 +1621,10 @@ function initStyling() {
         content: '✓ '; 
       }
     }`,
-    `div .toc {
+    `.toc {
       position: relative;
       display: inline-block;
+      margin-left: -1em;
       float: right;
       cursor: pointer;
       &:before {
@@ -1554,7 +1633,6 @@ function initStyling() {
       }
       &:hover::after {
         content: 'back to top';
-        margin: -0.3rem 0px 0px -7rem;
       }
     }`,
     `h3.head.between { 
@@ -1575,20 +1653,16 @@ function initStyling() {
         margin-left: -3em;
       }`,
     `details {
+      .lemmaContent { margin: auto 1em auto 1.5em; }
       summary {
         cursor: pointer;
-        
-        div.special {
-          display: inline-block;
-          width: 98%;
-        }
-        
-        .head {
+        h3.head.code {
           margin: 0;
-          div {
-            display: block;
-          } 
+          display: contents;
         }
+      }
+      pre {
+        margin-top: 0.1rem;
       }
     }`,
     `a.ExternalLink {
@@ -1605,6 +1679,9 @@ function initStyling() {
         margin: 1rem 0 0 -1rem;
         color: #444;
         background-color: #FFF;
+    }`,
+    `.toc:hover::after {
+      margin: -0.3rem 0px 0px -6rem;
     }`,
     `a.ExternalLink[data-backto].arrow:hover::after {
       content: ' navigates back to 'attr(data-backto);
