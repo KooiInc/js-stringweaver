@@ -58,6 +58,24 @@ describe(`Basics constructor`, () => {
         assert.strictEqual($S(new String()).value, "");
       });
     });
+    
+    describe(`Instantiation by Symbolic String extensions`, () => {
+      it(`creates an instance from a plain string`, () => {
+        assert.strictEqual("Hello world"[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual("Hello world"[Symbol.toSB].value, `Hello world`);
+      });
+      
+      it(`creates an instance from a template string`, () => {
+        const wrld = `world`;
+        assert.strictEqual(`Hello ${wrld}`[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual(`Hello ${wrld}`[Symbol.toSB].wordsUCFirst.value, `Hello World`);
+      });
+      
+      it(`creates an instance from an empty string`, () => {
+        assert.strictEqual(``[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual(``[Symbol.toSB].append(`!!!`).value, `!!!`);
+      });
+    });
   });
   
   describe(`Constructor static methods`, () => {

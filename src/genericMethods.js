@@ -88,6 +88,11 @@ function getSWInformation(notChainable) {
 }
 
 function createExtendedCTOR(ctor, customMethods) {
+  Symbol.toSB = Symbol.for(`toStringBuilder`);
+  Object.defineProperty(String.prototype, Symbol.toSB, { 
+    get() { return ctor(this); }, 
+    enumerable: false,
+    configurable: false });
   const notChainable =  `constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`);
   Object.defineProperties(ctor, {
     constructor: {
