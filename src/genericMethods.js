@@ -3,6 +3,7 @@ import interpolate from "./Factories/interpolateFactory.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import createInstance from "./extensions.js";
 const customMethods = {};
+const quotingStyles = defineQuotingStyles();
 
 export {
   customMethods,
@@ -15,6 +16,7 @@ export {
   resolveTemplateString,
   clone,
   interpolate,
+  quotingStyles,
 };
 
 createExtendedCTOR(CustomStringConstructor, customMethods);
@@ -153,6 +155,10 @@ function escapeRE(reString, modifiers) {
   return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
 }
 
+function escape4RE(reString) {
+  return reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
+}
+
 function decode() {
   return atob`Rm9yIHRoZSByZWNvcmQ6CltjbV0gY2hhaW5hYmxlIGdldHRlcnMvbWV0aG9kcyBtb2RpZnkgdGhlIGluc3RhbmNlIHN0cmluZwpbY21dIGluZGV4T2Ygb3ZlcnJpZGVzIHJldHVybiBbdW5kZWZpbmVkXSBpZiBub3RoaW5nIHdhcyBmb3VuZCAoc28gb25lIGNhbiB1c2UgW2xhc3RJXWluZGV4T2YoW3NvbWUgc3RyaW5nIHZhbHVlXSkgPz8gMApbY21dIGluY2x1ZGVzIGluZm9ybWF0aW9uIGZvciBjdXN0b20gbWV0aG9kcy9nZXR0ZXJzIGlmIGFwcGxpY2FibGU=`.replace(/\[cm\]/g, `\u2714`);
 }
@@ -186,7 +192,10 @@ function defineQuotingStyles() {
     single: [`'`, `'`],
     squareBrackets: [`[`, `]`],
   };
-  const regExpValues = Object.values(quots).filter(v => Array.isArray(v)).map(v => v.map(v => `\\${v}`).join(``)).join('');
+  const regExpValues = escape4RE([...new Set(
+    Object.values(quots)
+    .filter(v => Array.isArray(v))
+    .flat())].join(``));
   quots.re = RegExp(`^[${regExpValues}]|[${regExpValues}]$`, "g");
   return quots;
 }

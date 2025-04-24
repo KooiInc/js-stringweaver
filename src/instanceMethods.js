@@ -1,7 +1,7 @@
 import {
   isArrayOf,
   isNumber,
-  defineQuotingStyles,
+  quotingStyles,
   getStringValue,
   escapeRE,
   customMethods,
@@ -30,8 +30,6 @@ export {
   customMethods,
   clone,
 };
-
-const quotingStyles = defineQuotingStyles();
 
 function checkAndRun(string, fn, or) {
   string = getStringValue(string);
@@ -216,6 +214,7 @@ function quotGetters(instance, wrap) {
       get single() { return instance.enclose(...quotingStyles.single); },
       get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
     }, 
-    enumerable: false 
+    enumerable: false,
+    configurable: false,
   };
 }
