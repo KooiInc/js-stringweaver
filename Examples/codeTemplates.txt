@@ -105,6 +105,12 @@ const wrld = `world`;
 const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
 </template>
 
+<template id="quoteGetterExample">
+  const quotingStyles = Object.keys($S``.quote)
+  .reduce((acc, v) => 
+    !/re|custom/.test(v) && acc.concat($S`Hello!`.quote[v] || acc), []);
+</template>
+
 <template id="lastIndexOfExample">
 const initial = $S`hello world world`;
 const lastWord2Universe = instance =>
