@@ -485,9 +485,9 @@ function notEmptyEx() {
           <code>toTag</code> method for a use case`)
         
       .appendDiv(`b5`,
-          $S`$S(null).notEmpty?.append("hello!") ?? $S()`.toCode,
+          $S`$S(null).notEmpty?.append("hello!") ?? $S("hithere!")`.toCode,
         ` => `,
-        ($S(null).notEmpty?.append("hello!") ?? $S()).qcd
+        ($S(null).notEmpty?.append("hello!") ?? $S("hithere!")).qcd
       )
         
       .appendDiv(`b5`,
