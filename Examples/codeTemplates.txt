@@ -97,6 +97,14 @@ const word2Universe = instance =>
 word2Universe(initial);
 </template>
 
+<template id="SymbolicExtensionExample">
+const ex1 = `hello world`[Symbol.toSB].wordsUCFirst;
+const SB = Symbol.toSB;
+const ex2 = `hello world`[SB].append(`!`).firstUp;
+const wrld = `world`;
+const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
+</template>
+
 <template id="lastIndexOfExample">
 const initial = $S`hello world world`;
 const lastWord2Universe = instance =>

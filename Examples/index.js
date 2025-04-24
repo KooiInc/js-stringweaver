@@ -27,6 +27,11 @@ function printExamples() {
 }
 
 function printInitializationExamples() {
+  const ex1 = `hello world`[Symbol.toSB].wordsUCFirst;
+  const SB = Symbol.toSB;
+  const ex2 = `hello world`[SB].append(`!`).firstUp;
+  const wrld = `world`;
+  const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
   const allExamples = [
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
@@ -50,6 +55,19 @@ function printInitializationExamples() {
       $S`$S("hello world")`.toCode
         .append($S(`hello world`).qcd.prefix(` => `)),
       "initialization-asfn"
+    ),
+    
+    createLemma(
+      $S`Initialize using the predefined [Symbol.toSB] String getter extension`
+         .toIdTag({tag: "h3", className: "head code"}),
+      $S`We created a symbolic getter extension (<code>Symbol.toSB</code>) for <code>String.prototype</code>.`
+        .toTag("div", "normal")
+        .appendDiv(`b5`, `With it, one can create a StringWeaver instance from a plain JS string.`)
+        .append(exampleCode.SymbolicExtensionExample)
+        .appendDiv(`b5`, "ex1"[SB].toCode.append(ex1.qcd.prefix(` => `)))
+        .appendDiv(`b5`, "ex2"[SB].toCode.append(ex2.qcd.prefix(` => `)))
+        .appendDiv(`b5`, "ex3"[SB].toCode.append(ex3.qcd.prefix(` => `))),
+      "initialization-symbolic"
     ),
     
     createLemma(
@@ -119,6 +137,11 @@ function printInitializationExamples() {
       .appendDiv(``,
         $S("$S([ $S(\"hello\"), $S(\"world\") ].join(\" \")).firstUp.append(\"!\")").toCode
         .appendDiv(`b5`, `=> `, $S([$S("hello"), $S("world")].join(" ")).firstUp.append("!").qcd )
+      )
+      
+      .appendDiv(``,
+        $S("$S($S(\"hello\") + \" \" + $S(\"world\")).wordsUCFirst.append(\"!\")").toCode
+          .appendDiv(`b5`, `=> `, $S($S("hello") + " " + $S("world")).wordsUCFirst.append("!").qcd )
       ),
       "initialization-native-tostringvalueof"
     )];
@@ -433,7 +456,6 @@ function emptyEx() {
         $S`${$S("hello!").empty}`
       ),
       "getter-empty"
-      .value
     )
   );
 }
@@ -1272,7 +1294,7 @@ function undoLastEx() {
 function createLemma(header, content, id) {
   return $S(`
     <details class="in-content" id="${id}">
-      <summary>${header}</summary>
+      <summary>${header}<span class='toc'></span></summary>
       <div class="lemmaContent">${content}</div>
     </details>`)
   .toTag("div", "normal b5")
@@ -1396,7 +1418,6 @@ async function fetchTemplates() {
 }
 
 function setDelegates() {
-  const backLink = `<span class='toc'></span>`;
   $.delegate(`click`, `#codeVwr, #performance`, evt => {
     if (evt.target.id === "performance") {
       $.Popup.show({content: `<b class="spin">Working</b>`, modal: true});
@@ -1426,7 +1447,6 @@ function setDelegates() {
     
     if (fromDetailsElement) {
       evt.preventDefault();
-      $(`.toc`, fromDetailsElement).remove();
       $(`.in-content`).each(el => el.open = false);
     }
     return setTimeout(_ => document.body.scrollTop = 0, 300);
@@ -1440,14 +1460,10 @@ function setDelegates() {
   $.delegate(`click`, `a[href^='#'], details.in-content`, (_, me) => {
     const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`) ?? me;
     $(`details.in-content`).each(el => el !== me[0] && (el.open = false));
-    $(`span.toc`).remove();
     
     if (referredInternalLink) {
       referredInternalLink.open = true;
-      $(`summary`, referredInternalLink).append(backLink);
-      return setTimeout(_ => {
-        document.body.scrollTop -= 10;
-      });
+      return setTimeout(_ => document.body.scrollTop -= 10);
     }
   });
 }
@@ -1621,20 +1637,6 @@ function initStyling() {
         content: '✓ '; 
       }
     }`,
-    `.toc {
-      position: relative;
-      display: inline-block;
-      margin-left: -1em;
-      float: right;
-      cursor: pointer;
-      &:before {
-        content: "☝";
-        font-size: 1.2em;
-      }
-      &:hover::after {
-        content: 'back to top';
-      }
-    }`,
     `h3.head.between { 
         margin-top: 0.4rem;
      }`,
@@ -1654,13 +1656,33 @@ function initStyling() {
       }`,
     `details {
       .lemmaContent { margin: auto 1em auto 1.5em; }
+      
       summary {
         cursor: pointer;
         h3.head.code {
           margin: 0;
           display: contents;
         }
+        .toc {
+          position: relative;
+          display: none;
+          margin-left: -1em;
+          float: right;
+          cursor: pointer;
+          &:before {
+            content: "☝";
+            font-size: 1.2em;
+          }
+          &:hover::after {
+            content: 'back to top';
+          }
+        }
       }
+      
+      &[open] summary .toc {
+        display: inline-block;
+      }
+       
       pre {
         margin-top: 0.1rem;
       }
