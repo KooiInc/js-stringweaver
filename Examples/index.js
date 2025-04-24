@@ -1280,12 +1280,12 @@ function truncateEx() {
   
   for (let i = 1; i < exLen; i += 1) {
     allInOne.appendDiv(`b5`,
-      $S`ex${i}`.toCode.append(`b5`,` => `, examples[`ex${i}`].qcd));
+      $S`ex${i}`.toCode.append(` => `, examples[`ex${i}`].qcd));
   }
   
   log(createLemma(
     $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
-      .toIdTag({tag: "h3", className: "head code"}),
+      .toTag("h3", "head code"),
     allInOne,
     "method-truncate"
   ));
