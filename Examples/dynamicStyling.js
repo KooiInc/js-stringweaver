@@ -247,9 +247,10 @@ function initStyling($) {
       text-align: center;
     }`,
     `span.quoted {
-      color: #777;
-      font-size: 1.1em;
+      color: #555;
+      font-size: 1.2em;
       font-weight: bold;
+      font-family: serif;
     }`,
     `@keyframes spinner  {
       from {
