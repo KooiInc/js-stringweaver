@@ -1,7 +1,8 @@
-import {logFactory, $} from "./DOMhelpers.js";
-import initStyling from "./dynamicStyling.js";
+import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
+import initStyling from "./dynamicStyling.js";
 import $S from "../Bundle/index.min.js";
+
 const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
@@ -43,24 +44,23 @@ function printInitializationExamples() {
         .asNote
       ).value,
     
-    createLemma(
-      $S`Initialize using tagged template function`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Initialize using tagged template function`.toTag("h3", "head code"),
       $S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
         .append($S`hello world`.qcd),
       "initialization-astt"
     ),
     
-    createLemma(
-      $S`Initialize using function call`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Initialize using function call`.toTag("h3", "head code"),
       $S`$S("hello world")`.toCode
         .append($S(`hello world`).qcd.prefix(` => `)),
       "initialization-asfn"
     ),
     
-    createLemma(
-      $S`Initialize using the predefined [Symbol.toSB] String getter extension`
-         .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Initialize using the predefined [Symbol.toSB] String getter extension`.toTag("h3", "head code"),
       $S`We created a symbolic getter extension (<code>Symbol.toSB</code>) for <code>String.prototype</code>.`
         .toTag("div", "normal")
         .appendDiv(`b5`, `With it, one can create a StringWeaver instance from a plain JS string.`)
@@ -71,9 +71,8 @@ function printInitializationExamples() {
       "initialization-symbolic"
     ),
     
-    createLemma(
-      $S`Instantiation always returns an instance with a string`
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Instantiation always returns an instance with a string`.toTag("h3", "head code"),
       $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
         is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5")
       .appendDiv(``, $S`$S()`.toCode.append($S().qcd.prefix(` => `)))
@@ -82,25 +81,22 @@ function printInitializationExamples() {
       "initialization-alwaysstring"
     ),
     
-    createLemma(
-      $S`Instance methods are chainable`
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Instance methods are chainable`.toTag("h3", "head code"),
       $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode
       .appendDiv(``, `=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd),
       "initialization-instance-chainable"
     ),
     
-    createLemma(
-      $S`Native string function results are chainable`
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Native string function results are chainable`.toTag("h3", "head code"),
       $S`<code>\$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward</code>`
         .appendDiv(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward),
       "initialization-native-chainable"
     ),
     
-    createLemma(
-      $S`Native .toString/.valueOf are overridden`
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`Native .toString/.valueOf are overridden`.toTag("h3", "head code"),
       $S`To retrieve the instance string value one can use its <code>value</code> property
           or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
           `.toTag("div", "normal b5") 
@@ -154,33 +150,33 @@ function printStaticConstructorFunctionExamples() {
   const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`
     .toCode;
   
-  const h3 = (text, id) => `<h3 class="head code">${text}</h3>`;
+  const h3 = text => `<h3 class="head code">${text}</h3>`;
   log(
       $S`Static constructor properties/methods`
         .toIdTag({tag: "h2", id: "chapter-static", className: "head code"}).value,
       
-      createLemma(
+      createChapter(
         $S`${h3("$S.keys")}`,
         $S`includes user defined custom property/method keys`.asNote
         .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`)),
         "static-keys"
       ),
     
-      createLemma(
+      createChapter(
         $S`${h3("$S.info")}`,
         $S`includes user defined custom properties/methods`.asNote
         .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`)),
         "static-info"
       ),
       
-      createLemma(
+      createChapter(
         $S`${h3("$S.quoteInfo")}`,
         $S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`),
         "static-quoteinfo"
       ),
     
-    createLemma(
-      $S` $S.constructor`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S` $S.constructor`.toTag("h3", "head code"),
       $S`Result: `.prefix(`=> `).toTag(`b`)
         .append(constructorLine.prefix($S`${
           !fromUnbundled ? $S`this is the constructor from the bundled code => `.asNote : ``}`)),
@@ -237,9 +233,10 @@ function regExpEx() {
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
   log(
-    createLemma(
-      $S`$S.regExp`.toIdTag({tag: "h3", className: "head code"}),
-      $S`$S.regExp`.toCode
+    createChapter(
+      $S`$S.regExp`.toTag("h3", "head code"),
+      (`$S.regExp`[SB].toCode + ` enables creating a regular expression from a 
+        multiline (template) string, including comments`)[SB].asDiv 
       .appendDiv(`b5`, $S` can only be used as tagged template function`.asNote)
       .appendDiv(``,
         $S(exampleCode.regExpExample)
@@ -253,11 +250,11 @@ function regExpEx() {
 
 function addCustomEx() {
   log(
-    createLemma(
+    createChapter(
       $S` $S.addCustom({name, method, isGetter, enumerable})`
-      .toIdTag({tag: "h3", className: "head code"}),
+      .toTag("h3", "head code"),
        $S``
-       .appendDiv(``, `Use `, $S`$S.addCustom`.toCode.append(` `,`to define custom instance getters and/or methods`))
+       .append(`Use ${"$S.addCustom"[SB].toCode} to define custom instance getters and/or methods`[SB].asDiv)
        .appendDiv(``, $S`Syntax`.toTag(`i`).append(`: `, exampleCode.customGetterSyntax))
        .append(
           $S`Examples`.toTag(`h3`, `head`)
@@ -282,8 +279,8 @@ function addCustomEx() {
 
 function uuid4Ex() {
   log(
-    createLemma(
-      $S` $S.uuid4`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S` $S.uuid4`.toTag("h3", "head code"),
       $S`$S.uuid4`.toCode
         .append(
           ` => `,
@@ -296,9 +293,8 @@ function uuid4Ex() {
 
 function randomStringEx() {
   log(
-    createLemma(
-      $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`.toTag("h3", "head code"),
       $S`Syntax: `.toTag(`i`)
       .appendDiv(`b5`, $S`${exampleCode.randomStringSyntax}`)
       .append($S`Examples`.toTag(`h3`, `head`).value,)
@@ -341,8 +337,8 @@ function randomStringEx() {
 /* region getter examples */
 function camelCaseEx() {
   log(
-    createLemma(
-      $S(".camelCase").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(".camelCase").toTag("h3", "head code"),
       $S`Tries converting the instance string 
           to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Camel_case"
@@ -368,8 +364,8 @@ function cloneEx() {
   const toClone = $S("I shall be ").append("cloned");
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
   log(
-    createLemma(
-      $S(" .clone").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .clone").toTag("h3", "head code"),
       $S`Clone the instance.`.toTag("div", "normal b5")
         
       .appendDiv(`b5`, $S("the history of the originating instance is also cloned").asNote )
@@ -390,8 +386,8 @@ function cloneEx() {
 
 function firstUpEx() {
   log(
-    createLemma(
-      $S(" .firstUp").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .firstUp").toTag("h3", "head code"),
       $S`Converts the first letter of the instance string to upper case`
         .toTag("div", "normal b5")
       .appendDiv(`b5`,
@@ -407,15 +403,15 @@ function firstUpEx() {
 function historyEx() {
   const historyEx = JSON.stringify($S``.prefix("hello").append(` `, `world`).history);
   log(
-    createLemma(
-      $S(" .history").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .history").toTag("h3", "head code"),
       $S`Every instance records its history, which may be retrieved using 
             <code>.history</code>.`
-        .appendDiv(`b5`, `The history enables undoing things for an instance 
+      .appendDiv(`b5`, `The history enables undoing things for an instance 
             (see <code>undo/undoLast/undoAll</code>).`) 
-      .appendDiv(``,
-        $S("$S``.prefix('hello').append(` `, `world`).history").toCode,
-        $S` => `.append(historyEx)),
+      .append(
+        ("$S``.prefix('hello').append(` `, `world`).history"[SB].toCode +
+         " => " + historyEx)[SB].asDiv),
       "getter-history"
     ),
   );
@@ -423,8 +419,8 @@ function historyEx() {
 
 function emptyEx() {
   log(
-    createLemma(
-      $S`.empty`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`.empty`.toTag("h3", "head code"),
       
       $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") 
       
@@ -464,8 +460,8 @@ function emptyEx() {
 
 function notEmptyEx() {
   log(
-    createLemma(
-      $S`.notEmpty`.toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S`.notEmpty`.toTag("h3", "head code"),
       $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> 
           if that value is not empty (not "")`
         
@@ -501,56 +497,54 @@ function notEmptyEx() {
 }
 
 function quoteEx() {
-  const quotingStyles = Object.keys($S``.quote)
+  const quotingStyleExamples = Object.keys($S``.quote)
     .reduce((acc, v) => {
       return !/re|custom|^_/.test(v) 
         ? [...acc, $S`<code>$S(" Hello ").quote.${v}</code> => <span class="quoted">${
           " Hello "[SB].quote[v]}</span>`.toTag("div", "normal b5")]
         : acc;
-    }, []);
-  quotingStyles.push($S`<code>$S(" Hello ").quote.curlyDoubleEqual.quote.remove</code> => <span class="quoted">${
-    $S(" Hello ").quote.curlyDoubleEqual.quote.remove}</span>`.toTag("div", "normal b5"));
-  quotingStyles.push($S`<code>$S(" Hello ").quote.custom("**")</code> => <span class="quoted">${
-    $S(" Hello ").quote.custom("**")}</span>`.toTag("div", "normal b5"));
-  quotingStyles.push($S`<code>$S(" Hello ").quote.double.quote.remove</code> => <span class="quoted">${
-    $S(" Hello ").quote.double.quote.remove}</span>`.toTag("div", "normal b5"));
+    }, [])
+    .concat(
+      $S`<code>$S(" Hello ").quote.custom("**")</code> => <span class="quoted">${
+        $S(" Hello ").quote.custom("**")}</span>`.toTag("div", "normal b5"),
+      $S`<code>$S(" Hello ").quote.curlyDoubleEqual.quote.remove</code> => <span class="quoted">${
+        $S(" Hello ").quote.curlyDoubleEqual.quote.remove}</span>`.toTag("div", "normal b5")
+    );
   
-  const lemma = createLemma(
+  const lemma = createChapter(
     $S(" .quote[...]").toTag("h3", "head code"),
-    `Apply a quoting style to the instance string value.`[SB].toTag("div", "normal")
-    .appendDiv(``,
-      `The module includes a number of 
-        <a
-          class="externalLink arrow"
-          target="_top"
-          data-internal="[constructor].quoteInfo" 
-          href="#static-quoteinfo"> predefined quoting styles</a> 
-      one can use to quote the instance string value.`[SB])
-    .appendDiv(``, `The <code>quote</code> getter returns an Object.
+    `Apply a quoting style to the instance string value.`[SB].asDiv
+    .append(`The module includes a number of 
+      <a
+        class="externalLink arrow"
+        target="_top"
+        data-internal="[constructor].quoteInfo" 
+        href="#static-quoteinfo"> predefined quoting styles</a> 
+      one can use to quote the instance string value.`[SB].asDiv)
+    .append(`The <code>quote</code> getter returns an Object.
       One of the properties of this object is the <code>[instance].quote.custom</code>
       method that can be called to apply custom quotes to the instance string value.
-      The other properties are getters (e.g. <code>$S("hi").quote.singleQuote</code>).`)
-    .appendDiv(``, `The <code>quote.remove</code> special getter can be used to remove 
+      The other properties are getters (e.g. <code>$S("hi").quote.singleQuote</code>).`.asDiv)
+    .append(`The <code>quote.remove</code> special getter can be used to remove 
       <i>predefined</i> quoting styles from the instance string value. It will not work 
-      on custom quotes.`)
-    .appendDiv(`b5`,
-      $S`The <code>[instance].quote.custom</code> method works exactly like
+      on custom quotes.`.asDiv)
+    .append($S`The <code>[instance].quote.custom</code> method works exactly like
       <a
         class="externalLink arrow"
         target="_top"
         data-internal="[instance].enclose" 
-        href="#method-enclose"> [instance].enclose</a>`.asNote)
-    .appendDiv(`b5`, $S`<b>Here are examples for all predefined- and special 
-      <code>quote</code> fields</b>`)  
-    .appendDiv(``, quotingStyles.join(``)),
+        href="#method-enclose"> [instance].enclose</a>`.asNote.asDiv)
+    .append($S`<h4 class="between">Here are examples for all predefined- and special 
+      <code>quote</code> fields</h4>`.asDiv)  
+    .append(``, quotingStyleExamples.join(``)),
     "getter-quote");
   log(lemma);
 }
 
 function snakeCaseEx() {
   log(
-    createLemma(
-      $S(" .snakeCase").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .snakeCase").toTag("h3", "head code"),
       $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
@@ -592,8 +586,8 @@ function snakeCaseEx() {
 
 function kebabCaseEx() {
   log(
-    createLemma(
-      $S(" .kebabCase").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .kebabCase").toTag("h3", "head code"),
       $S`Tries converting 
             the instance string to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
@@ -649,8 +643,8 @@ function trimAllEx() {
     `];
   
   log(
-    createLemma(
-      $S(" .trimAll").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .trimAll").toTag("h3", "head code"),
       $S`Tries to trim all superfluous white space from the instance string. 
           So multiple spaces, tabs, linefeeds are reduced to single white space or no
           white space if after a line feed. This is a fairly simple and certainly not
@@ -704,8 +698,8 @@ function trimAllKeepLFEx() {
             
             please! \`.trimAllKeepLF</code></pre>`;
   log(
-    createLemma(
-    $S(" .trimAllKeepLF").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+    $S(" .trimAllKeepLF").toTag("h3", "head code"),
     $S`Tries to trim all superfluous white space <i>except line feeds</i> 
         from the instance string. So multiple whitespace are reduced to single 
         white space or no white space if after a line feed. 
@@ -737,8 +731,8 @@ function undoEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase(); 
   
   log(
-    createLemma(
-      $S(" .undo").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .undo").toTag("h3", "head code"),
       $S`Sets the instance string value to the previous string value 
           (from the history, see <code>$S.history</code>`
         .toTag("div", "normal b5")
@@ -759,8 +753,8 @@ function undoAllEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase();
   
   log(
-    createLemma(
-      $S(" .undoAll").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .undoAll").toTag("h3", "head code"),
       $S`Sets the instance string value to the initial string value 
           (from the history, see <code>$S.history</code>`
       .toTag("div", "normal b5")
@@ -789,8 +783,8 @@ function valueEx() {
   emptyClone.value += {hello: 1, world: 2}; // stringified
 
   log(
-    createLemma(
-      $S(" .value").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .value").toTag("h3", "head code"),
       $S`<code>.value</code> is a getter and a setter for the instance string value.`
       .appendDiv(`b5`,
         $S`if the given value is not a string, setting it will do nothing`.asNote)
@@ -816,8 +810,8 @@ function valueEx() {
 
 function wordsFirstUpEx() {
   log(
-    createLemma(
-      $S(" .wordsUCFirst").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .wordsUCFirst").toTag("h3", "head code"),
       $S`Converts the first letter of every word of the instance string to upper case.`
         .toTag("div", "normal b5")
         
@@ -837,7 +831,7 @@ function wordsFirstUpEx() {
 /* region method examples */
 function appendEx() {
   log(
-    createLemma(
+    createChapter(
       $S(".append(...values:[string|instance])").toIdTag({tag: "h3", className: "head code"}).value,
       $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
       .appendDiv(`b5`,
@@ -854,8 +848,8 @@ function appendEx() {
 
 function encloseEx() {
   log(
-    createLemma(
-      $S(" .enclose(start:string|instance[, end:string|instance])").toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .enclose(start:string|instance[, end:string|instance])").toTag("h3", "head code"),
       $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
         ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
       .toTag("div", "normal b5")
@@ -959,8 +953,8 @@ function formatEx() {
     caption: `<code>tableRowTemplate.format(...)</code> using <code>theNames</code>`,
     rows: tableRows.value } );
   
-  const allInOne = createLemma(
-    $S(".format(...token:object&lt;string, string>)").toIdTag({tag: "h3", className: "head code"}),
+  const allInOne = createChapter(
+    $S(".format(...token:object&lt;string, string>)").toTag("h3", "head code"),
     $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
       <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.toTag("div", "normal b5")
       
@@ -990,9 +984,8 @@ function indexOfEx() {
   word2Universe(initial);
   
   log(
-    createLemma(
-      $S(" .indexOf(str2Find:string,[ fromIndex:number])")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .indexOf(str2Find:string,[ fromIndex:number])").toTag("h3", "head code"),
       $S``.append(
         $S("indexOf").toCode,
         " (as well as ",
@@ -1027,9 +1020,8 @@ function indexOfEx() {
 
 function insertEx() {
   log(
-    createLemma(
-      $S(".insert({value:string|instance, values:string|instance|[string|instance], at:number=0})")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(".insert({value:string|instance, values:string|instance|[string|instance], at:number=0})").toTag("h3", "head code"),
       
       $S`Inserts either <code>[value]</code> or <code>[values]</code> into the instance string value
          at position <code>[at]</code>. <code>at</code> may be negative. For an <code>at</code>-value 
@@ -1100,9 +1092,8 @@ function insertEx() {
 
 function interpolateEx() {
   log(
-    createLemma(
-      $S(" .interpolate(...token:object&lt;string, string>)")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .interpolate(...token:object&lt;string, string>)").toTag("h3", "head code"),
       $S`Alias for <code><a
         class="externalLink arrow"
         target="_top"
@@ -1121,9 +1112,8 @@ function lastIndexOfEx() {
   lastWord2Universe(initial);
   
   log(
-    createLemma(
-      $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])").toTag("h3", "head code"),
       
       $S(exampleCode.lastIndexOfExample).append(
         $S("lastIndexOf").toCode,
@@ -1157,9 +1147,8 @@ function lastIndexOfEx() {
 
 function prefixEx() {
   log(
-    createLemma(
-      $S(" .prefix(...strings2Prefix:[string])")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .prefix(...strings2Prefix:[string])").toTag("h3", "head code"),
       
       $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
           order of the strings from <code>strings2Prefix</code>.
@@ -1212,9 +1201,8 @@ function replaceWordsEx() {
     replacements: {"🎉": "😋"} });
   
   log(
-    createLemma(
-      $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})")
-        .toIdTag({tag: "h3", className: "head code"}),
+    createChapter(
+      $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})").toTag("h3", "head code"),
     
       $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
       .toTag("div", "normal b5")
@@ -1283,7 +1271,7 @@ function truncateEx() {
       $S`ex${i}`.toCode.append(` => `, examples[`ex${i}`].qcd));
   }
   
-  log(createLemma(
+  log(createChapter(
     $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
       .toTag("h3", "head code"),
     allInOne,
@@ -1309,9 +1297,10 @@ function undoLastEx() {
     get ex6() { return cloned.undoLast(-3); }
   };
   
-  const allInOne = 
-    $S`Sets the instance value back to <code>nSteps</code> in its history`
+  const chapterContent = 
+    $S`Sets the instance value back <code>nSteps</code> from its history.`
     .toTag("div", "normal b5")
+    .appendDiv(`b5`, `the first instance value will always be retained`[SB].asNote)
     
     .append(exampleCode.undoLastExample)
       
@@ -1326,25 +1315,24 @@ function undoLastEx() {
   const exLen = Object.keys(examples).length + 1;
   
   for (let i = 1; i < exLen; i += 1) {
-    allInOne.appendDiv(`b5`, $S`ex${i}`.toCode.append(` => `, $S`${examples[`ex${i}`]}`.qcd));
+    chapterContent.appendDiv(`b5`, $S`ex${i}`.toCode.append(` => `, $S`${examples[`ex${i}`]}`.qcd));
   }
   
   log(
-    createLemma(
-      $S(".undoLast(nSsteps:number)")
-        .toIdTag({tag: "h3", className: "head code"}),
-      allInOne,
+    createChapter(
+      $S(".undoLast(nSsteps:number)").toTag("h3", "head code"),
+      chapterContent,
       "method-undolast"
     )
   );
 }
 /* endregion method examples */
 
-function createLemma(header, content, id) {
+function createChapter(header, content, id) {
   return $S(`
     <details class="in-content" id="${id}">
       <summary>${header}<span class='toc'></span></summary>
-      <div class="lemmaContent">${content}</div>
+      <div class="chapterContent">${content}</div>
     </details>`)
   .toTag("div", "normal b5")
   .value;
@@ -1388,7 +1376,12 @@ async function createCodeElement() {
     {id: "codeOverlay"},
     $.pre({class: "codebox", id: "overlayed"},
       $.code({class: "hljs language-javascript"}, 
-        code.replace(/</g, `&lt;`).replace(/>/g, `&gt;`)) ) 
+        code
+          .replace(/&lt;/g, `&amp;lt;`)
+          .replace(/&gt;/g, `&amp;gt;`)
+          .replace(/>/g, `&gt;`)
+          .replace(/</g, `&lt;`)
+      ) ) 
     ).hide();
 }
 
@@ -1417,7 +1410,7 @@ function addCustomized() {
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
       className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? ``;
-      return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("<\/", ">"));
+      return me.enclose($S(tagName).append(className).enclose("<", ">"), $S(tagName).enclose("</", ">"));
     }
   });
   $S.addCustom({
@@ -1431,14 +1424,15 @@ function addCustomized() {
   });
   $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
   $S.addCustom({name: `asDiv`, method(me) { return me.toTag("div", "normal"); }, isGetter: true});
-  $S.addCustom({name: `appendDiv`, method: (me, classNames, ...strings) => me.append($S(strings.join(``)).toTag("div", `normal${classNames ? ` ${classNames} ` : ``}`))});
+  $S.addCustom({name: `appendDiv`, method: (me, classNames, ...strings) => 
+    me.append($S(strings.join(``)).toTag("div", `normal${classNames ? ` ${classNames} ` : ``}`))});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
   $S.addCustom({
     name: `asNote`, method: me =>
       me.trim().toTag(`i`).prefix($S`Note`.toTag(`b`, `note`).append(`: `)), isGetter: true
   });
-  $S.addCustom({name: `trimEverything`, method: me =>
-      me.constructor(trimAllAlternative(me.value)), isGetter: true});
+  $S.addCustom({name: `trimEverything`, method: me => 
+    me.value = me.constructor(trimAllAlternative(String(me))), isGetter: true});
 }
 
 function getStringValue(string) {

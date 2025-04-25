@@ -71,6 +71,8 @@ function initStyling($) {
         padding: 0 4px;
         display: inline-block;
         border-radius: 4px;
+        font-style: normal;
+        font-weight: normal;
       }`,
     `code.codeblock { 
         background-color: rgb(227, 230, 232);
@@ -116,6 +118,7 @@ function initStyling($) {
        padding: 0.3rem; 
        text-align: center;
      }`,
+    `h4.between { margin: 0.4em 0 0.2em 0; }`,
     `h1.head { line-height: 1.4em; }`,
     `#log2screen li:not(.head) { 
       line-height: 1.4em; 
@@ -126,7 +129,7 @@ function initStyling($) {
         margin-left: -3em;
       }`,
     `details {
-      .lemmaContent { margin: auto 1em auto 1.5em; }
+      .chapterContent { margin: auto 1em auto 1.5em; }
       
       summary {
         cursor: pointer;
