@@ -137,26 +137,8 @@ function initStyling($) {
           margin: 0;
           display: contents;
         }
-        .toc {
-          position: relative;
-          display: none;
-          margin-left: -1em;
-          float: right;
-          cursor: pointer;
-          &:before {
-            content: "☝";
-            font-size: 1.2em;
-          }
-          &:hover::after {
-            content: 'back to top';
-          }
-        }
       }
       
-      &[open] summary .toc {
-        display: inline-block;
-      }
-       
       pre {
         margin-top: 0.1rem;
       }
@@ -208,6 +190,28 @@ function initStyling($) {
         color: red;
       }
     }`,
+    `.back-to-top {
+      position: fixed;
+      top: 1rem;
+      cursor: pointer;
+      &:before {
+        content: "☝";
+        font-size: 1.6em;
+      }
+      &:hover::after {
+        content: 'back to top';
+        fontSize: 0.7rem;
+        position: absolute;
+        zIndex: 2;
+        display: inline-block;
+        padding: 1px 6px;
+        border: 1px solid #777;
+        box-shadow: 1px 1px 5px #777;
+        margin: 0 0 0 -7rem;
+        color: #444;
+        background-color: #FFF;
+      }
+     }`,
     `table {
       margin: 1rem 0;
       font-family: verdana;

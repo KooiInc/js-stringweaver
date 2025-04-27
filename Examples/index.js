@@ -9,6 +9,7 @@ const exampleCode = await fetchTemplates();
 const spaceIndicator = `<span style="color:#AAA">&lt;space&gt;</span>`;
 const SB = Symbol.toSB;
 const {log, logTop} = logFactory();
+let backLink, firstChapterTop;
 main();
 
 function main() {
@@ -1331,7 +1332,7 @@ function undoLastEx() {
 function createChapter(header, content, id) {
   return $S(`
     <details class="in-content" id="${id}">
-      <summary>${header}<span class='toc'></span></summary>
+      <summary>${header}</summary>
       <div class="chapterContent">${content}</div>
     </details>`)
   .toTag("div", "normal b5")
@@ -1368,6 +1369,11 @@ function printHeader() {
     .value,
   );
   $(`#log2screen`).beforeMe($.div({id: `top`}));
+  const back2TopElem = $.div_jql({class: "back-to-top"}).appendTo($(`body`));
+  const logUlDims = $(`#log2screen`).first$(`li:first-child`).dimensions;
+  back2TopElem.style({left: `${logUlDims.left + logUlDims.width - 38}px`, display: "none"});
+  backLink = back2TopElem;
+  firstChapterTop = $(`#chapter-initialization`).dimensions.y;
 }
 
 async function createCodeElement() {
@@ -1484,20 +1490,24 @@ function setDelegates() {
     return bttn.dataset.codeVisible = `visible`;
   });
   
-  $.delegate(`click`, `.toc, details .toc`, evt => {
-    const fromDetailsElement = evt.target.closest(`details.in-content`);
+  $.delegate(`scroll`, _ => {
+    return window.scrollY > firstChapterTop ? backLink.show() : backLink.hide();
+  });
+  
+  $.delegate(`click`, `.back-to-top`, _ => {
     $.node(`#top`).scrollIntoView({behavior: "smooth"});
-    
-    if (fromDetailsElement) {
-      evt.preventDefault();
-      $(`.in-content`).each(el => el.open = false);
-    }
+    $.node(`details.in-content[open]`).open = false;
     return setTimeout(_ => document.body.scrollTop = 0, 300);
   });
   
   $.delegate(`click`, `.lemma`, (_, me) => {
     $(`.lemma[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
+    
+    setTimeout(_ => {
+      const toTopLinkTop = $(me.attr(`href`)).dimensions.top;
+      $(`.back-to-top`).style(`top: ${toTopLinkTop + 5}px`);
+    },100);
   });
   
   $.delegate(`click`, `a[href^='#'], details.in-content`, (_, me) => {
