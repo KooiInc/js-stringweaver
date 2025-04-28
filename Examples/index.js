@@ -1,7 +1,8 @@
 import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
-import $S from "../index.js";
+const useBundled = true;
+const $S = (await import(useBundled ? `../Bundle/index.min.js` : `../index.js`)).default;
 
 const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
