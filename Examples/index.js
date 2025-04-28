@@ -1,10 +1,9 @@
+const startTime = performance.now();
 import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
 const useBundle = false;
 const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
-
-const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
 const spaceIndicator = `<span style="color:#AAA">&lt;space&gt;</span>`;
@@ -14,7 +13,6 @@ let backLink, firstChapterTop, pageDuration;
 main();
 
 function main() {
-  const startTime = performance.now();
   window.$S = $S; // try out in console
   initStyling($);
   setDelegates();
@@ -1539,8 +1537,8 @@ function runAndReportPerformance() {
   const perSecond = Math.round(1000/mean);
   $.Popup.show({content: 
     $S.create.append($S`This examples page used the StringWeaver module to create the bulk of the html. 
-      Creating, styling, handling and rendering the whole of the page the took ${
-        +(pageDuration.toFixed(1)).toLocaleString()} <b>milli</b>seconds`
+      Importing modules, creating, styling, handling and rendering the whole of the page in total took ${
+        +((pageDuration/1000).toFixed(2)).toLocaleString()} seconds.`
         .asNote.toTag(`div`, `normal h5`))
     .append($S`Performance test`.toTag(`h3`, `head between`))
     .append(
