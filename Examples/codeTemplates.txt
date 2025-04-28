@@ -87,7 +87,6 @@ emptyClone.append({hello: 1, world: 2});  // nothing happens
 emptyClone.value += {hello: 1, world: 2}; // {hello: 1, world: 2} will be stringified
 </template>
 
-
 <template id="indexOfExample">
 const initial = $S`hello world`;
 const word2Universe = instance => 
@@ -100,7 +99,7 @@ word2Universe(initial);
 <template id="SymbolicExtensionExample">
 const ex1 = `hello world`[Symbol.toSB].wordsUCFirst;
 const SB = Symbol.toSB;
-const ex2 = `hello world`[SB].append(`!`).firstUp;
+const ex2 = "hello world"[SB].append(`!`).firstUp;
 const wrld = `world`;
 const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
 </template>

@@ -1,7 +1,8 @@
 import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
-import $S from "../Bundle/index.min.js";
+//import $S from "../Bundle/index.min.js";
+import $S from "../index.js";
 
 const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
@@ -32,17 +33,18 @@ function printExamples() {
 
 function printInitializationExamples() {
   const ex1 = `hello world`[Symbol.toSB].wordsUCFirst;
-  const ex2 = `hello world`[SB].append(`!`).firstUp;
+  const ex2 = "hello world"[SB].append(`!`).firstUp;
   const wrld = `world`;
   const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
   const allExamples = [
     $S`Initialization`
       .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
-      .appendDiv(``, $S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote)
-      .appendDiv(``, $S`output string values in this document are intentionally `
+      .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.asDiv)
+      .append($S`output string values in this document are intentionally `
         .append($S`quoted`.qcd)
         .append(` where applicable`)
         .asNote
+        .asDiv
       ).value,
     
     createChapter(
@@ -62,9 +64,9 @@ function printInitializationExamples() {
     
     createChapter(
       $S`Initialize using the predefined [Symbol.toSB] String getter extension`.toTag("h3", "head code"),
-      $S`We created a symbolic getter extension (<code>Symbol.toSB</code>) for <code>String.prototype</code>.`
-        .toTag("div", "normal")
-        .appendDiv(`b5`, `With it, one can create a StringWeaver instance from a plain JS string.`)
+      $S`The StringWeaver module contains a symbolic getter extension (<code>Symbol.toSB</code>) for <code>String.prototype</code>.`
+        .asDiv
+        .append($S`With it, one can create a StringWeaver instance from a plain JS string.`.asDiv)
         .append(exampleCode.SymbolicExtensionExample)
         .appendDiv(`b5`, "ex1"[SB].toCode.append(ex1.qcd.prefix(` => `)))
         .appendDiv(`b5`, "ex2"[SB].toCode.append(ex2.qcd.prefix(` => `)))
@@ -76,23 +78,24 @@ function printInitializationExamples() {
       $S`Instantiation always returns an instance with a string`.toTag("h3", "head code"),
       $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
         is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5")
-      .appendDiv(``, $S`$S()`.toCode.append($S().qcd.prefix(` => `)))
-      .appendDiv(``, $S`$S("hello world")`.toCode.append($S(`hello world`).qcd.prefix(` => `)))
-      .appendDiv(``, $S`$S([1,2,3])`.toCode.append($S([1,2,3]).qcd.prefix(` => `))),
+        .append($S`$S()`.toCode.append($S().qcd.prefix(` => `)).asDiv)
+        .append($S`$S("hello world")`.toCode.append($S(`hello world`).qcd.prefix(` => `)).asDiv)
+        .append($S`$S([1,2,3])`.toCode.append($S([1,2,3]).qcd.prefix(` => `)).asDiv),
       "initialization-alwaysstring"
     ),
     
     createChapter(
       $S`Instance methods are chainable`.toTag("h3", "head code"),
-      $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode
-      .appendDiv(``, `=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd),
+      $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode.asDiv
+        .append(`=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd).asDiv,
       "initialization-instance-chainable"
     ),
     
     createChapter(
       $S`Native string function results are chainable`.toTag("h3", "head code"),
-      $S`<code>\$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").quote.guillemetsInward</code>`
-        .appendDiv(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward),
+      $S`<code>\$S("hello world").<i class="red">toUpperCase</i>().<i class="red">replace</i>(/world/i, "UNIVERSE")
+        .quote.guillemetsInward</code>`.asDiv
+        .append(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward).asDiv,
       "initialization-native-chainable"
     ),
     
@@ -1410,8 +1413,8 @@ function trimAllAlternative(string) {
 
 function addCustomized() {
   $S.addCustom({name: `enclose`, method: (me, start, end) => me.enclose(start, end)});
-  /* ↳ this will do nothing. It displays an error in the console
-     because 'enclose' is already an instance method */
+  /* ↳ this will display an error in the console
+       because 'enclose' is already an instance method */
   $S.addCustom({name: "festive", method: me => me.enclose("\u{1F389}"), isGetter: true});
   $S.addCustom({
     name: "toTag", method: (me, tagName, className) => {
@@ -1421,11 +1424,13 @@ function addCustomized() {
   });
   $S.addCustom({
     name: "toIdTag", method: (me, {tag, id, className} = {}) => {
-      tag = getStringValue(tag);
-      if (!tag) { return me; }
-      className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? ``;
-      id = $S(id).notEmpty?.quote.double.prefix(" id=") ?? ``;
-      return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
+      if (tag?.value || (tag?.constructor === String && tag)) { 
+        className = $S(className).notEmpty?.quote.double.prefix($S(" class=")) ?? ``;
+        id = $S(id).notEmpty?.quote.double.prefix(" id=") ?? ``;
+        return me.enclose($S(tag).append(className, id).enclose("<", ">"), $S(tag).enclose("<\/", ">"));
+      }
+      
+      return me;
     }
   });
   $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
@@ -1439,10 +1444,6 @@ function addCustomized() {
   });
   $S.addCustom({name: `trimEverything`, method: me => 
     me.value = me.constructor(trimAllAlternative(String(me))), isGetter: true});
-}
-
-function getStringValue(string) {
-  return string?.value || (string?.constructor === String && string);
 }
 
 function getCodeblocks(templates) {
@@ -1564,7 +1565,7 @@ function runAndReportPerformance() {
     .append(
       $S`Created 10 * ${10_000..toLocaleString()} StringWeaver instance <code>clone</code>s, 
         <code>append</code>ing a string to each (\u03A3 ${100_000..toLocaleString()} instances).`.asDiv
-      .append($S`Mean time per iteration was <b>${+(mean.toFixed(5)).toLocaleString()}</b> 
+      .append($S`Average time per iteration was <b>${+(mean.toFixed(5)).toLocaleString()}</b> 
           <i><b>milli</b></i>seconds (\u00B1 ${(+(sd.toFixed(5)).toLocaleString())}).`).asDiv
       .append($S`That is an average of <b>${perSecond.toLocaleString()}</b> instances per second.`)
     )
