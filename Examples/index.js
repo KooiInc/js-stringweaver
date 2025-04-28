@@ -1,7 +1,6 @@
 import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
-//import $S from "../Bundle/index.min.js";
 import $S from "../index.js";
 
 const fromUnbundled = false;
