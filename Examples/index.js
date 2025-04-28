@@ -1,8 +1,8 @@
 import {logFactory, $} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
-const useBundled = true;
-const $S = (await import(useBundled ? `../Bundle/index.min.js` : `../index.js`)).default;
+const useBundle = false;
+const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
 
 const fromUnbundled = false;
 const codeOverlay = await createCodeElement();
@@ -10,10 +10,11 @@ const exampleCode = await fetchTemplates();
 const spaceIndicator = `<span style="color:#AAA">&lt;space&gt;</span>`;
 const SB = Symbol.toSB;
 const {log, logTop} = logFactory();
-let backLink, firstChapterTop;
+let backLink, firstChapterTop, pageDuration;
 main();
 
 function main() {
+  const startTime = performance.now();
   window.$S = $S; // try out in console
   initStyling($);
   setDelegates();
@@ -21,6 +22,7 @@ function main() {
   printExamples();
   hljs.highlightAll(`javascript`);
   createTOC();
+  pageDuration = performance.now() - startTime;
 }
 
 function printExamples() {
@@ -37,8 +39,7 @@ function printInitializationExamples() {
   const wrld = `world`;
   const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
   const allExamples = [
-    $S`Initialization`
-      .toIdTag({tag: "h2", id: "chapter-initialization", className: "head code"})
+       $S.create
       .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.asDiv)
       .append($S`output string values in this document are intentionally `
         .append($S`quoted`.qcd)
@@ -147,157 +148,171 @@ function printInitializationExamples() {
       "initialization-native-tostringvalueof"
     )];
   
-  log(...allExamples);
+  log( 
+    chapterHeader("Initialization", "chapter-initialization"),
+    ...allExamples);
 }
 
 function printStaticConstructorFunctionExamples() {
-  const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`
-    .toCode;
-  
-  const h3 = text => `<h3 class="head code">${text}</h3>`;
   log(
-      $S`Static constructor properties/methods`
-        .toIdTag({tag: "h2", id: "chapter-static", className: "head code"}).value,
-      
-      createChapter(
-        $S`${h3("$S.keys")}`,
-        $S`includes user defined custom property/method keys`.asNote
-        .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`)),
-        "static-keys"
-      ),
-    
-      createChapter(
-        $S`${h3("$S.info")}`,
-        $S`includes user defined custom properties/methods`.asNote
-        .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`)),
-        "static-info"
-      ),
-      
-      createChapter(
-        $S`${h3("$S.quoteInfo")}`,
-        $S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`),
-        "static-quoteinfo"
-      ),
-    
-    createChapter(
-      $S` $S.constructor`.toTag("h3", "head code"),
-      $S`Result: `.prefix(`=> `).toTag(`b`)
-        .append(constructorLine.prefix($S`${
-          !fromUnbundled ? $S`this is the constructor from the bundled code => `.asNote : ``}`)),
-      "static-constructor"
-    )
+    chapterHeader(`Static constructor properties/methods`, "chapter-static"),
+    addCustomEx(),
+    constructorEx(),
+    createEx(),
+    infoEx(),
+    keysEx(),
+    quoteInfoEx(),
+    randomStringEx(),
+    regExpEx(),
+    uuid4Ex(),
   );
-  regExpEx();
-  addCustomEx();
-  uuid4Ex();
-  randomStringEx();
 }
 
 function printGetterExamples() {
-  log($S("Instance getters").toIdTag({tag: "h2", id: "chapter-getter", className: "head code"}).value);
-  camelCaseEx();
-  cloneEx();
-  emptyEx();
-  firstUpEx();
-  historyEx();
-  kebabCaseEx();
-  notEmptyEx();
-  quoteEx();
-  snakeCaseEx();
-  trimAllEx();
-  trimAllKeepLFEx();
-  undoEx();
-  undoAllEx();
-  valueEx();
-  wordsFirstUpEx();
+  log(
+    chapterHeader("Instance getters", "chapter-getter"),
+    camelCaseEx(),
+    cloneEx(),
+    emptyEx(),
+    firstUpEx(),
+    historyEx(),
+    kebabCaseEx(),
+    notEmptyEx(),
+    quoteEx(),
+    snakeCaseEx(),
+    trimAllEx(),
+    trimAllKeepLFEx(),
+    undoEx(),
+    undoAllEx(),
+    valueEx(),
+    wordsUCFirst()
+  );
 }
 
 function printMethodExamples() {
   log(
-    $S("Instance methods")
-      .toIdTag({tag: "h2", id: "chapter-method", className: "head code"})
-      .value );
-  appendEx();
-  encloseEx();
-  formatEx();
-  indexOfEx();
-  insertEx();
-  interpolateEx();
-  lastIndexOfEx();
-  prefixEx();
-  replaceWordsEx();
-  truncateEx();
-  undoLastEx();
+    chapterHeader("Instance methods", "chapter-method"),
+    appendEx(),
+    encloseEx(),
+    formatEx(),
+    indexOfEx(),
+    insertEx(),
+    interpolateEx(),
+    lastIndexOfEx(),
+    prefixEx(),
+    replaceWordsEx(),
+    truncateEx(),
+    undoLastEx(),
+  );
 }
 
 /* region static constructor function examples */
+function createEx() {
+  return createChapter(
+    itemHeader("$S.create"),
+    $S`<code>$S.create</code> delivers an instance with an empty string value`.asDiv
+      .append($S`$S.create.append("world").prefix("Hello ")`.toCode.asDiv)
+      .append($S.create.append("world").prefix("Hello ").prefix(`=> `).asDiv),
+    "static-keys"
+  );
+}
+
+function keysEx() {
+  return createChapter(
+    $S`${itemHeader("$S.keys")}`,
+    $S`includes user defined custom property/method keys`.asNote
+      .append($S(JSON.stringify($S.keys, null, 2)).toTag(`pre`)),
+    "static-keys"
+  );
+}
+
+function constructorEx() {
+  const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
+  
+  return createChapter(
+    $S` $S.constructor`.toTag("h3", "head code"),
+    $S`Result: `.prefix(`=> `).toTag(`b`)
+      .append(constructorLine.prefix($S`${
+        useBundle ? $S`this is the constructor from the bundled code => `.asNote : ``}`)),
+    "static-constructor"
+  );
+}
+
+function infoEx() {
+  return createChapter(
+    $S`${itemHeader("$S.info")}`,
+    $S`includes user defined custom properties/methods`.asNote
+      .append($S(JSON.stringify($S.info, null, 2)).toTag(`pre`)),
+    "static-info"
+  );
+}
+function quoteInfoEx() {
+  return createChapter(
+    $S`${itemHeader("$S.quoteInfo")}`,
+    $S(JSON.stringify($S.quoteInfo, null, 2)).toTag(`pre`),
+    "static-quoteinfo"
+  );
+}
+
 function regExpEx() {
   const reDemo = $S.regExp`
       ^[\p{L}]              //=> always start with a letter
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
-  log(
-    createChapter(
-      $S`$S.regExp`.toTag("h3", "head code"),
-      (`$S.regExp`[SB].toCode + ` enables creating a regular expression from a 
-        multiline (template) string, including comments`)[SB].asDiv 
-      .appendDiv(`b5`, $S` can only be used as tagged template function`.asNote)
-      .appendDiv(``,
-        $S(exampleCode.regExpExample)
-        .append($S`Result`.toTag(`b`).prefix(`=> `)
-        .append(`: `, $S(reDemo.toString()).toCode))
-      ),
-      "static-regexp"
+  return createChapter(
+    itemHeader(`$S.regExp`),
+    (`$S.regExp`[SB].toCode + ` enables creating a regular expression from a 
+      multiline (template) string, including comments`)[SB].asDiv 
+    .appendDiv(`b5`, $S` can only be used as tagged template function`.asNote)
+    .appendDiv(``,
+      $S(exampleCode.regExpExample)
+      .append($S`Result`.toTag(`b`).prefix(`=> `)
+      .append(`: `, $S(reDemo.toString()).toCode))
     ),
+    "static-regexp"
   );
 }
 
 function addCustomEx() {
-  log(
-    createChapter(
-      $S` $S.addCustom({name, method, isGetter, enumerable})`
-      .toTag("h3", "head code"),
-       $S``
-       .append(`Use ${"$S.addCustom"[SB].toCode} to define custom instance getters and/or methods`[SB].asDiv)
-       .appendDiv(``, $S`Syntax`.toTag(`i`).append(`: `, exampleCode.customGetterSyntax))
-       .append(
-          $S`Examples`.toTag(`h3`, `head`)
-          .appendDiv(`b5`, 
-            $S`<b>User defined <i>getter</i> <code>.festive</code></b>`,
-            $S`${exampleCode.festiveExample}`
-            .append($S`=&gt; `,
-              $S`result`.toCode, `: `, $S("Hurray!").festive.qcd)
-          )
-          .appendDiv(`b5`,
-            $S`<b>User defined <i>method</i> <code>.toTag</code></b>`,
-            $S`${exampleCode.toTagExample}`
-            .appendDiv(``,
-              $S`result`.toCode.prefix(`=> `).append(` `,
-              $S`Hurray!`.toTag("i", "green").toTag("b").qcd)
-          ))
-       ),
-      "static-addcustom"
-    )
+  return createChapter(
+     itemHeader(` $S.addCustom({name, method, isGetter, enumerable})`),
+     $S.create
+     .append(`Use ${"$S.addCustom"[SB].toCode} to define custom instance getters and/or methods`[SB].asDiv)
+     .appendDiv(``, $S`Syntax`.toTag(`i`).append(`: `, exampleCode.customGetterSyntax))
+     .append(
+        $S`Examples`.toTag(`h3`, `head`)
+        .appendDiv(`b5`, 
+          $S`<b>User defined <i>getter</i> <code>.festive</code></b>`,
+          $S`${exampleCode.festiveExample}`
+          .append($S`=&gt; `,
+            $S`result`.toCode, `: `, $S("Hurray!").festive.qcd)
+        )
+        .appendDiv(`b5`,
+          $S`<b>User defined <i>method</i> <code>.toTag</code></b>`,
+          $S`${exampleCode.toTagExample}`
+          .appendDiv(``,
+            $S`result`.toCode.prefix(`=> `).append(` `,
+            $S`Hurray!`.toTag("i", "green").toTag("b").qcd)
+        ))
+     ),
+    "static-addcustom"
   );
 }
 
 function uuid4Ex() {
-  log(
-    createChapter(
-      $S` $S.uuid4`.toTag("h3", "head code"),
-      $S`$S.uuid4`.toCode
-        .append(
-          ` => `,
-          $S.uuid4.qcd
-        ).asDiv,
-      "static-uuid4"
-    )
+  return createChapter(
+    $S` $S.uuid4`.toTag("h3", "head code"),
+    $S`$S.uuid4`.toCode
+      .append(
+        ` => `,
+        $S.uuid4.qcd
+      ).asDiv,
+    "static-uuid4"
   );
 }
 
 function randomStringEx() {
-  log(
-    createChapter(
+  return createChapter(
       $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`.toTag("h3", "head code"),
       $S`Syntax: `.toTag(`i`)
       .appendDiv(`b5`, $S`${exampleCode.randomStringSyntax}`)
@@ -333,15 +348,13 @@ function randomStringEx() {
             }).qcd)
       ),
       "static-randomstring"
-    )
-  )
+  );
 }
 /* endregion static constructor function examples */
 
 /* region getter examples */
 function camelCaseEx() {
-  log(
-    createChapter(
+  return createChapter(
       $S(".camelCase").toTag("h3", "head code"),
       $S`Tries converting the instance string 
           to <a target="_blank" class="ExternalLink arrow"
@@ -360,143 +373,133 @@ function camelCaseEx() {
           .append( $S`you -- should convert    -me    too`
             .camelCase.qcd.prefix(" => ")) ),
       "getter-camelcase",
-    )
-  );
+    );
 }
 
 function cloneEx() {
   const toClone = $S("I shall be ").append("cloned");
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
-  log(
-    createChapter(
-      $S(" .clone").toTag("h3", "head code"),
-      $S`Clone the instance.`.toTag("div", "normal b5")
-        
-      .appendDiv(`b5`, $S("the history of the originating instance is also cloned").asNote )
-        
-      .append( exampleCode.cloneExample )
-        
-      .append(
-        $S``
-        .appendDiv(`b5`, $S`toClone.history`.toCode.append($S`${JSON.stringify(toClone.history)}`.prefix("=>")))
-        .appendDiv(`b5`, $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")))
-        .appendDiv(`b5`, $S`cloned`.toCode.append(cloned.qcd.prefix("=>")))
-        .appendDiv(`b5`, $S`toClone`.toCode.append(toClone.qcd.prefix("=>")))
-      ),
-      "getter-clone",
+  return createChapter(
+    $S(" .clone").toTag("h3", "head code"),
+    $S`Clone the instance.`.toTag("div", "normal b5")
+      
+    .appendDiv(`b5`, $S("the history of the originating instance is also cloned").asNote )
+      
+    .append( exampleCode.cloneExample )
+      
+    .append(
+      $S``
+      .appendDiv(`b5`, $S`toClone.history`.toCode.append($S`${JSON.stringify(toClone.history)}`.prefix("=>")))
+      .appendDiv(`b5`, $S`cloned.history`.toCode.append($S`${JSON.stringify(cloned.history)}`.prefix("=>")))
+      .appendDiv(`b5`, $S`cloned`.toCode.append(cloned.qcd.prefix("=>")))
+      .appendDiv(`b5`, $S`toClone`.toCode.append(toClone.qcd.prefix("=>")))
     ),
+    "getter-clone",
   );
 }
 
 function firstUpEx() {
-  log(
-    createChapter(
-      $S(" .firstUp").toTag("h3", "head code"),
-      $S`Converts the first letter of the instance string to upper case`
-        .toTag("div", "normal b5")
-      .appendDiv(`b5`,
-        $S("$S`hello world`.firstUp").toCode,
-        $S`hello world`.firstUp.qcd.prefix(" => "))
-      .appendDiv(`b5`,
-        $S("$S`   hello world`.trim().firstUp").toCode,
-        $S`hello world`.trim().firstUp.qcd.prefix(" => ")),
-      "getter-firstup")
+  return createChapter(
+    itemHeader(" .firstUp"),
+    $S`Converts the first letter of the instance string to upper case`
+      .toTag("div", "normal b5")
+    .appendDiv(`b5`,
+      $S("$S`hello world`.firstUp").toCode,
+      $S`hello world`.firstUp.qcd.prefix(" => "))
+    .appendDiv(`b5`,
+      $S("$S`   hello world`.trim().firstUp").toCode,
+      $S`hello world`.trim().firstUp.qcd.prefix(" => ")),
+    "getter-firstup"
   );
 }
 
 function historyEx() {
   const historyEx = JSON.stringify($S``.prefix("hello").append(` `, `world`).history);
-  log(
-    createChapter(
-      $S(" .history").toTag("h3", "head code"),
-      $S`Every instance records its history, which may be retrieved using 
-            <code>.history</code>.`
-      .appendDiv(`b5`, `The history enables undoing things for an instance 
-            (see <code>undo/undoLast/undoAll</code>).`) 
-      .append(
-        ("$S``.prefix('hello').append(` `, `world`).history"[SB].toCode +
-         " => " + historyEx)[SB].asDiv),
-      "getter-history"
-    ),
+  return createChapter(
+    itemHeader(" .history"),
+    $S`Every instance records its history, which may be retrieved using 
+          <code>.history</code>.`
+    .appendDiv(`b5`, `The history enables undoing things for an instance 
+          (see <code>undo/undoLast/undoAll</code>).`) 
+    .append(
+      ("$S``.prefix('hello').append(` `, `world`).history"[SB].toCode +
+       " => " + historyEx)[SB].asDiv),
+    "getter-history"
   );
 }
 
 function emptyEx() {
-  log(
-    createChapter(
-      $S`.empty`.toTag("h3", "head code"),
-      
-      $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") 
-      
-      .appendDiv(`b5`,
-        $S`$S(null).empty`.toCode,
-        ` => `,
-        $S`${$S(null).empty}`
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S().empty`.toCode,
-        ` => `,
-        $S`${$S(null).empty}`
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S(new String()).empty`.toCode,
-        ` => `,
-        $S`${$S(new String()).empty}`
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S(new String("hello!")).empty`.toCode,
-        ` => `,
-        $S`${$S(new String("hello!")).empty}`
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S("hello!").empty`.toCode,
-        ` => `,
-        $S`${$S("hello!").empty}`
-      ),
-      "getter-empty"
+  return createChapter(
+    itemHeader($S`.empty`),
+    
+    $S`Check if the instance string value is an empty string`.toTag("div", "normal b5") 
+    
+    .appendDiv(`b5`,
+      $S`$S(null).empty`.toCode,
+      ` => `,
+      $S`${$S(null).empty}`
     )
+      
+    .appendDiv(`b5`,
+      $S`$S().empty`.toCode,
+      ` => `,
+      $S`${$S(null).empty}`
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S(new String()).empty`.toCode,
+      ` => `,
+      $S`${$S(new String()).empty}`
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S(new String("hello!")).empty`.toCode,
+      ` => `,
+      $S`${$S(new String("hello!")).empty}`
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S("hello!").empty`.toCode,
+      ` => `,
+      $S`${$S("hello!").empty}`
+    ),
+    "getter-empty"
   );
 }
 
 function notEmptyEx() {
-  log(
-    createChapter(
-      $S`.notEmpty`.toTag("h3", "head code"),
-      $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> 
-          if that value is not empty (not "")`
-        
-      .appendDiv(`b5`,
-        `In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
-        instance value is an empty string, the instance if not.`)
-        
-      .appendDiv(`b5`,
-        `This means one can use <a target="_blank" class="ExternalLink arrow"
-        href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
-        >optional chaining</a> in combination with the <a target="_blank" class="ExternalLink arrow"
-        href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
-        >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
-        
-      .appendDiv(`b5`,
-          `See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
-          <code>toTag</code> method for a use case`)
-        
-      .appendDiv(`b5`,
-          $S`$S(null).notEmpty?.append("hello!") ?? $S("hithere!")`.toCode,
-        ` => `,
-        ($S(null).notEmpty?.append("hello!") ?? $S("hithere!")).qcd
-      )
-        
-      .appendDiv(`b5`,
-          $S(`$S\`hello\`.notEmpty?.append(" ", "world!") ?? $S()`).toCode,
-        ` => `,
-        ($S`hello`.notEmpty?.append(" ", "world!") ?? $S()).qcd
-      ),
-      "getter-notempty"
+  return createChapter(
+    itemHeader(`.notEmpty`),
+    $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> 
+        if that value is not empty (not "")`
+      
+    .appendDiv(`b5`,
+      `In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
+      instance value is an empty string, the instance if not.`)
+      
+    .appendDiv(`b5`,
+      `This means one can use <a target="_blank" class="ExternalLink arrow"
+      href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining"
+      >optional chaining</a> in combination with the <a target="_blank" class="ExternalLink arrow"
+      href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing"
+      >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
+      
+    .appendDiv(`b5`,
+        `See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
+        <code>toTag</code> method for a use case`)
+      
+    .appendDiv(`b5`,
+        $S`$S(null).notEmpty?.append("hello!") ?? $S("hithere!")`.toCode,
+      ` => `,
+      ($S(null).notEmpty?.append("hello!") ?? $S("hithere!")).qcd
     )
+      
+    .appendDiv(`b5`,
+        $S(`$S\`hello\`.notEmpty?.append(" ", "world!") ?? $S()`).toCode,
+      ` => `,
+      ($S`hello`.notEmpty?.append(" ", "world!") ?? $S()).qcd
+    ),
+    "getter-notempty"
   );
 }
 
@@ -516,7 +519,7 @@ function quoteEx() {
     );
   
   const lemma = createChapter(
-    $S(" .quote[...]").toTag("h3", "head code"),
+    itemHeader(" .quote[...]"),
     `Apply a quoting style to the instance string value.`[SB].asDiv
     .append(`The module includes a number of 
       <a
@@ -542,93 +545,89 @@ function quoteEx() {
       <code>quote</code> fields</h4>`.asDiv)  
     .append(``, quotingStyleExamples.join(``)),
     "getter-quote");
-  log(lemma);
+  return lemma;
 }
 
 function snakeCaseEx() {
-  log(
-    createChapter(
-      $S(" .snakeCase").toTag("h3", "head code"),
-      $S`Tries converting 
-            the instance string to <a target="_blank" class="ExternalLink arrow"
-            href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
-            >Snake case</a>, meaning that all words of a string 
-            will be converted to lower case, all non-letters/-numbers 
-            (all not a-z <i>including diacriticals</i>) 
-            will be removed and the converted words will be concatenated 
-            with underscore ('_'). May be useful for cleaning up property names.`
-      .toTag("div", "normal b5")
-      .appendDiv(`b5`,
-          $S("$S`convertMe`.snakeCase").toCode
-          .append( $S`convertMe`
-            .snakeCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert-Me Please`.snakeCase").toCode
-          .append( $S`Convert Me Please`
-            .snakeCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
-          .append( $S`Convert Me _    Please`
-            .snakeCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
-          .append( $S`Convert Me, PlËase $#!`.snakeCase
-            .replace("plase", "<b class='red'>plase</b>")
-            .qcd.prefix(" => ")))
-        
-      .appendDiv(`b5`,
-        $S("$S`42 Convert Me, please`.snakeCase").toCode
-          .append( $S`42 Convert Me, Please`
-            .snakeCase.qcd.prefix(" => ")) ),
-      "getter-snakecase"
-    ),
+  return createChapter(
+    itemHeader(" .snakeCase"),
+    $S`Tries converting 
+          the instance string to <a target="_blank" class="ExternalLink arrow"
+          href="https://developer.mozilla.org/en-US/docs/Glossary/Snake_case"
+          >Snake case</a>, meaning that all words of a string 
+          will be converted to lower case, all non-letters/-numbers 
+          (all not a-z <i>including diacriticals</i>) 
+          will be removed and the converted words will be concatenated 
+          with underscore ('_'). May be useful for cleaning up property names.`
+    .toTag("div", "normal b5")
+    .appendDiv(`b5`,
+        $S("$S`convertMe`.snakeCase").toCode
+        .append( $S`convertMe`
+          .snakeCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert-Me Please`.snakeCase").toCode
+        .append( $S`Convert Me Please`
+          .snakeCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert Me _&nbsp;&nbsp;&nbsp;&nbsp;Please__`.snakeCase").toCode
+        .append( $S`Convert Me _    Please`
+          .snakeCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert Me, pl<b class='red'>Ë</b>ase  $#!`.snakeCase").toCode
+        .append( $S`Convert Me, PlËase $#!`.snakeCase
+          .replace("plase", "<b class='red'>plase</b>")
+          .qcd.prefix(" => ")))
+      
+    .appendDiv(`b5`,
+      $S("$S`42 Convert Me, please`.snakeCase").toCode
+        .append( $S`42 Convert Me, Please`
+          .snakeCase.qcd.prefix(" => ")) ),
+    "getter-snakecase"
   );
 }
 
 function kebabCaseEx() {
-  log(
-    createChapter(
-      $S(" .kebabCase").toTag("h3", "head code"),
-      $S`Tries converting 
-            the instance string to <a target="_blank" class="ExternalLink arrow"
-            href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
-            >Kebab case</a> (aka 'dashed notation'), 
-            meaning that all words of a string 
-            will be converted to lower case. All non-letters/-numbers 
-            (<b>not</b> a-z, A-Z <i>including diacriticals</i>) 
-            will be removed and the converted words will be concatenated 
-            with hyphens. May be useful for css- or data-attributes.`
-      .toTag("div", "normal b5")
-        
-      .appendDiv(`b5`,
-        $S("$S`ConvertMe`.kebabCase").toCode
-          .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert-Me _Please`.kebabCase").toCode
-          .append( $S`Convert Me _Please`
-            .kebabCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
-          .append( $S`Convert Me --    Please`
-            .kebabCase.qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`Convert Me, _pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
-          .append( $S`Convert Me, _Plëase $#!`.kebabCase
-            .replace("plase", "<b class='red'>plase</b>")
-            .qcd.prefix(" => ")) )
-        
-      .appendDiv(`b5`,
-        $S("$S`42 Convert Me, &Please`.kebabCase").toCode
-          .append( $S`42 Convert Me, &Please`
-            .kebabCase.qcd.prefix(" => ")) ),
-      "getter-kebabcase"
-    )
+  return createChapter(
+    itemHeader(" .kebabCase"),
+    $S`Tries converting 
+          the instance string to <a target="_blank" class="ExternalLink arrow"
+          href="https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case"
+          >Kebab case</a> (aka 'dashed notation'), 
+          meaning that all words of a string 
+          will be converted to lower case. All non-letters/-numbers 
+          (<b>not</b> a-z, A-Z <i>including diacriticals</i>) 
+          will be removed and the converted words will be concatenated 
+          with hyphens. May be useful for css- or data-attributes.`
+    .toTag("div", "normal b5")
+      
+    .appendDiv(`b5`,
+      $S("$S`ConvertMe`.kebabCase").toCode
+        .append( $S`ConvertMe`.kebabCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert-Me _Please`.kebabCase").toCode
+        .append( $S`Convert Me _Please`
+          .kebabCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert Me --&nbsp;&nbsp;&nbsp;&nbsp;Please`.kebabCase").toCode
+        .append( $S`Convert Me --    Please`
+          .kebabCase.qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`Convert Me, _pl<b class='red'>ë</b>ase  $#!`.kebabCase").toCode
+        .append( $S`Convert Me, _Plëase $#!`.kebabCase
+          .replace("plase", "<b class='red'>plase</b>")
+          .qcd.prefix(" => ")) )
+      
+    .appendDiv(`b5`,
+      $S("$S`42 Convert Me, &Please`.kebabCase").toCode
+        .append( $S`42 Convert Me, &Please`
+          .kebabCase.qcd.prefix(" => ")) ),
+    "getter-kebabcase"
   );
 }
 
@@ -646,50 +645,48 @@ function trimAllEx() {
       {  ok  ? }
     `];
   
-  log(
-    createChapter(
-      $S(" .trimAll").toTag("h3", "head code"),
-      $S`Tries to trim all superfluous white space from the instance string. 
-          So multiple spaces, tabs, linefeeds are reduced to single white space or no
-          white space if after a line feed. This is a fairly simple and certainly not
-          a failsafe method (see second example)`
-      .toTag("div", "normal b5")
-      .appendDiv(`b5`,$S`for clarity the spaces in the result are marked as ${spaceIndicator}`.asNote)  
+  return createChapter(
+    itemHeader(" .trimAll"),
+    $S`Tries to trim all superfluous white space from the instance string. 
+        So multiple spaces, tabs, linefeeds are reduced to single white space or no
+        white space if after a line feed. This is a fairly simple and certainly not
+        a failsafe method (see second example)`
+    .toTag("div", "normal b5")
+    .appendDiv(`b5`,$S`for clarity the spaces in the result are marked as ${spaceIndicator}`.asNote)  
+      
+    .appendDiv(`b5`,
+      $S`Example 1`.toTag(`h3`, `head between`),
+      cleanupStr1,
+      $S`<pre>${$S`clean    me
         
-      .appendDiv(`b5`,
-        $S`Example 1`.toTag(`h3`, `head between`),
-        cleanupStr1,
-        $S`<pre>${$S`clean    me
-          
-             please!   `.trimAll.qcd.replace(/ /g, spaceIndicator).prefix(`=> `)}</pre>`)
-      .appendDiv(`b5`,
-        $S`Example 2`.toTag(`h3`, `head between`),
-        $S`<pre class="codebox"><code>$S\`clean me
-        
-            up    ,
-        
-            ( please !  )   
-          {  ok  ? }
-          \`.trimAll</code></pre>`
-        .append( `<pre>${$S`${cleanupStr2}`.trimAll.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`) )
-        
-      .appendDiv(`b5`,
-        $S`Example 2a`.toTag(`h3`, `head between`),
-        $S`we created a custom getter called <code>trimEverything</code> with a 
-          different approach to this. (go to the <a href="#top">page top</a>, click 'Display code' and scroll to 
-          <code>function trimAllAlternative</code>...).
-          It's pretty convoluted and not perfect, but hey, it's an idea ...`.asNote)
-        
-        .append($S`<pre class="codebox"><code>$S\`clean me
-        
-            up    ,
-        
-            ( please !  )   
-          {  ok  ? }
-          \`.trimEverything</code></pre>`
-          .append( `<pre>${$S`${cleanupStr2}`.trimEverything.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`).asDiv ),
-      "getter-trimall"
-    )
+           please!   `.trimAll.qcd.replace(/ /g, spaceIndicator).prefix(`=> `)}</pre>`)
+    .appendDiv(`b5`,
+      $S`Example 2`.toTag(`h3`, `head between`),
+      $S`<pre class="codebox"><code>$S\`clean me
+      
+          up    ,
+      
+          ( please !  )   
+        {  ok  ? }
+        \`.trimAll</code></pre>`
+      .append( `<pre>${$S`${cleanupStr2}`.trimAll.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`) )
+      
+    .appendDiv(`b5`,
+      $S`Example 2a`.toTag(`h3`, `head between`),
+      $S`we created a custom getter called <code>trimEverything</code> with a 
+        different approach to this. (go to the <a href="#top">page top</a>, click 'Display code' and scroll to 
+        <code>function trimAllAlternative</code>...).
+        It's pretty convoluted and not perfect, but hey, it's an idea ...`.asNote)
+      
+      .append($S`<pre class="codebox"><code>$S\`clean me
+      
+          up    ,
+      
+          ( please !  )   
+        {  ok  ? }
+        \`.trimEverything</code></pre>`
+        .append( `<pre>${$S`${cleanupStr2}`.trimEverything.replace(/ /g, spaceIndicator).qcd.prefix(" => ")}</pre>`).asDiv ),
+    "getter-trimall"
   );
 }
 
@@ -701,8 +698,7 @@ function trimAllKeepLFEx() {
             
             
             please! \`.trimAllKeepLF</code></pre>`;
-  log(
-    createChapter(
+  return createChapter(
     $S(" .trimAllKeepLF").toTag("h3", "head code"),
     $S`Tries to trim all superfluous white space <i>except line feeds</i> 
         from the instance string. So multiple whitespace are reduced to single 
@@ -726,53 +722,48 @@ function trimAllKeepLFEx() {
         .replace(/\n/g, `\n${lfIndicator}`)
         .qcd.prefix(`=> `)}</pre>`.asDiv ) 
       ),
-      "getter-trimallkeeplf"
-    )
+    "getter-trimallkeeplf"
   );
 }
 
 function undoEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase(); 
   
-  log(
-    createChapter(
-      $S(" .undo").toTag("h3", "head code"),
-      $S`Sets the instance string value to the previous string value 
-          (from the history, see <code>$S.history</code>`
-        .toTag("div", "normal b5")
-      .append(
-        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
-          .toCode
-          .append(` => `, $S(initial.value).qcd) ) 
-      .append(
-        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
+  return createChapter(
+    itemHeader(" .undo"),
+    $S`Sets the instance string value to the previous string value 
+        (from the history, see <code>$S.history</code>`
+      .toTag("div", "normal b5")
+    .append(
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
         .toCode
-        .append(` => `, $S(initial.undo.value).qcd) ),
-      "getter-undo"
-    )
+        .append(` => `, $S(initial.value).qcd) ) 
+    .append(
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undo")
+      .toCode
+      .append(` => `, $S(initial.undo.value).qcd) ),
+    "getter-undo"
   );
 }
 
 function undoAllEx() {
   const initial = $S` `.append('World').prefix('Hello').toLowerCase();
   
-  log(
-    createChapter(
-      $S(" .undoAll").toTag("h3", "head code"),
-      $S`Sets the instance string value to the initial string value 
-          (from the history, see <code>$S.history</code>`
-      .toTag("div", "normal b5")
-      .appendDiv(`b5`,
-        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
-        .toCode
-        .append(` => `, $S(initial.value).qcd))
-        
-      .appendDiv(`b5`,
-        $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undoAll")
-        .toCode
-        .append(` => `, $S(initial.undoAll.value).qcd) ),
-      "getter-undoall"
-    )
+  return createChapter(
+    itemHeader(" .undoAll"),
+    $S`Sets the instance string value to the initial string value 
+        (from the history, see <code>$S.history</code>`
+    .toTag("div", "normal b5")
+    .appendDiv(`b5`,
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase()")
+      .toCode
+      .append(` => `, $S(initial.value).qcd))
+      
+    .appendDiv(`b5`,
+      $S("$S``.append('World').prefix(' ').prefix('Hello').toLowerCase().undoAll")
+      .toCode
+      .append(` => `, $S(initial.undoAll.value).qcd) ),
+    "getter-undoall"
   );
 }
 
@@ -786,128 +777,120 @@ function valueEx() {
   emptyClone.append({hello: 1, world: 2})   // nothing happens
   emptyClone.value += {hello: 1, world: 2}; // stringified
 
-  log(
-    createChapter(
-      $S(" .value").toTag("h3", "head code"),
-      $S`<code>.value</code> is a getter and a setter for the instance string value.`
-      .appendDiv(`b5`,
-        $S`if the given value is not a string, setting it will do nothing`.asNote)
-      
-      .append(exampleCode.valueExample1)
-          
-      .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty.value).qcd)
-          
-      .appendDiv(`b5`,
-        $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
-        .append($S`be aware that non string values will be stringified here`.asNote)
-      )
-          
-      .append(exampleCode.valueExample2)
-          
-      .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty2.value).qcd)
-          
-      .appendDiv(`b5`,`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd),
-      "getter-value"
+  return createChapter(
+    itemHeader(" .value"),
+    $S`<code>.value</code> is a getter and a setter for the instance string value.`
+    .appendDiv(`b5`,
+      $S`if the given value is not a string, setting it will do nothing`.asNote)
+    
+    .append(exampleCode.valueExample1)
+        
+    .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty.value).qcd)
+        
+    .appendDiv(`b5`,
+      $S`<code>.value</code> may also be set using <code>+=</code>.<br>`
+      .append($S`be aware that non string values will be stringified here`.asNote)
     )
+        
+    .append(exampleCode.valueExample2)
+        
+    .appendDiv(`b5`,`<code>empty.value</code> => `, $S(empty2.value).qcd)
+        
+    .appendDiv(`b5`,`<code>emptyClone.value</code> => `, $S(emptyClone.value).qcd),
+    "getter-value"
   );
 }
 
-function wordsFirstUpEx() {
-  log(
-    createChapter(
-      $S(" .wordsUCFirst").toTag("h3", "head code"),
-      $S`Converts the first letter of every word of the instance string to upper case.`
-        .toTag("div", "normal b5")
-        
-      .appendDiv(`b5`,
-        $S("$S`hello world`.wordsUCFirst").toCode,
-        $S`hello world`.wordsUCFirst.qcd.prefix(" => "))
-        
-      .appendDiv(`b5`,
-        $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
-        $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")),
-      "getter-wordsucfirst"
-    )
+function wordsUCFirst() {
+  return createChapter(
+    itemHeader(" .wordsUCFirst"),
+    $S`Converts the first letter of every word of the instance string to upper case.`
+      .toTag("div", "normal b5")
+      
+    .appendDiv(`b5`,
+      $S("$S`hello world`.wordsUCFirst").toCode,
+      $S`hello world`.wordsUCFirst.qcd.prefix(" => "))
+      
+    .appendDiv(`b5`,
+      $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
+      $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")),
+    "getter-wordsucfirst"
   );
 }
 /* endregion getter examples */
 
 /* region method examples */
 function appendEx() {
-  log(
-    createChapter(
-      $S(".append(...values:[string|instance])").toIdTag({tag: "h3", className: "head code"}).value,
-      $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
+  return createChapter(
+    itemHeader(".append(...values:[string|instance])"),
+    $S`Append one or more strings/instances to the instance string value`.toTag("div", "normal b5")
+    .appendDiv(`b5`,
+      $S('$S`Hello`.append(" ","world.", " ", "Here is a random string: ", $S.randomString())').toCode
       .appendDiv(`b5`,
-        $S('$S`Hello`.append(" ","world.", " ", "Here is a random string: ", $S.randomString())').toCode
-        .appendDiv(`b5`,
-          `=> `,
-          $S`Hello`.append(" ", "world.", " ", "Here is a random string: ", $S.randomString()).qcd
-        )
-      ),
-      "method-append"
-    )
+        `=> `,
+        $S`Hello`.append(" ", "world.", " ", "Here is a random string: ", $S.randomString()).qcd
+      )
+    ),
+    "method-append"
   );
 }
 
 function encloseEx() {
-  log(
-    createChapter(
-      $S(" .enclose(start:string|instance[, end:string|instance])").toTag("h3", "head code"),
-      $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
-        ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
-      .toTag("div", "normal b5")
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose("--- ", "  ---")').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose("--- ", "  ---").qcd
-          )
-      )
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose("**")').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose("**").qcd
-          )
-      )
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose($S("=&gt;"), "&lt;=")').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose($S("=&gt;"), "&lt;=").qcd)
-      )
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose("=&gt;", $S("&lt;=")').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose("=&gt;", $S("&lt;=")).qcd)
-      )
-        
-      .appendDiv(`b5`,
-        $S`if one of the values is not a string or instance, 
-        the instance value will not change`.asNote
-      )
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose([1,2,3], "&lt;")').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose([1,2,3]).qcd)
-      )
-        
-      .appendDiv(`b5`,
-        $S('$S`Hello world`.enclose("hithere", {hi: 1})').toCode
-          .append(
-            ` => `,
-            $S`Hello world`.enclose("hithere", {hi: 1}).qcd)
-      ),
-      "method-enclose"
+  return createChapter(
+    itemHeader(" .enclose(start:string|instance[, end:string|instance])"),
+    $S("Surround instance string with <code>[start]</code> and/or <code>[end]</code>" +
+      ". If <code>end</code> is not given, <code>start</code> is used as <code>end</code> value.")
+    .toTag("div", "normal b5")
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose("--- ", "  ---")').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose("--- ", "  ---").qcd
+        )
     )
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose("**")').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose("**").qcd
+        )
+    )
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose($S("=&gt;"), "&lt;=")').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose($S("=&gt;"), "&lt;=").qcd)
+    )
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose("=&gt;", $S("&lt;=")').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose("=&gt;", $S("&lt;=")).qcd)
+    )
+      
+    .appendDiv(`b5`,
+      $S`if one of the values is not a string or instance, 
+      the instance value will not change`.asNote
+    )
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose([1,2,3], "&lt;")').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose([1,2,3]).qcd)
+    )
+      
+    .appendDiv(`b5`,
+      $S('$S`Hello world`.enclose("hithere", {hi: 1})').toCode
+        .append(
+          ` => `,
+          $S`Hello world`.enclose("hithere", {hi: 1}).qcd)
+    ),
+    "method-enclose"
   );
 }
 
@@ -958,7 +941,7 @@ function formatEx() {
     rows: tableRows.value } );
   
   const allInOne = createChapter(
-    $S(".format(...token:object&lt;string, string>)").toTag("h3", "head code"),
+    itemHeader(".format(...token:object&lt;string, string>)"),
     $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
       <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.toTag("div", "normal b5")
       
@@ -976,7 +959,7 @@ function formatEx() {
     "method-format"
   );
   
-  log(allInOne);
+  return allInOne;
 }
 
 function indexOfEx() {
@@ -987,124 +970,118 @@ function indexOfEx() {
       : instance;
   word2Universe(initial);
   
-  log(
-    createChapter(
-      $S(" .indexOf(str2Find:string,[ fromIndex:number])").toTag("h3", "head code"),
-      $S``.append(
-        $S("indexOf").toCode,
-        " (as well as ",
-        $S("lastIndexOf)").toCode,
-        " overrides the native ",
-        $S("String.prototype.indexOf").toCode,
-        $S` method`
-        .append(
-          ` (see <a target="_blank"
-          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
-          >MDN</a>).`
-        )
-      .toTag("div", "normal b5")
-          
-      .appendDiv(``, 
-        $S("The override returns "),
-        $S("undefined").toCode,
-        " if the string to search was not found, instead of ",
-        $S("-1").toCode,
-        ".",
-        $S(exampleCode.indexOfExample)))
+  return createChapter(
+    itemHeader(" .indexOf(str2Find:string,[ fromIndex:number])"),
+    $S``.append(
+      $S("indexOf").toCode,
+      " (as well as ",
+      $S("lastIndexOf)").toCode,
+      " overrides the native ",
+      $S("String.prototype.indexOf").toCode,
+      $S` method`
+      .append(
+        ` (see <a target="_blank"
+        href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf"
+        >MDN</a>).`
+      )
+    .toTag("div", "normal b5")
         
-      .appendDiv(``, 
-        $S`String(initial)`.toCode,
-        " (see code above) => ",
-        initial.qcd
-      ),
-      "method-indexof"
-    )
+    .appendDiv(``, 
+      $S("The override returns "),
+      $S("undefined").toCode,
+      " if the string to search was not found, instead of ",
+      $S("-1").toCode,
+      ".",
+      $S(exampleCode.indexOfExample)))
+      
+    .appendDiv(``, 
+      $S`String(initial)`.toCode,
+      " (see code above) => ",
+      initial.qcd
+    ),
+    "method-indexof"
   );
 }
 
 function insertEx() {
-  log(
-    createChapter(
-      $S(".insert({value:string|instance, values:string|instance|[string|instance], at:number=0})").toTag("h3", "head code"),
-      
-      $S`Inserts either <code>[value]</code> or <code>[values]</code> into the instance string value
-         at position <code>[at]</code>. <code>at</code> may be negative. For an <code>at</code>-value 
-          exceeding the instance string length, the value(s) will be appended. 
-          If <code>at</code> is not given, the value(s) will be prefixed to the instance value.
-          if <code>value</code> or one of the <code>values</code> is not a string or instance,
-          will do nothing.` 
-      .toTag("div", "normal b5")
-  
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: "dear ", at: 6})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).qcd.value)
-      )
-  
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: ["oh", " ", "dear", " "] , at: 6})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).qcd.value)
-      )
-      
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "] , at: 6})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert({value: $S("I say").festive})')
-          .toCode
-          .append(` => `, $S("hello world").insert({value: $S("I say").festive}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: "So, i said: "' +
-          '<span class="cmmt">// Note: valueS may also be single string</span>"})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: "So, i said: "}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: ["42"], at: 100})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert({values: [42]})')
-          .toCode
-          .append(` => `, $S("hello world").insert({values: [42]}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert({value: {value: 1}})')
-          .toCode
-          .append(` => `, $S("hello world").insert({value: 1}).qcd.value)
-      )
-        
-      .appendDiv(``, 
-        $S('$S("hello world").insert()')
-          .toCode
-          .append(` => `, $S("hello world").insert().qcd.value)
-      ),
-      "method-insert"
+  return createChapter(
+    itemHeader(".insert({value:string|instance, values:string|instance|[string|instance], at:number=0})"),
+    
+    $S`Inserts either <code>[value]</code> or <code>[values]</code> into the instance string value
+       at position <code>[at]</code>. <code>at</code> may be negative. For an <code>at</code>-value 
+        exceeding the instance string length, the value(s) will be appended. 
+        If <code>at</code> is not given, the value(s) will be prefixed to the instance value.
+        if <code>value</code> or one of the <code>values</code> is not a string or instance,
+        will do nothing.` 
+    .toTag("div", "normal b5")
+
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: "dear ", at: 6})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: "dear ", at: 6}).qcd.value)
     )
+
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: ["oh", " ", "dear", " "] , at: 6})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: ["oh", " ", "dear", " "], at: 6}).qcd.value)
+    )
+    
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "] , at: 6})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: ["oh", " ", $S`dear`.festive, " "], at: 6}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert({value: $S("I say").festive})')
+        .toCode
+        .append(` => `, $S("hello world").insert({value: $S("I say").festive}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: "So, i said: "' +
+        '<span class="cmmt">// Note: valueS may also be single string</span>"})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: "So, i said: "}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: ["42"], at: 100})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: [" 42"], at: 100}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert({values: [42]})')
+        .toCode
+        .append(` => `, $S("hello world").insert({values: [42]}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert({value: {value: 1}})')
+        .toCode
+        .append(` => `, $S("hello world").insert({value: 1}).qcd.value)
+    )
+      
+    .appendDiv(``, 
+      $S('$S("hello world").insert()')
+        .toCode
+        .append(` => `, $S("hello world").insert().qcd.value)
+    ),
+    "method-insert"
   );
 }
 
 function interpolateEx() {
-  log(
-    createChapter(
-      $S(" .interpolate(...token:object&lt;string, string>)").toTag("h3", "head code"),
-      $S`Alias for <code><a
-        class="externalLink arrow"
-        target="_top"
-        data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`
-      .toTag("div", "normal b5"),
-      "method-interpolate"
-    )
+  return createChapter(
+    itemHeader(" .interpolate(...token:object&lt;string, string>)"),
+    $S`Alias for <code><a
+      class="externalLink arrow"
+      target="_top"
+      data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`
+    .toTag("div", "normal b5"),
+    "method-interpolate"
   );
 }
 
@@ -1115,77 +1092,73 @@ function lastIndexOfEx() {
       .append(" and universe");
   lastWord2Universe(initial);
   
-  log(
-    createChapter(
-      $S(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])").toTag("h3", "head code"),
+  return createChapter(
+    itemHeader(" .lastIndexOf(lastStr2Find:string[, beforeIndex:number])"),
+    
+    $S(exampleCode.lastIndexOfExample).append(
+      $S("lastIndexOf").toCode,
+      " (as well as ",
+      $S("indexOf)").toCode,
+      " overrides the native ",
+      $S("String.prototype.lastIndexOf").toCode,
+      $S` method`
+        .append(
+        ` (see <a target="_blank"
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf"
+          >MDN</a>).`
+        )
+   ).toTag("div", "normal b5") 
+   
+  .appendDiv(`b5`,
+    $S("The override returns "),
+    $S("undefined").toCode,
+    " if the string to search was not found, instead of ",
+    $S("-1").toCode, ".")
       
-      $S(exampleCode.lastIndexOfExample).append(
-        $S("lastIndexOf").toCode,
-        " (as well as ",
-        $S("indexOf)").toCode,
-        " overrides the native ",
-        $S("String.prototype.lastIndexOf").toCode,
-        $S` method`
-          .append(
-          ` (see <a target="_blank"
-            href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/lastIndexOf"
-            >MDN</a>).`
-          )
-     ).toTag("div", "normal b5") 
-     
     .appendDiv(`b5`,
-      $S("The override returns "),
-      $S("undefined").toCode,
-      " if the string to search was not found, instead of ",
-      $S("-1").toCode, ".")
-        
-      .appendDiv(`b5`,
-        $S`initial.value`.toCode,
-        " (see code above) => ",
-        initial.qcd.value
-      ),
-      "method-lastindexof"
-    )
+      $S`initial.value`.toCode,
+      " (see code above) => ",
+      initial.qcd.value
+    ),
+    "method-lastindexof"
   );
 }
 
 function prefixEx() {
-  log(
-    createChapter(
-      $S(" .prefix(...strings2Prefix:[string])").toTag("h3", "head code"),
+  return createChapter(
+    itemHeader(" .prefix(...strings2Prefix:[string])"),
+    
+    $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
+        order of the strings from <code>strings2Prefix</code>.
+        Will do nothing if one of the given <code>strings2Prefix</code> is not a string or instance.`
+    .toTag("div", "normal b5")
       
-      $S`Prefixes <code>[strings2Prefix]</code> to the instance string value in the
-          order of the strings from <code>strings2Prefix</code>.
-          Will do nothing if one of the given <code>strings2Prefix</code> is not a string or instance.`
-      .toTag("div", "normal b5")
-        
-      .appendDiv(`b5`,
-        $S`$S("world").prefix("hello", " ")`.toCode
-          .append(` => `, $S("world").prefix("hello", " ").qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S("world").prefix("hello", " and", " ", "then again ... bye ")`.toCode
-          .append(` => `, $S("world").prefix("hello", " and", " ", "then again ... bye ").qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S("world").prefix()`.toCode
-          .append(` => `, $S("world").prefix().qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S("world").prefix(42, "Hello ")`.toCode
-          .append(` => `, $S("world").prefix(42, "Hello ").qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`$S("world").prefix($S\`Hello! \`.toTag("b").toTag("i", "green"), "hello ").festive`.toCode
-          .append(` => `, $S("world").prefix($S`Hello! `.toTag(`b`).toTag(`i`, `green`), "hello ").festive.value)
-      ),
-      
-      "method-prefix"
+    .appendDiv(`b5`,
+      $S`$S("world").prefix("hello", " ")`.toCode
+        .append(` => `, $S("world").prefix("hello", " ").qcd.value)
     )
+      
+    .appendDiv(`b5`,
+      $S`$S("world").prefix("hello", " and", " ", "then again ... bye ")`.toCode
+        .append(` => `, $S("world").prefix("hello", " and", " ", "then again ... bye ").qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S("world").prefix()`.toCode
+        .append(` => `, $S("world").prefix().qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S("world").prefix(42, "Hello ")`.toCode
+        .append(` => `, $S("world").prefix(42, "Hello ").qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`$S("world").prefix($S\`Hello! \`.toTag("b").toTag("i", "green"), "hello ").festive`.toCode
+        .append(` => `, $S("world").prefix($S`Hello! `.toTag(`b`).toTag(`i`, `green`), "hello ").festive.value)
+    ),
+    
+    "method-prefix"
   );
 }
 
@@ -1204,40 +1177,38 @@ function replaceWordsEx() {
   const ex5 = ex4.clone.replaceWords({
     replacements: {"🎉": "😋"} });
   
-  log(
-    createChapter(
-      $S(" .replaceWords({replacements:object, caseSensitive:boolean=false})").toTag("h3", "head code"),
-    
-      $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
-      .toTag("div", "normal b5")
-        
-      .append(exampleCode.replaceWordsExample)
-        
-      .appendDiv(`b5`,
-          $S`ex1`.toCode.append(` => `, ex1.qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`ex2`.toCode.append(` => `, ex2.qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`ex2a`.toCode.append(` => `, ex2a.qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`ex3`.toCode.append(` => `, ex3.qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`ex4`.toCode.append(` => `, ex4.qcd.value)
-      )
-        
-      .appendDiv(`b5`,
-        $S`ex5`.toCode.append(` => `, ex5.qcd.value)
-      ),
-      "method-replacewords"
+  return createChapter(
+    itemHeader(" .replaceWords({replacements:object, caseSensitive:boolean=false})"),
+  
+    $S`Replaces <code>replacements</code> keys with <code>replacements</code> values.`
+    .toTag("div", "normal b5")
+      
+    .append(exampleCode.replaceWordsExample)
+      
+    .appendDiv(`b5`,
+        $S`ex1`.toCode.append(` => `, ex1.qcd.value)
     )
+      
+    .appendDiv(`b5`,
+      $S`ex2`.toCode.append(` => `, ex2.qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`ex2a`.toCode.append(` => `, ex2a.qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`ex3`.toCode.append(` => `, ex3.qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`ex4`.toCode.append(` => `, ex4.qcd.value)
+    )
+      
+    .appendDiv(`b5`,
+      $S`ex5`.toCode.append(` => `, ex5.qcd.value)
+    ),
+    "method-replacewords"
   );
 }
 
@@ -1275,12 +1246,11 @@ function truncateEx() {
       $S`ex${i}`.toCode.append(` => `, examples[`ex${i}`].qcd));
   }
   
-  log(createChapter(
-    $S(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})")
-      .toTag("h3", "head code"),
+  return createChapter(
+    itemHeader(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})"),
     allInOne,
     "method-truncate"
-  ));
+  );
 }
 
 function undoLastEx() {
@@ -1322,12 +1292,10 @@ function undoLastEx() {
     chapterContent.appendDiv(`b5`, $S`ex${i}`.toCode.append(` => `, $S`${examples[`ex${i}`]}`.qcd));
   }
   
-  log(
-    createChapter(
-      $S(".undoLast(nSsteps:number)").toTag("h3", "head code"),
-      chapterContent,
-      "method-undolast"
-    )
+  return createChapter(
+    itemHeader(".undoLast(nSsteps:number)"),
+    chapterContent,
+    "method-undolast"
   );
 }
 /* endregion method examples */
@@ -1446,6 +1414,14 @@ function addCustomized() {
     me.value = me.constructor(trimAllAlternative(String(me))), isGetter: true});
 }
 
+function itemHeader(text) {
+  return  `<h3 class="head code">${text}</h3>`; 
+}
+
+function chapterHeader(text, id) {
+  return $S(text).toIdTag({tag: "h2", id, className: "head code"}).value;
+}
+
 function getCodeblocks(templates) {
   const exampleBlocks = templates.find(`template[id]`);
   
@@ -1561,7 +1537,12 @@ function runAndReportPerformance() {
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
-  $.Popup.show({content: $S`Performance`.toTag(`b`, `b5`)
+  $.Popup.show({content: 
+    $S.create.append($S`This examples page used the StringWeaver module to create the bulk of the html. 
+      Creating, styling, handling and rendering the whole of the page the took ${
+        +(pageDuration.toFixed(1)).toLocaleString()} <b>milli</b>seconds`
+        .asNote.toTag(`div`, `normal h5`))
+    .append($S`Performance test`.toTag(`h3`, `head between`))
     .append(
       $S`Created 10 * ${10_000..toLocaleString()} StringWeaver instance <code>clone</code>s, 
         <code>append</code>ing a string to each (\u03A3 ${100_000..toLocaleString()} instances).`.asDiv
