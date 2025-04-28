@@ -28,7 +28,7 @@ const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|ital
 function instanceCreator({initialstring} = {}) {
   let customStringExtensions = { };
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
-  let actualValue = initialstring?.constructor === String ? initialstring : ``;
+  let actualValue = getStringValue(initialstring);
   let history = [actualValue];
   const descriptorProps = {configurable: false, enumerable: false};
   
