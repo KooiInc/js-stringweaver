@@ -23,10 +23,9 @@ createExtendedCTOR(CustomStringConstructor, customMethods);
 
 function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
-  Object.defineProperties(
-    instance, {
-      constructor: { get() { return CustomStringConstructor; }, enumerable: false},
-    });
+  Object.defineProperty( instance, 
+    `constructor`, { get() { return CustomStringConstructor; }, enumerable: false}
+  );
   return Object.freeze(instance);
 }
 
@@ -97,6 +96,10 @@ function createExtendedCTOR(ctor, customMethods) {
     configurable: false });
   const notChainable =  `constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`);
   Object.defineProperties(ctor, {
+    create: {
+      get() { return ctor(); },
+      enumerable: false
+    },
     constructor: {
       get() { return ctor; },
       enumerable: false,

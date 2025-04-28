@@ -176,7 +176,17 @@ describe(`Basics constructor`, () => {
         '[instance].quote.squareBrackets ([ [instance value] ])'
       ];
       assert.deepStrictEqual($S.quoteInfo, shouldBe);
-    })
+    });
+    
+    it(`$S.create getter delivers an instance with an empty string value`, () => {
+      const hi = $S.create;
+      assert.strictEqual(hi.value, ``);
+    });
+    
+    it(`$S.create getter delivers an instance`, () => {
+      const hi = $S.create.append(`Hello!`);
+      assert.strictEqual(hi.value, `Hello!`);
+    });
     
     it(`$S.addCustom getter enumerable works as expected`, () => {
       $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().quote.curlyDouble; }, enumerable: true, isGetter: true});
