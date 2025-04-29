@@ -1,15 +1,16 @@
 const startTime = performance.now();
-import {logFactory, $} from "./DOMhelpers.min.js";
+const useBundle = true;
+
+import {$, logFactory} from "./DOMhelpers.min.js";
 // ↳ see https://github.com/KooiInc/SBHelpers
 import initStyling from "./dynamicStyling.js";
-const useBundle = false;
 const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
 const codeOverlay = await createCodeElement();
 const exampleCode = await fetchTemplates();
-const spaceIndicator = `<span style="color:#AAA">&lt;space&gt;</span>`;
 const SB = Symbol.toSB;
 const {log, logTop} = logFactory();
 let backLink, firstChapterTop, pageDuration;
+
 main();
 
 function main() {
@@ -515,35 +516,34 @@ function quoteEx() {
       $S`<code>$S(" Hello ").quote.curlyDoubleEqual.quote.remove</code> => <span class="quoted">${
         $S(" Hello ").quote.curlyDoubleEqual.quote.remove}</span>`.toTag("div", "normal b5")
     );
-  
-  const lemma = createChapter(
+
+  return createChapter(
     itemHeader(" .quote[...]"),
     `Apply a quoting style to the instance string value.`[SB].asDiv
-    .append(`The module includes a number of 
+      .append(`The module includes a number of 
       <a
         class="externalLink arrow"
         target="_top"
         data-internal="[constructor].quoteInfo" 
         href="#static-quoteinfo"> predefined quoting styles</a> 
       one can use to quote the instance string value.`[SB].asDiv)
-    .append(`The <code>quote</code> getter returns an Object.
+      .append(`The <code>quote</code> getter returns an Object.
       One of the properties of this object is the <code>[instance].quote.custom</code>
       method that can be called to apply custom quotes to the instance string value.
       The other properties are getters (e.g. <code>$S("hi").quote.singleQuote</code>).`.asDiv)
-    .append(`The <code>quote.remove</code> special getter can be used to remove 
+      .append(`The <code>quote.remove</code> special getter can be used to remove 
       <i>predefined</i> quoting styles from the instance string value. It will not work 
       on custom quotes.`.asDiv)
-    .append($S`The <code>[instance].quote.custom</code> method works exactly like
+      .append($S`The <code>[instance].quote.custom</code> method works exactly like
       <a
         class="externalLink arrow"
         target="_top"
         data-internal="[instance].enclose" 
         href="#method-enclose"> [instance].enclose</a>`.asNote.asDiv)
-    .append($S`<h4 class="between">Here are examples for all predefined- and special 
-      <code>quote</code> fields</h4>`.asDiv)  
-    .append(``, quotingStyleExamples.join(``)),
+      .append($S`<h4 class="between">Here are examples for all predefined- and special 
+      <code>quote</code> fields</h4>`.asDiv)
+      .append(``, quotingStyleExamples.join(``)),
     "getter-quote");
-  return lemma;
 }
 
 function snakeCaseEx() {
@@ -650,7 +650,7 @@ function trimAllEx() {
         white space if after a line feed. This is a fairly simple and certainly not
         a failsafe method (see second example)`
     .toTag("div", "normal b5")
-    .appendDiv(`b5`,$S`for clarity the spaces in the result are marked as ${spaceIndicator}`.asNote)  
+    .appendDiv(`b5`,$S`for clarity the spaces in the result are marked as ${spaceIndicator()}`.asNote)  
       
     .appendDiv(`b5`,
       $S`Example 1`.toTag(`h3`, `head between`),
@@ -689,7 +689,8 @@ function trimAllEx() {
 }
 
 function trimAllKeepLFEx() {
-  const lfIndicator = spaceIndicator.replace(/space/g, "\\n");
+  const spceIndicator = spaceIndicator();
+  const lfIndicator = spceIndicator.replace(/space/g, "\\n");
   const cleanupStr = `<pre class="codebox"><code>$S\`clean me
             
             
@@ -705,7 +706,7 @@ function trimAllKeepLFEx() {
         fairly simple and certainly not a failsafe method.`
     .toTag("div", "normal b5")
     .appendDiv(`b5`,$S`for clarity the line feeds in the result are marked as ${lfIndicator}
-      and spaces as ${spaceIndicator}`.asNote)
+      and spaces as ${spceIndicator}`.asNote)
       
     .appendDiv(`b5`,
       $S(cleanupStr)
@@ -716,7 +717,7 @@ function trimAllKeepLFEx() {
             
                please!   `
         .trimAllKeepLF
-        .replace(/[\t\v\f ]/g, spaceIndicator)
+        .replace(/[\t\v\f ]/g, spceIndicator)
         .replace(/\n/g, `\n${lfIndicator}`)
         .qcd.prefix(`=> `)}</pre>`.asDiv ) 
       ),
@@ -937,27 +938,25 @@ function formatEx() {
   const exampleTable = tableTemplate.format({
     caption: `<code>tableRowTemplate.format(...)</code> using <code>theNames</code>`,
     rows: tableRows.value } );
-  
-  const allInOne = createChapter(
+
+  return createChapter(
     itemHeader(".format(...token:object&lt;string, string>)"),
     $S`Fills the instance string value (formatted as a string containing template placeholder(s) 
       <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.toTag("div", "normal b5")
       
-    .appendDiv(`b5`,
-      $S`Visit the <a target="_blank" class="externalLink arrow" href="https://github.com/KooiInc/StringInterpolator"
+      .appendDiv(`b5`,
+        $S`Visit the <a target="_blank" class="externalLink arrow" href="https://github.com/KooiInc/StringInterpolator"
       >StringInterpolator</a>  module to learn more.`)
-    
-    .append(exampleCode.formatExample)
       
-    .appendDiv(`b5`,
-      $S`exampleTable`.toCode.append(` =>`)
-    )
+      .append(exampleCode.formatExample)
       
-    .append(exampleTable),
+      .appendDiv(`b5`,
+        $S`exampleTable`.toCode.append(` =>`)
+      )
+      
+      .append(exampleTable),
     "method-format"
   );
-  
-  return allInOne;
 }
 
 function indexOfEx() {
@@ -1266,7 +1265,7 @@ function undoLastEx() {
     get ex3() { return undoExample.undoLast(2); },
     get ex4() { return undoExample.undoLast(10); },
     get ex5() { return cloned.undoLast(1); },
-    get ex6() { return cloned.undoLast(-3); }
+    get ex6() { return cloned.undoLast(-3); },
   };
   
   const chapterContent = 
@@ -1287,7 +1286,9 @@ function undoLastEx() {
   const exLen = Object.keys(examples).length + 1;
   
   for (let i = 1; i < exLen; i += 1) {
-    chapterContent.appendDiv(`b5`, $S`ex${i}`.toCode.append(` => `, $S`${examples[`ex${i}`]}`.qcd));
+    chapterContent.appendDiv(`b5`, $S`ex${i}`
+      .toCode
+      .append(` => `, $S`${examples[`ex${i}`]}`.qcd));
   }
   
   return createChapter(
@@ -1430,6 +1431,10 @@ function getCodeblocks(templates) {
       ...acc, 
       [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
   }, {});
+}
+
+function spaceIndicator() {
+  return `<span style="color:#AAA">&lt;space&gt;</span>`; 
 }
 
 async function fetchTemplates() {
