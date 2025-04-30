@@ -1,8 +1,11 @@
 const startTime = performance.now();
 const useBundle = true;
 
-import {$, logFactory} from "./DOMhelpers.min.js";
-// ↳ see https://github.com/KooiInc/SBHelpers
+import {
+  $,         // ⇒ $: https://github.com/KooiInc/JQL 
+  logFactory // ⇒ logFactory: https://github.com/KooiInc/SBHelpers
+} from "./DOMhelpers.min.js";
+
 import initStyling from "./dynamicStyling.js";
 const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
 const codeOverlay = await createCodeElement();
@@ -1527,7 +1530,7 @@ function createTOC() {
   $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
 }
 
-function runPerformanceTest() {
+function singlePerformanceTest() {
   let i = 10_000;
   let me = $S`hello`;
   const now = performance.now();
@@ -1536,7 +1539,7 @@ function runPerformanceTest() {
 }
 
 function runAndReportPerformance() {
-  const testResults = [...Array(10)].map(_ => runPerformanceTest())
+  const testResults = [...Array(10)].map(_ => singlePerformanceTest())
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
@@ -1557,12 +1560,13 @@ function runAndReportPerformance() {
     .append($S`the values above may vary according to the hardware/JS engine used.`.asNote.asDiv)
     .append(
         $S`using StringWeaver instances for string manipulation for sure will be slower 
-        than using native Strings. This is mainly due to the fact that every instance is a 
-          <a target="_blank" class="ExternalLink arrow" 
+        than using native Strings. This is mainly due to the fact that every StringWeaver 
+        instance is a  <a target="_blank" class="ExternalLink arrow" 
           href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"
-          >Proxy</a>. Proxies are <a target="_blank" class="ExternalLink arrow" 
+          >Proxy</a>.
+        Proxies are <a target="_blank" class="ExternalLink arrow" 
             href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>. 
-            Still, if one does't need to manipulate hundreds of thousands of strings, 
-            StringWeaver's performance should not get in the way`.asNote.asDiv)
+        Still, if one does't need to manipulate hundreds of thousands of strings, 
+        StringWeaver's performance should not get in the way`.asNote.asDiv)
     .value});
 }
