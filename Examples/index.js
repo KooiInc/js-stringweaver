@@ -1263,12 +1263,14 @@ function undoLastEx() {
     .festive;
   const cloned = undoExample.clone;
   const examples = {
-    get ex1() { return undoExample; },
-    get ex2() { return undoExample.undoLast(1); },
-    get ex3() { return undoExample.undoLast(2); },
-    get ex4() { return undoExample.undoLast(10); },
-    get ex5() { return cloned.undoLast(1); },
-    get ex6() { return cloned.undoLast(-3); },
+    get example1() { return undoExample; },
+    get example2() { return undoExample.undoLast(1); },
+    get example3() { return undoExample.undoLast(2); },
+    get example4() { return undoExample.undoLast(10); },
+    get example5() { return cloned.undoLast(1); },
+    get example6() { return cloned.undoLast(-3); },
+    get example7() { return $S`undoExample.history`.toCode.append(` now: `) + JSON.stringify(undoExample.history); },
+    get example8() { return $S`clone.history`.toCode.append(` now: `) + JSON.stringify(cloned.history); }
   };
   
   const chapterContent = 
@@ -1279,19 +1281,15 @@ function undoLastEx() {
     .append(exampleCode.undoLastExample)
       
     .appendDiv(`b5`,
-      $S`<code>undoExample.history</code>`
-      .append(" => ", `[${undoExample.history.join(`, `)}]`) )
+      $S`undoExample.history`.toCode.append(" => ", `[${undoExample.history.join(`, `)}]`) )
       
       .appendDiv(`b5`,
-        $S`<code>cloned.history</code>`
-        .append(" => ", `[${cloned.history.join(`, `)}]`) );
+        $S`cloned.history`.toCode.append(" => ", `[${cloned.history.join(`, `)}]`) );
   
-  const exLen = Object.keys(examples).length + 1;
-  
-  for (let i = 1; i < exLen; i += 1) {
-    chapterContent.appendDiv(`b5`, $S`ex${i}`
+  for (let i = 1; i < Object.keys(examples).length + 1; i += 1) {
+    chapterContent.appendDiv(`b5`, $S`example${i}`
       .toCode
-      .append(` => `, $S`${examples[`ex${i}`]}`.qcd));
+      .append(` => `, $S`${examples[`example${i}`]}`.qcd));
   }
   
   return createChapter(

@@ -179,14 +179,18 @@ undoExample
   .festive;
 const cloned = undoExample.clone;
 const examples = {
-  get ex1() { return undoExample; },
-  get ex2() { return undoExample.undoLast(1); },
-  get ex3() { return undoExample.undoLast(2); },
-  get ex4() { return undoExample.undoLast(10); },
-  //                                      ↳ equals [instance].undoAll
-  get ex5() { return cloned.undoLast(1); },
-  get ex6() { return cloned.undoLast(-3); },
-  //                                  ↳ equals [instance].undoAll
+  get example1() { return undoExample; },
+  get example2() { return undoExample.undoLast(1); },
+  get example3() { return undoExample.undoLast(2); },
+  get example4() { return undoExample.undoLast(10); },
+  //                                            ↳ equals [instance].undoAll
+  get example5() { return cloned.undoLast(1); },
+  get example6() { return cloned.undoLast(-3); },
+  //                                       ↳ equals [instance].undoAll
+  get example7() { return $S`undoExample.history`.toCode.append(` now: `) + 
+    JSON.stringify(undoExample.history); },
+  get example8() { return $S`clone.history`.toCode.append(` now: `) + 
+    JSON.stringify(cloned.history); }
 };
 </template>
 
