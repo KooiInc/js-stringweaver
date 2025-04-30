@@ -1491,8 +1491,8 @@ function setDelegates() {
   });
   
   $.delegate(`click`, `a[href^='#'], details.in-content`, (_, me) => {
-    const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`) ?? me;
-    $(`details.in-content`).each(el => el !== me[0] && (el.open = false));
+    const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`);
+    $(`details.in-content`).each(el => el.open = el !== me[0] ? false : el.open);
     
     if (referredInternalLink) {
       referredInternalLink.open = true;

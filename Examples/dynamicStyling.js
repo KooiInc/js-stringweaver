@@ -129,7 +129,7 @@ function initStyling($) {
         margin-left: -3em;
       }`,
     `details {
-      .chapterContent { margin: auto 1em auto 1.5em; }
+      .chapterContent { margin: auto 1em auto 2.5em; }
       
       summary {
         cursor: pointer;
