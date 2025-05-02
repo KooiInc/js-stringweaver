@@ -61,31 +61,37 @@ function isNumber(value) {
 
 function getSWInformation(notChainable) {
   const firstLines = CustomStringConstructor(decode());
-  return firstLines.value.split(/\n/).concat(
-    Object.entries(Object.getOwnPropertyDescriptors(firstLines))
-    .map(([key, descriptr]) => {
-      if (key === `quote`) { return `quote (Object. See [constructor].quoteInfo)`; }
-      const isChainable = !notChainable.find(k => k === key);
-       
-      return `${key} (${
-        key === `value` 
-          ? `getter/setter`
-          : key === `clone`
-            ? `chainable getter`
-            : key === `notEmpty` 
-              ? `chainable getter|undefined`
-              : key in String.prototype 
-                ? `${descriptr.get ? `getter` : `method`} (override)` 
-                : descriptr.value && descriptr.value.constructor === Function
-                  ? (isChainable 
-                    ? `chainable method${key in customMethods ? ` *custom*` : ``}` : `method`)
-                  : descriptr.value
-                    ? `property`
-                    : descriptr.get ? (isChainable 
-                      ? `chainable getter${key in customMethods ? ` *custom*` : ``}` 
-                      : `getter`) : `-`})`; })
-    .sort( (a,b) => a.localeCompare(b) ) 
-  );
+  
+  return firstLines.split(/\n/)
+    .concat(
+      Object.entries(Object.getOwnPropertyDescriptors(firstLines))
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .map(([key, descriptr]) => {
+        const isChainable = !notChainable.find(k => k === key);
+        const isGetter = descriptr.get?.constructor === Function;
+        const isMethod = descriptr.value?.constructor === Function;
+        const isNative = key in String.prototype; 
+        const custom = key in customMethods ? ` *custom*` : ``;
+        const getter = isGetter && isChainable ? `chainable getter${custom}` : `getter`;
+        const method = isMethod && isChainable ? `chainable method${custom}` : `method`;
+        const native = isNative && `${descriptr.get ? `getter` : `method`} (override)`;
+        
+        switch (true) {
+            case key === `value`: return infoValue(key, `getter/setter`);
+            case key === `clone`: return infoValue(key, `chainable getter`);
+            case key === `notEmpty`: return infoValue(key, `chainable getter|undefined`);
+            case key === `quote`: return infoValue(key, `Object. See [constructor].quoteInfo`);
+            case isNative: return infoValue(key, native);
+            case isMethod: return infoValue(key, method);
+            case isGetter: return infoValue(key, getter);
+            default: return infoValue(key, `property`);
+          }
+        })
+    );
+}
+
+function infoValue(key, infoValue) {
+  return `${key} (${infoValue})`;
 }
 
 function createExtendedCTOR(ctor, customMethods) {
