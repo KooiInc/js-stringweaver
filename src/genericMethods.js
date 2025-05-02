@@ -61,6 +61,12 @@ function isNumber(value) {
 
 function getSWInformation(notChainable) {
   const firstLines = CustomStringConstructor(decode());
+  const plainValues = {
+    value: `getter/setter`,
+    clone: `chainable getter`,
+    notEmpty: `chainable getter|undefined`,
+    quote: `Object. See [constructor].quoteInfo`,
+  };
   
   return firstLines.split(/\n/)
     .concat(
@@ -68,19 +74,17 @@ function getSWInformation(notChainable) {
       .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
       .map(([key, descriptr]) => {
         const isChainable = !notChainable.find(k => k === key);
-        const isGetter = descriptr.get?.constructor === Function;
-        const isMethod = descriptr.value?.constructor === Function;
-        const isNative = key in String.prototype; 
+        const isGetter = 'get' in descriptr;
+        const isMethod = 'value' in descriptr;
+        const isNative = key in String.prototype;
+        const isPlainValue = !isNative && key in plainValues;
         const custom = key in customMethods ? ` *custom*` : ``;
         const getter = isGetter && isChainable ? `chainable getter${custom}` : `getter`;
         const method = isMethod && isChainable ? `chainable method${custom}` : `method`;
         const native = isNative && `${descriptr.get ? `getter` : `method`} (override)`;
         
         switch (true) {
-            case key === `value`: return infoValue(key, `getter/setter`);
-            case key === `clone`: return infoValue(key, `chainable getter`);
-            case key === `notEmpty`: return infoValue(key, `chainable getter|undefined`);
-            case key === `quote`: return infoValue(key, `Object. See [constructor].quoteInfo`);
+            case isPlainValue: return infoValue(key, plainValues[key]);
             case isNative: return infoValue(key, native);
             case isMethod: return infoValue(key, method);
             case isGetter: return infoValue(key, getter);
