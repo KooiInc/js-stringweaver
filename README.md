@@ -7,6 +7,14 @@
 
 ## js-stringweaver
 
-A "stringbuilder" library
+A JS "stringbuilder" module
+
+A constructor to create *mutable* strings with build in getter/methods.
+
+- small footprint
+- extendable with custom getters/methods
+- retains history of changes
+- no external dependencies
+- instances can use/chain native String getters/methods (e.g. `length`, `split`)
 
 Documentation by <a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Example</a>
