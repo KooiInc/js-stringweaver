@@ -1491,14 +1491,19 @@ function setDelegates() {
     },100);
   });
   
-  $.delegate(`click`, `a[href^='#'], details.in-content`, (_, me) => {
+  $.delegate(`click`, `a[href^='#'], details.in-content`, (evt, me) => {
     const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`);
     $(`details.in-content`).each(el => el.open = el !== me[0] ? false : el.open);
-    
+
     if (referredInternalLink) {
       referredInternalLink.open = true;
       return setTimeout(_ => document.body.scrollTop -= 10);
     }
+
+    return setTimeout(_ => {
+      me[0].scrollIntoView({behavior: "smooth"});
+      document.body.scrollTop -= 10
+    });
   });
 }
 
