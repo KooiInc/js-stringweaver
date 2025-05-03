@@ -90,7 +90,8 @@ function getSWInformation(notChainable) {
             case isGetter: return infoValue(key, getter);
             default: return infoValue(key, `property`);
           }
-        })
+        }
+      )
     );
 }
 
