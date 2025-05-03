@@ -215,7 +215,7 @@ function createEx() {
     $S`<code>$S.create</code> delivers an instance with an empty string value`.asDiv
       .append($S`$S.create.append("world").prefix("Hello ")`.toCode.asDiv)
       .append($S.create.append("world").prefix("Hello ").prefix(`=> `).asDiv),
-    "static-keys"
+    "static-create"
   );
 }
 
@@ -487,7 +487,8 @@ function notEmptyEx() {
       >nullish coalescing operator</a><br>to modify the instance value conditionally.`)
       
     .appendDiv(`b5`,
-        `See the <a target="_top" href="#static-addcustom"> .addCustom</a> user defined
+        `See the <span class="internalLink" data-internal="[constructor].addCustom" 
+          data-link-to="#static-addcustom"> .addCustom</span> user defined
         <code>toTag</code> method for a use case`)
       
     .appendDiv(`b5`,
@@ -523,12 +524,9 @@ function quoteEx() {
   return createChapter(
     itemHeader(" .quote[...]"),
     `Apply a quoting style to the instance string value.`[SB].asDiv
-      .append(`The module includes a number of 
-      <a
-        class="externalLink arrow"
-        target="_top"
-        data-internal="[constructor].quoteInfo" 
-        href="#static-quoteinfo"> predefined quoting styles</a> 
+      .append(`The module includes a number of
+      <span class="internalLink" data-internal="[constructor].quoteInfo" 
+        data-link-to="#static-quoteinfo"> predefined quoting styles</span>  
       one can use to quote the instance string value.`[SB].asDiv)
       .append(`The <code>quote</code> getter returns an Object.
       One of the properties of this object is the <code>[instance].quote.custom</code>
@@ -538,11 +536,10 @@ function quoteEx() {
       <i>predefined</i> quoting styles from the instance string value. It will not work 
       on custom quotes.`.asDiv)
       .append($S`The <code>[instance].quote.custom</code> method works exactly like
-      <a
-        class="externalLink arrow"
-        target="_top"
-        data-internal="[instance].enclose" 
-        href="#method-enclose"> [instance].enclose</a>`.asNote.asDiv)
+        <span class="internalLink"
+          data-internal="[instance].enclose"
+          data-link-to="#method-enclose"> [instance].enclose</span>`
+        .asNote.asDiv)
       .append($S`<h4 class="between">Here are examples for all predefined- and special 
       <code>quote</code> fields</h4>`.asDiv)
       .append(``, quotingStyleExamples.join(``)),
@@ -1076,10 +1073,10 @@ function insertEx() {
 function interpolateEx() {
   return createChapter(
     itemHeader(" .interpolate(...token:object&lt;string, string>)"),
-    $S`Alias for <code><a
-      class="externalLink arrow"
-      target="_top"
-      data-internal="[instance].format example" href="#method-format">[instance].format</a></code>`
+    $S`Alias for <code><span
+      class="internalLink"
+      data-internal="[instance].format example"
+      data-link-to="#method-format">[instance].format</span></code>`
     .toTag("div", "normal b5"),
     "method-interpolate"
   );
@@ -1262,6 +1259,7 @@ function undoLastEx() {
     .append("world")
     .festive;
   const cloned = undoExample.clone;
+  // noinspection JSUnusedGlobalSymbols
   const examples = {
     get example1() { return undoExample; },
     get example2() { return undoExample.undoLast(1); },
@@ -1448,7 +1446,20 @@ async function fetchTemplates() {
 }
 
 function setDelegates() {
-  $.delegate(`click`, `#codeVwr, #performance`, evt => {
+  $.delegate(`click`, `#codeVwr, #performance`, codeViewerAndPerformanceClickHandler);
+  $.delegate(`scroll`, _ => {
+    return window.scrollY > firstChapterTop ? backLink.show() : backLink.hide();
+  });
+  $.delegate(`click`, `.back-to-top`, _ => {
+    $.node(`#top`).scrollIntoView({behavior: "smooth"});
+    closeAllContentDetails();
+    return setTimeout(_ => document.body.scrollTop = 0, 300);
+  });
+  $.delegate(`click`, `[data-link-to]`, linkToLinkHandler);
+  $.delegate(`click`, `details.in-content`, detailsInContentClickHandler);
+}
+
+function codeViewerAndPerformanceClickHandler(evt) {
     if (evt.target.id === "performance") {
       $.Popup.show({content: `<b class="spin">Working</b>`, modal: true});
       return setTimeout(runAndReportPerformance);
@@ -1469,43 +1480,33 @@ function setDelegates() {
     
     codeOverlay.show();
     return bttn.dataset.codeVisible = `visible`;
-  });
-  
-  $.delegate(`scroll`, _ => {
-    return window.scrollY > firstChapterTop ? backLink.show() : backLink.hide();
-  });
-  
-  $.delegate(`click`, `.back-to-top`, _ => {
-    $.node(`#top`).scrollIntoView({behavior: "smooth"});
-    $.node(`details.in-content[open]`).open = false;
-    return setTimeout(_ => document.body.scrollTop = 0, 300);
-  });
-  
-  $.delegate(`click`, `.lemma`, (_, me) => {
-    $(`.lemma[data-active='1']`).data.set({active: "0"});
-    me.data.set({active: "1"});
-    
-    setTimeout(_ => {
-      const toTopLinkTop = $(me.attr(`href`)).dimensions.top;
-      $(`.back-to-top`).style(`top: ${toTopLinkTop + 5}px`);
-    },100);
-  });
-  
-  $.delegate(`click`, `a[href^='#'], details.in-content`, (evt, me) => {
-    const referredInternalLink = $.node(me.attr(`href`))?.closest(`details.in-content`);
-    $(`details.in-content`).each(el => el.open = el !== me[0] ? false : el.open);
-
-    if (referredInternalLink) {
-      referredInternalLink.open = true;
-      return setTimeout(_ => document.body.scrollTop -= 10);
-    }
-
-    return setTimeout(_ => {
-      me[0].scrollIntoView({behavior: "smooth"});
-      document.body.scrollTop -= 10
-    });
-  });
 }
+
+function detailsInContentClickHandler(evt, me) {
+  if (evt.target.dataset?.linkTo) { return linkToLinkHandler(evt, $(evt.target)); }
+  
+  closeAllContentDetails();
+  $.nodes(`.chapterContent`).forEach(el => el.classList.remove(`open`));
+  
+  return me.showOnTop();
+}
+
+function linkToLinkHandler(_, me) {
+  if (me.closest(`.lemma`)) {
+    $(`[data-active='1']`).data.set({active: "0"});
+    me.data.set({active: "1"});
+  }
+  
+  const linkElement = $(me.data.get(`link-to`));
+  linkElement.showOnTop();
+  closeAllContentDetails();
+  linkElement[0].open = true;
+}
+
+function closeAllContentDetails() {
+  $(`details.in-content`).each(el => el.open = false);
+}
+
 
 function createTOC() {
   const chapters = $.nodes(`[id^=chapter]`);
@@ -1521,7 +1522,7 @@ function createTOC() {
       .forEach( lemma => {
         let text = $.node(`summary h3`, lemma).textContent;
         text = /\(/.test(text) ? text.slice(0, text.indexOf(`(`)+1).trim() + `...)` : text;
-        detailElem.append($.a_jql({class: "lemma", textContent: text, href: `#${lemma.id}`}))
+        detailElem.append($.div_jql({class: "lemma", textContent: text, data: {linkTo: `#${lemma.id}`}}));
       });
     
     toc.push(detailElem);
@@ -1530,7 +1531,6 @@ function createTOC() {
   const tocElem = $($.node(`#codeVwr`).closest(`li`).querySelector(`div`))
     .append($.h2({id: "TOCElem", class: `head code`}, `Content`));
   toc.forEach(chapter => tocElem.append(chapter));
-  $.div_jql({class: `bottomSpacer`}, `&nbsp;`).toDOM();
 }
 
 function singlePerformanceTest() {

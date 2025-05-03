@@ -1,6 +1,13 @@
 export default initStyling;
 
 function initStyling($) {
+  $.fn("showOnTop", me => {
+    return document.body.scrollTo({
+      top: document.body.scrollTop + me.dimensions.y - 10, 
+      behavior: "smooth"
+    });
+  });
+
   // style rules are stored in the JQL style element (head)style#JQLStylesheet
   const arrowRepeat = $S` ⬇ `.repeat(5).enclose(`"`);
   $.editCssRules(
@@ -125,12 +132,15 @@ function initStyling($) {
       list-style: none;
      }`,
     `#log2screen li div.normal li {
-        list-style: none;
-        margin-left: -3em;
-      }`,
+      list-style: none;
+      margin-left: -3em;
+    }`,
+    `#log2screen li:last-child {
+      margin-bottom: 100vh;
+    }`,
     `details {
-      .chapterContent { margin: auto 1em auto 2.5em; }
-      
+      overflow: hidden;
+      scroll-margin-top: 20px;
       summary {
         cursor: pointer;
         h3.head.code {
@@ -143,11 +153,14 @@ function initStyling($) {
         margin-top: 0.1rem;
       }
     }`,
+    `.chapterContent {
+      margin: auto 1em auto 2.5em;
+    }`,
     `a.ExternalLink {
       background-color: transparent;
       font-style: normal;
     }`,
-    `a.ExternalLink.arrow:hover::after, .toc:hover::after { 
+    `a.ExternalLink.arrow:hover::after, .toc:hover::after, .internalLink:hover::after { 
         fontSize: 0.7rem;
         position: absolute;
         zIndex: 2;
@@ -168,13 +181,17 @@ function initStyling($) {
     `a.ExternalLink[data-internal].arrow:hover::after {
       content: ' navigate to 'attr(data-internal);
     }`,
+    `.internalLink:hover::after {
+      content: ' navigate to 'attr(data-internal);
+    }`,
     `a.ExternalLink[target="_top"]:not([data-backto], [data-internal]).arrow:hover::after {
       content: ' navigates back to 'attr(href);
     }`,
     `a.ExternalLink[target="_blank"].arrow:hover::after {
       content: ' Opens in new tab/window';
     }`,
-    `a.lemma {
+    `div.lemma {
+      cursor: pointer;
       text-decoration: none;
       color: #777;
       margin-left: 1rem;
@@ -190,8 +207,26 @@ function initStyling($) {
         color: red;
       }
     }`,
+    `.internalLink {
+        color: blue;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        font-style: normal;
+        &:hover {
+          text-decoration: underline;
+        }
+        &:before {
+          color: rgba(0, 0, 238, 0.7);
+          font-size: 1.1rem;
+          padding-right: 2px;
+          vertical-align: baseline;
+          content: "↺"
+        }
+      }`,
     `.back-to-top {
       position: fixed;
+      scroll-margin-top: 10px;
       top: 1rem;
       cursor: pointer;
       &:before {
