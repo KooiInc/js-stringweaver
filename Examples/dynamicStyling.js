@@ -156,7 +156,7 @@ function initStyling($, $S) {
       margin: 0.3em 1em auto 1em;
       height: revert;
       position: relative;
-      transition: opacity 1s ease-in;
+      transition: margin 0.8s ease-in, opacity 0.6s ease-in;
       opacity: 1;
       pre {
         margin-top: 0.1rem;

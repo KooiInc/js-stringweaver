@@ -1463,12 +1463,12 @@ function codeViewerAndPerformanceClickHandler(evt) {
 
 function linkToLinkHandler(_, me) {
   const linkElement = $(me.data.get(`link-to`));
-    
-  if (me.closest(`.lemma`)) {
+  console.log(me[0], linkElement[0], me[0].closest(`.lemma`));  
+  if (!me.closest(`.lemma`).is.empty) {
     $(`[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
   }
-  closeAllContentDetails(linkElement.first());
+  linkElement.first().open = true;
   return linkElement.showOnTop();
 }
 
