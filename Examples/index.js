@@ -1,30 +1,14 @@
-const startTime = performance.now();
-const useBundle = true;
-
-import {
-  $,         // ⇒ $: https://github.com/KooiInc/JQL 
-  logFactory // ⇒ logFactory: https://github.com/KooiInc/SBHelpers
-} from "./DOMhelpers.min.js";
-
-import initStyling from "./dynamicStyling.js";
-const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
-const codeOverlay = await createCodeElement();
-const exampleCode = await fetchTemplates();
-const SB = Symbol.toSB;
-const {log, logTop} = logFactory();
-let backLink, firstChapterTop, pageDuration;
-
+const {$, $S, codeOverlay, exampleCode, SB, log, logTop, useBundle, load} = await initialize({useBundle: true});
 main();
 
 function main() {
   window.$S = $S; // try out in console
-  initStyling($);
   setDelegates();
   addCustomized();
   printExamples();
   hljs.highlightAll(`javascript`);
   createTOC();
-  pageDuration = performance.now() - startTime;
+  load.done();
 }
 
 function printExamples() {
@@ -51,7 +35,7 @@ function printInitializationExamples() {
       ).value,
     
     createChapter(
-      $S`Initialize using tagged template function`.toTag("h3", "head code"),
+      $S`Initialize using tagged template function`.toTag("h3", "summary"),
       $S`${exampleCode.asTaggedTemplateExample}`
         .append(`=> `)
         .append($S`hello world`.qcd),
@@ -59,14 +43,14 @@ function printInitializationExamples() {
     ),
     
     createChapter(
-      $S`Initialize using function call`.toTag("h3", "head code"),
+      $S`Initialize using function call`.toTag("h3", "summary"),
       $S`$S("hello world")`.toCode
         .append($S(`hello world`).qcd.prefix(` => `)),
       "initialization-asfn"
     ),
     
     createChapter(
-      $S`Initialize using the predefined [Symbol.toSB] String getter extension`.toTag("h3", "head code"),
+      $S`Initialize using the predefined [Symbol.toSB] String getter extension`.toTag("h3", "summary"),
       $S`The StringWeaver module contains a symbolic getter extension (<code>Symbol.toSB</code>) for <code>String.prototype</code>.`
         .asDiv
         .append($S`With it, one can create a StringWeaver instance from a plain JS string.`.asDiv)
@@ -78,7 +62,7 @@ function printInitializationExamples() {
     ),
     
     createChapter(
-      $S`Instantiation always returns an instance with a string`.toTag("h3", "head code"),
+      $S`Instantiation always returns an instance with a string`.toTag("h3", "summary"),
       $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
         is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5")
         .append($S`$S()`.toCode.append($S().qcd.prefix(` => `)).asDiv)
@@ -88,14 +72,14 @@ function printInitializationExamples() {
     ),
     
     createChapter(
-      $S`Instance methods are chainable`.toTag("h3", "head code"),
+      $S`Instance methods are chainable`.toTag("h3", "summary"),
       $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode.asDiv
         .append(`=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd).asDiv,
       "initialization-instance-chainable"
     ),
     
     createChapter(
-      $S`Native string function results are chainable`.toTag("h3", "head code"),
+      $S`Native string function results are chainable`.toTag("h3", "summary"),
       $S`<code>\$S("hello world").<i class="red">toUpperCase</i>().<i class="red">replace</i>(/world/i, "UNIVERSE")
         .quote.guillemetsInward</code>`.asDiv
         .append(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward).asDiv,
@@ -103,7 +87,7 @@ function printInitializationExamples() {
     ),
     
     createChapter(
-      $S`Native .toString/.valueOf are overridden`.toTag("h3", "head code"),
+      $S`Native .toString/.valueOf are overridden`.toTag("h3", "summary"),
       $S`To retrieve the instance string value one can use its <code>value</code> property
           or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
           `.toTag("div", "normal b5") 
@@ -232,7 +216,7 @@ function constructorEx() {
   const constructorLine = $S`function ${$S.constructor.name}(str, ...args) {...}`.toCode;
   
   return createChapter(
-    $S` $S.constructor`.toTag("h3", "head code"),
+    $S` $S.constructor`.toTag("h3", "summary"),
     $S`Result: `.prefix(`=> `).toTag(`b`)
       .append(constructorLine.prefix($S`${
         useBundle ? $S`this is the constructor from the bundled code => `.asNote : ``}`)),
@@ -303,7 +287,7 @@ function addCustomEx() {
 
 function uuid4Ex() {
   return createChapter(
-    $S` $S.uuid4`.toTag("h3", "head code"),
+    $S` $S.uuid4`.toTag("h3", "summary"),
     $S`$S.uuid4`.toCode
       .append(
         ` => `,
@@ -315,7 +299,7 @@ function uuid4Ex() {
 
 function randomStringEx() {
   return createChapter(
-      $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`.toTag("h3", "head code"),
+      $S` $S.randomString({len, includeNumbers, includeSymbols, includeUppercase})`.toTag("h3", "summary"),
       $S`Syntax: `.toTag(`i`)
       .appendDiv(`b5`, $S`${exampleCode.randomStringSyntax}`)
       .append($S`Examples`.toTag(`h3`, `head`).value,)
@@ -357,7 +341,7 @@ function randomStringEx() {
 /* region getter examples */
 function camelCaseEx() {
   return createChapter(
-      $S(".camelCase").toTag("h3", "head code"),
+      $S(".camelCase").toTag("h3", "summary"),
       $S`Tries converting the instance string 
           to <a target="_blank" class="ExternalLink arrow"
             href="https://developer.mozilla.org/en-US/docs/Glossary/Camel_case"
@@ -382,7 +366,7 @@ function cloneEx() {
   const toClone = $S("I shall be ").append("cloned");
   const cloned = toClone.clone.replace("shall be", "was").append(", yeah!");
   return createChapter(
-    $S(" .clone").toTag("h3", "head code"),
+    $S(" .clone").toTag("h3", "summary"),
     $S`Clone the instance.`.toTag("div", "normal b5")
       
     .appendDiv(`b5`, $S("the history of the originating instance is also cloned").asNote )
@@ -473,7 +457,7 @@ function notEmptyEx() {
   return createChapter(
     itemHeader(`.notEmpty`),
     $S`Using <code>.notEmpty</code> one can modify the instance value <i>only</i> 
-        if that value is not empty (not "")`
+        if that value is not empty (not "")`.asDiv
       
     .appendDiv(`b5`,
       `In other words, <code>.notEmpty</code> returns <code>undefined</code> if the
@@ -698,7 +682,7 @@ function trimAllKeepLFEx() {
             
             please! \`.trimAllKeepLF</code></pre>`;
   return createChapter(
-    $S(" .trimAllKeepLF").toTag("h3", "head code"),
+    $S(" .trimAllKeepLF").toTag("h3", "summary"),
     $S`Tries to trim all superfluous white space <i>except line feeds</i> 
         from the instance string. So multiple whitespace are reduced to single 
         white space or no white space if after a line feed. 
@@ -1300,11 +1284,10 @@ function undoLastEx() {
 
 function createChapter(header, content, id) {
   return $S(`
-    <details class="in-content" id="${id}">
-      <summary>${header}</summary>
-      <div class="chapterContent">${content}</div>
-    </details>`)
-  .toTag("div", "normal b5")
+      <details class="in-content" id="${id}">
+        <summary>${header}</summary>
+      </details>
+      <div class="chapterContent">${content}</div>`)
   .value;
 }
 
@@ -1340,12 +1323,10 @@ function printHeader() {
   $(`#log2screen`).beforeMe($.div({id: `top`}));
   const back2TopElem = $.div_jql({class: "back-to-top"}).appendTo($(`body`));
   const logUlDims = $(`#log2screen`).first$(`li:first-child`).dimensions;
-  back2TopElem.style({left: `${logUlDims.left + logUlDims.width - 38}px`, display: "none"});
-  backLink = back2TopElem;
-  firstChapterTop = $(`#chapter-initialization`).dimensions.y;
+  back2TopElem.style({left: `${logUlDims.left + logUlDims.width - 24}px`});
 }
 
-async function createCodeElement() {
+async function createCodeElement($) {
   const code = await(fetch("./index.js")).then(res => res.text());
   return $.div_jql(
     {id: "codeOverlay"},
@@ -1413,19 +1394,18 @@ function addCustomized() {
 }
 
 function itemHeader(text) {
-  return  `<h3 class="head code">${text}</h3>`; 
+  return `<h3 class="summary">${text}</h3>`; 
 }
 
 function chapterHeader(text, id) {
-  return $S(text).toIdTag({tag: "h2", id, className: "head code"}).value;
+  return $S(text).toIdTag({tag: "h2", id, className: "summary"}).value;
 }
 
-function getCodeblocks(templates) {
+function getCodeblocks(templates, $S) {
   const exampleBlocks = templates.find(`template[id]`);
   
   return [...exampleBlocks].reduce( (acc, block) => {
-    const codeTemplate = 
-      $S`<pre class="codebox"><code class="language-javascript">{code}</code></pre>`;
+    const codeTemplate = $S`<pre class="codebox"><code class="language-javascript">{code}</code></pre>`;
     return {
       ...acc, 
       [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
@@ -1436,27 +1416,24 @@ function spaceIndicator() {
   return `<span style="color:#AAA">&lt;space&gt;</span>`; 
 }
 
-async function fetchTemplates() {
+async function fetchTemplates($S, $) {
   $.allowTag(`template`);
   return getCodeblocks(
     $.div_jql(
       await fetch(`./codeTemplates.txt`)
-        .then(r => r.text()) )
-  );
+        .then(r => r.text()) ), 
+    $S );
 }
 
 function setDelegates() {
   $.delegate(`click`, `#codeVwr, #performance`, codeViewerAndPerformanceClickHandler);
-  $.delegate(`scroll`, _ => {
-    return window.scrollY > firstChapterTop ? backLink.show() : backLink.hide();
-  });
-  $.delegate(`click`, `.back-to-top`, _ => {
-    $.node(`#top`).scrollIntoView({behavior: "smooth"});
-    closeAllContentDetails();
-    return setTimeout(_ => document.body.scrollTop = 0, 300);
-  });
+  $.delegate(`click`, `.back-to-top`, backToTopHandler);
   $.delegate(`click`, `[data-link-to]`, linkToLinkHandler);
-  $.delegate(`click`, `details.in-content`, detailsInContentClickHandler);
+}
+
+function backToTopHandler() {
+  closeAllContentDetails();
+  $.node(`#top`).scrollIntoView({behavior: "smooth"});
 }
 
 function codeViewerAndPerformanceClickHandler(evt) {
@@ -1482,31 +1459,39 @@ function codeViewerAndPerformanceClickHandler(evt) {
     return bttn.dataset.codeVisible = `visible`;
 }
 
-function detailsInContentClickHandler(evt, me) {
-  if (evt.target.dataset?.linkTo) { return linkToLinkHandler(evt, $(evt.target)); }
-  
-  closeAllContentDetails();
-  $.nodes(`.chapterContent`).forEach(el => el.classList.remove(`open`));
-  
-  return me.showOnTop();
-}
-
 function linkToLinkHandler(_, me) {
+  const linkElement = $(me.data.get(`link-to`));
+    
   if (me.closest(`.lemma`)) {
     $(`[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
   }
+  closeAllContentDetails(linkElement.first());
+  return linkElement.showOnTop();
+}
+
+function closeAllContentDetails(detailsElementToOpen) {
+  $(`details.in-content[open]`).each(el => el.removeAttribute(`open`));
   
-  const linkElement = $(me.data.get(`link-to`));
-  linkElement.showOnTop();
-  closeAllContentDetails();
-  linkElement[0].open = true;
+  if (detailsElementToOpen?.constructor === HTMLDetailsElement) {
+    requestAnimationFrame(_ => detailsElementToOpen.open = true);
+  }
 }
 
-function closeAllContentDetails() {
-  $(`details.in-content`).each(el => el.open = false);
+async function initialize({useBundle = false} = {}) {
+  const load = pageLoadDurationFactory();
+  const {$, logFactory} = await import("./DOMhelpers.min.js")
+    .then(r => ({$: r.$, logFactory: r.logFactory}))
+    .then(r => r);
+  const initStyling = (await import("./dynamicStyling.js")).default;
+  const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
+  const SB = Symbol.toSB;
+  const {log, logTop} = logFactory();
+  const codeOverlay = await createCodeElement($);
+  initStyling($, $S);
+  const exampleCode = await fetchTemplates($S, $);
+  return {$, $S, codeOverlay, exampleCode, SB, log, logTop, useBundle, load};
 }
-
 
 function createTOC() {
   const chapters = $.nodes(`[id^=chapter]`);
@@ -1549,7 +1534,7 @@ function runAndReportPerformance() {
   $.Popup.show({content: 
     $S.create.append($S`This examples page used the StringWeaver module to create the bulk of the html. 
       Importing modules, creating, styling, handling and rendering the whole of the page in total took ${
-        +((pageDuration/1000).toFixed(2)).toLocaleString()} seconds.`
+        +((load.duration/1000).toFixed(2)).toLocaleString()} seconds.`
         .asNote.toTag(`div`, `normal h5`))
     .append($S`Performance test`.toTag(`h3`, `head between`))
     .append(
@@ -1572,4 +1557,14 @@ function runAndReportPerformance() {
         Still, if one does't need to manipulate hundreds of thousands of strings, 
         StringWeaver's performance should not get in the way`.asNote.asDiv)
     .value});
+}
+
+function pageLoadDurationFactory() {
+  let startTime = performance.now();
+  let pageDuration = 0;
+  return {
+    get duration() {return pageDuration;},
+    done() { pageDuration = performance.now() - startTime; },
+  }
+  
 }

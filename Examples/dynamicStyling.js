@@ -1,11 +1,8 @@
 export default initStyling;
 
-function initStyling($) {
+function initStyling($, $S) {
   $.fn("showOnTop", me => {
-    return document.body.scrollTo({
-      top: document.body.scrollTop + me.dimensions.y - 10, 
-      behavior: "smooth"
-    });
+    return window.scroll({ top: document.body.scrollTop + me.dimensions.y - 10, });
   });
 
   // style rules are stored in the JQL style element (head)style#JQLStylesheet
@@ -31,6 +28,7 @@ function initStyling($) {
     `button[data-code-visible="hidden"]:before {
       content: 'Display code';
     }`,
+    `#top { position: absolute; top: 0; margin: 0;}`,
     `button[data-code-visible="visible"]:before {
       content: 'Hide code';
     }`,
@@ -107,16 +105,6 @@ function initStyling($) {
     `h3.head { 
       font-size: 1.1rem;
      }`,
-    `h3.head.code {
-      font-family: monospace;
-      color: rgb(98 109 147);
-      padding: 0.2em;
-      border-bottom: 1px solid #DDD;
-      font-size: 1.1em;
-      &:before {
-        content: '✓ '; 
-      }
-    }`,
     `h3.head.between { 
         margin-top: 0.4rem;
      }`,
@@ -139,22 +127,40 @@ function initStyling($) {
       margin-bottom: 100vh;
     }`,
     `details {
-      overflow: hidden;
+        summary { cursor: pointer; }
+    }`,
+    `details.in-content {
       scroll-margin-top: 20px;
+  
       summary {
         cursor: pointer;
-        h3.head.code {
-          margin: 0;
-          display: contents;
-        }
+        
+        h3.summary {
+        cursor: pointer: !important;
+        font-family: monospace;
+        color: rgb(98 109 147);
+        font-size: 1.1em;
+        display: inline;
+        z-index: 100;
       }
-      
+      }
+    }`,
+    `details.in-content:not(:open) + .chapterContent {
+      position: absolute;
+      left: -200vw;
+      height: 0;
+      opacity: 0;
+    }`,
+    `details.in-content[open] summary h3 { color: green; }`,
+    `details.in-content[open] + .chapterContent {
+      margin: 0.3em 1em auto 1em;
+      height: revert;
+      position: relative;
+      transition: opacity 1s ease-in;
+      opacity: 1;
       pre {
         margin-top: 0.1rem;
       }
-    }`,
-    `.chapterContent {
-      margin: auto 1em auto 2.5em;
     }`,
     `a.ExternalLink {
       background-color: transparent;
@@ -204,7 +210,7 @@ function initStyling($) {
       }
       &[data-active='1'] {
         background-color: #eee;
-        color: red;
+        color: green;
       }
     }`,
     `.internalLink {
@@ -229,20 +235,23 @@ function initStyling($) {
       scroll-margin-top: 10px;
       top: 1rem;
       cursor: pointer;
+      z-index: 5;
       &:before {
-        content: "☝";
+        content: "\\2630";
         font-size: 1.6em;
+        font-weight: bold;
+        color: #8f5536;
       }
       &:hover::after {
-        content: 'back to top';
+        content: 'Close all/back to index';
         fontSize: 0.7rem;
         position: absolute;
         zIndex: 2;
         display: inline-block;
-        padding: 1px 6px;
+        padding: 2px 6px;
         border: 1px solid #777;
         box-shadow: 1px 1px 5px #777;
-        margin: 0 0 0 -7rem;
+        margin: 0 0 0 -11.5rem;
         color: #444;
         background-color: #FFF;
       }
