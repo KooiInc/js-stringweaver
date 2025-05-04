@@ -236,6 +236,10 @@ function initStyling($, $S) {
       top: 1rem;
       cursor: pointer;
       z-index: 5;
+      border: 1px solid #777;
+      text-align: center;
+      padding: 1px 2px 4px;
+      border-radius: 3px;
       &:before {
         content: "\\2630";
         font-size: 1.6em;
