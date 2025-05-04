@@ -232,6 +232,7 @@ function infoEx() {
     "static-info"
   );
 }
+
 function quoteInfoEx() {
   return createChapter(
     $S`${itemHeader("$S.quoteInfo")}`,
@@ -1337,8 +1338,9 @@ async function createCodeElement($) {
           .replace(/&gt;/g, `&amp;gt;`)
           .replace(/>/g, `&gt;`)
           .replace(/</g, `&lt;`)
-      ) ) 
-    ).hide();
+      )
+    )
+  ).hide();
 }
 
 // An alternative for .trimAll
@@ -1398,7 +1400,7 @@ function itemHeader(text) {
 }
 
 function chapterHeader(text, id) {
-  return $S(text).toIdTag({tag: "h2", id, className: "summary"}).value;
+  return $S(text).toIdTag({tag: "h2", id, className: "head"}).value;
 }
 
 function getCodeblocks(templates, $S) {
@@ -1483,14 +1485,16 @@ async function initialize({useBundle = false} = {}) {
   const {$, logFactory} = await import("./DOMhelpers.min.js")
     .then(r => ({$: r.$, logFactory: r.logFactory}))
     .then(r => r);
+  /* ▲ libraries used for DOM manipulation
+     ⇒ $: https://github.com/KooiInc/JQL 
+     ⇒ logFactory: https://github.com/KooiInc/SBHelpers */
   const initStyling = (await import("./dynamicStyling.js")).default;
   const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
-  const SB = Symbol.toSB;
   const {log, logTop} = logFactory();
   const codeOverlay = await createCodeElement($);
   initStyling($, $S);
   const exampleCode = await fetchTemplates($S, $);
-  return {$, $S, codeOverlay, exampleCode, SB, log, logTop, useBundle, load};
+  return {$, $S, codeOverlay, exampleCode, SB: Symbol.toSB, log, logTop, useBundle, load};
 }
 
 function createTOC() {
@@ -1565,6 +1569,5 @@ function pageLoadDurationFactory() {
   return {
     get duration() {return pageDuration;},
     done() { pageDuration = performance.now() - startTime; },
-  }
-  
+  };
 }
