@@ -1,22 +1,20 @@
-const {$, $S, codeOverlay, exampleCode, SB, log, logTop, useBundle, load} = await initialize({useBundle: true});
+const {
+  $, $S, codeOverlay, exampleCode, SB, 
+  print2Document, useBundle, load} = await initialize({useBundle: true});
 main();
 
 function main() {
   window.$S = $S; // try out in console
-  setDelegates();
-  addCustomized();
   printExamples();
-  hljs.highlightAll(`javascript`);
-  createTOC();
-  load.done();
+  finish();
 }
 
 function printExamples() {
+  printHeader();
   printInitializationExamples();
   printStaticConstructorFunctionExamples();
   printGetterExamples();
   printMethodExamples();
-  printHeader();
 }
 
 function printInitializationExamples() {
@@ -134,13 +132,13 @@ function printInitializationExamples() {
       "initialization-native-tostringvalueof"
     )];
   
-  log( 
+  print2Document( 
     chapterHeader("Initialization", "chapter-initialization"),
     ...allExamples);
 }
 
 function printStaticConstructorFunctionExamples() {
-  log(
+  print2Document(
     chapterHeader(`Static constructor properties/methods`, "chapter-static"),
     addCustomEx(),
     constructorEx(),
@@ -155,7 +153,7 @@ function printStaticConstructorFunctionExamples() {
 }
 
 function printGetterExamples() {
-  log(
+  print2Document(
     chapterHeader("Instance getters", "chapter-getter"),
     camelCaseEx(),
     cloneEx(),
@@ -176,7 +174,7 @@ function printGetterExamples() {
 }
 
 function printMethodExamples() {
-  log(
+  print2Document(
     chapterHeader("Instance methods", "chapter-method"),
     appendEx(),
     encloseEx(),
@@ -1293,10 +1291,10 @@ function createChapter(header, content, id) {
 }
 
 function printHeader() {
-  logTop(
-    $S`<button id="performance">Performance</button>
-       &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
-      .append($S`&nbsp;`).toTag(`div`, `normal`).value,
+  print2Document(
+    $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
+        target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
+      .value,
     $S`js-stringweaver: a stringbuilder utility`.toTag(`h1`, `head`)
       .append($S`
       In many other languages, a programmer can choose to explicitly use a string view or a
@@ -1315,11 +1313,11 @@ function printHeader() {
           >class free object oriented</a> module (<a class="ExternalLink arrow"
           href="https://www.researchgate.net/publication/347727033_How_JavaScript_Works#pf83"
           >See also</a> (chapter 17))`
-        .toTag(`p`, `normal`) )
+          .toTag(`p`, `normal`) )
       .value,
-    $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
-        target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
-    .value,
+    $S`<button id="performance">Performance</button>
+       &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
+      .append($S`&nbsp;`).toTag(`div`, `normal`).value,
   );
   $(`#log2screen`).beforeMe($.div({id: `top`}));
   const back2TopElem = $.div_jql({class: "back-to-top"}).appendTo($(`body`));
@@ -1360,7 +1358,7 @@ function trimAllAlternative(string) {
     .join(`\n`);
 }
 
-function addCustomized() {
+function addCustomized($S) {
   $S.addCustom({name: `enclose`, method: (me, start, end) => me.enclose(start, end)});
   /* ↳ this will display an error in the console
        because 'enclose' is already an instance method */
@@ -1427,7 +1425,7 @@ async function fetchTemplates($S, $) {
     $S );
 }
 
-function setDelegates() {
+function setDelegates($) {
   $.delegate(`click`, `#codeVwr, #performance`, codeViewerAndPerformanceClickHandler);
   $.delegate(`click`, `.back-to-top`, backToTopHandler);
   $.delegate(`click`, `[data-link-to]`, linkToLinkHandler);
@@ -1463,11 +1461,12 @@ function codeViewerAndPerformanceClickHandler(evt) {
 
 function linkToLinkHandler(_, me) {
   const linkElement = $(me.data.get(`link-to`));
-  console.log(me[0], linkElement[0], me[0].closest(`.lemma`));  
+    
   if (!me.closest(`.lemma`).is.empty) {
     $(`[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
   }
+  
   linkElement.first().open = true;
   return linkElement.showOnTop();
 }
@@ -1490,14 +1489,17 @@ async function initialize({useBundle = false} = {}) {
      ⇒ logFactory: https://github.com/KooiInc/SBHelpers */
   const initStyling = (await import("./dynamicStyling.js")).default;
   const $S = (await import(useBundle ? `../Bundle/index.min.js` : `../index.js`)).default;
-  const {log, logTop} = logFactory();
+  const {log} = logFactory();
   const codeOverlay = await createCodeElement($);
   initStyling($, $S);
+  setDelegates($);
+  addCustomized($S);
   const exampleCode = await fetchTemplates($S, $);
-  return {$, $S, codeOverlay, exampleCode, SB: Symbol.toSB, log, logTop, useBundle, load};
+  return {$, $S, codeOverlay, exampleCode, SB: Symbol.toSB, print2Document: log, useBundle, load};
 }
 
-function createTOC() {
+function finish() {
+  hljs.highlightAll(`javascript`);
   const chapters = $.nodes(`[id^=chapter]`);
   const toc = [];
   chapters.forEach((chapter) => {
@@ -1520,6 +1522,7 @@ function createTOC() {
   const tocElem = $($.node(`#codeVwr`).closest(`li`).querySelector(`div`))
     .append($.h2({id: "TOCElem", class: `head code`}, `Content`));
   toc.forEach(chapter => tocElem.append(chapter));
+  load.done();
 }
 
 function singlePerformanceTest() {
