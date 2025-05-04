@@ -32,7 +32,7 @@ In html
       src="https://app.unpkg.com/stringweaver@latest/files/Bundle/index.min.js">
   </script>
 ```
-In JS file (NodeJS or browser client file)
+### Import/use (NodeJS or browser client file)
 ```javascript
 // note: for NodeJS, make sure the project is of type "module"
 // import as $S
