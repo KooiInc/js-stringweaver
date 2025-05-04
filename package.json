@@ -1,7 +1,7 @@
 {
   "name": "stringweaver",
   "type": "module",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "private": false,
   "main": "./index.js",
   "sideEffects": false,
