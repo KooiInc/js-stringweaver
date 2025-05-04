@@ -1563,7 +1563,8 @@ function runAndReportPerformance() {
       .append($S`That is an average of <b>${perSecond.toLocaleString()}</b> instances per second.`)
     )
     .toTag(`div`, `normal b5`)
-    .append($S`the values above may vary according to the hardware/JS engine used.`.asNote.asDiv)
+    .append($S`the values above may vary according to the hardware/JS engine used.
+      Reloading the page may lower the page load time because of the browser/JS engine cache.`.asNote.asDiv)
     .append(
         $S`using StringWeaver instances for string manipulation for sure will be slower 
         than using native Strings. This is mainly due to the fact that every StringWeaver 
