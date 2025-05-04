@@ -955,8 +955,8 @@ function indexOfEx() {
     $S``.append(
       $S("indexOf").toCode,
       " (as well as ",
-      $S("lastIndexOf)").toCode,
-      " overrides the native ",
+      $S("lastIndexOf").toCode,
+      ") overrides the native ",
       $S("String.prototype.indexOf").toCode,
       $S` method`
       .append(
@@ -1078,8 +1078,8 @@ function lastIndexOfEx() {
     $S(exampleCode.lastIndexOfExample).append(
       $S("lastIndexOf").toCode,
       " (as well as ",
-      $S("indexOf)").toCode,
-      " overrides the native ",
+      $S("indexOf").toCode,
+      ") overrides the native ",
       $S("String.prototype.lastIndexOf").toCode,
       $S` method`
         .append(
@@ -1295,29 +1295,39 @@ function printHeader() {
     $S`<a class="ExternalLink arrow" data-backto="GitHub repository" 
         target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
       .value,
+    
     $S`js-stringweaver: a stringbuilder utility`.toTag(`h1`, `head`)
       .append($S`
       In many other languages, a programmer can choose to explicitly use a string view or a
       string builder where they really need them. But JS has the programmer either hoping the
       engine is smart enough, or using black magic to force it to do what they want.`.toTag(`div`, `q`),
-        String($S`Cited from
+      String($S`Cited from
         <a target="_blank" class="ExternalLink arrow" 
           href="https://iliazeus.github.io/articles/js-string-optimizations-en/"
         >Exploring V8's strings: implementation and optimizations</a>.`.toTag(`p`, `normal`)),
+    
         $S`Consider the code here the aforementioned <i>black magic</i>. It delivers a way to build a string
-        (actually a <i>wrapped <b>String</b> instance</i> making its internal string value <i>mutable</i>).
-        Instances can use native String methods and a number of custom methods.
-        <b>js-stringweaver</b> is programmed as a <a target="_blank"
+      (actually a <i>wrapped <b>String</b> instance</i> making its internal string value <i>mutable</i>).
+      Instances can use native String methods and a number of custom methods.
+      <b>js-stringweaver</b> is programmed as a <a target="_blank"
           class="ExternalLink arrow"
           href="https://depth-first.com/articles/2019/03/04/class-free-object-oriented-programming"
           >class free object oriented</a> module (<a class="ExternalLink arrow"
           href="https://www.researchgate.net/publication/347727033_How_JavaScript_Works#pf83"
           >See also</a> (chapter 17))`
-          .toTag(`p`, `normal`) )
-      .value,
-    $S`<button id="performance">Performance</button>
-       &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
-      .append($S`&nbsp;`).toTag(`div`, `normal`).value,
+      .toTag(`div`, `normal`) ).value,
+    
+    $S(chapterHeader("This document"))
+    .append($S`<button id="performance">Performance</button>
+        &nbsp;<button id="codeVwr" data-code-visible="hidden"></button> used in this page`
+        .append($S`&nbsp;`).toTag(`p`, `normal b5`)).toString(),
+    
+    $S`Click the 'Performance' button to check the page load performance and 
+       run a small performance test for ${(100_000).toLocaleString()} instances.`
+    .toTag(`div`, `normal b5`)
+    .append($S`The code used for this document makes extensive use of the StringWeaver module in a number of
+      different ways. Click the 'Display code' button to examine that.`.toTag(`div`, `normal b5 lastHeaderElement`))
+    .value,
   );
   $(`#log2screen`).beforeMe($.div({id: `top`}));
   const back2TopElem = $.div_jql({class: "back-to-top"}).appendTo($(`body`));
@@ -1519,8 +1529,7 @@ function finish() {
     toc.push(detailElem);
   });
   
-  const tocElem = $($.node(`#codeVwr`).closest(`li`).querySelector(`div`))
-    .append($.h2({id: "TOCElem", class: `head code`}, `Content`));
+  const tocElem = $($.node(`.lastHeaderElement`)).append($.h2({id: "TOCElem", class: `head code`}, `Content`));
   toc.forEach(chapter => tocElem.append(chapter));
   load.done();
 }
@@ -1539,10 +1548,12 @@ function runAndReportPerformance() {
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
   $.Popup.show({content: 
-    $S.create.append($S`This examples page used the StringWeaver module to create the bulk of the html. 
-      Importing modules, creating, styling, handling and rendering the whole of the page in total took ${
-        +((load.duration/1000).toFixed(2)).toLocaleString()} seconds.`
-        .asNote.toTag(`div`, `normal h5`))
+    $S.create
+      .append($S`Page load`.toTag(`h3`, `head between`))
+      .append($S`This examples page used the StringWeaver module to create the bulk of the html.`.asDiv) 
+      .append($S`Importing modules, creating, styling, handling and rendering the whole of the page in total took <b>${
+        +((load.duration/1000).toFixed(2)).toLocaleString()}</b> seconds.`
+      .toTag(`div`, `normal h5`))
     .append($S`Performance test`.toTag(`h3`, `head between`))
     .append(
       $S`Created 10 * ${10_000..toLocaleString()} StringWeaver instance <code>clone</code>s, 
