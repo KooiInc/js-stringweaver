@@ -102,6 +102,7 @@ function initStyling($, $S) {
       font-family: system-ui, sans-serif;
       margin-bottom: 0.4rem;
     }`,
+    `h2.head { scroll-margin-top: 20px; }`,
     `h3.head { 
       font-size: 1.1rem;
      }`,
@@ -238,26 +239,45 @@ function initStyling($, $S) {
       z-index: 5;
       border: 1px solid #777;
       text-align: center;
-      padding: 1px 2px 4px;
-      border-radius: 3px;
+      padding: 2px 2px 4px;
+      border-radius: 4px;
+      .menu {
+        text-align: left;
+        position: absolute;
+        opacity: 0;
+        left: -200vw;
+      }
+      .menu [data-action] {
+        margin: 0.2rem 0;
+        cursor: pointer;
+        color: rgb(119, 119, 119);
+    
+        &:hover { 
+          color: green;
+          background-color: rgb(238, 238, 238);
+        }
+        &::before {
+          content: "✓ ";
+        }
+      }
+      &:hover {
+        &:before { content: ""; }
+        background-color: white;
+        padding: 0.6rem;
+        border: none;
+        box-shadow: 2px 2px 6px #AAA;
+      }
+      &:hover .menu {
+        left: auto;
+        position: relative;
+        opacity: 1;
+        transition: opacity 0.8s ease-in;
+      }
       &:before {
         content: "\\2630";
         font-size: 1.6em;
         font-weight: bold;
         color: #8f5536;
-      }
-      &:hover::after {
-        content: 'Close all/back to index';
-        fontSize: 0.7rem;
-        position: absolute;
-        zIndex: 2;
-        display: inline-block;
-        padding: 2px 6px;
-        border: 1px solid #777;
-        box-shadow: 1px 1px 5px #777;
-        margin: 0 0 0 -11.5rem;
-        color: #444;
-        background-color: #FFF;
       }
      }`,
     `table {

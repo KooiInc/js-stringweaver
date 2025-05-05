@@ -1330,9 +1330,23 @@ function printHeader() {
     .value,
   );
   $(`#log2screen`).beforeMe($.div({id: `top`}));
-  const back2TopElem = $.div_jql({class: "back-to-top"}).appendTo($(`body`));
+  createTopMenuElement();
+}
+
+function createTopMenuElement() {
+  const back2TopElem = $.div_jql(
+    {class: "back-to-top"},
+    $.div({class: "menu"},
+      $.div({data:{action: "top"}}, "Page top"),
+      $.div({data:{action: "content"}}, "Content"),
+      $.div({data:{action: "open-all"}}, "Open all examples"),
+      $.div({data:{action: "close-all"}}, "Close all examples"),
+      $.div({data:{action: "close-and-content"}}, "Close all <i>and</i> to content"),
+      $.div({data:{action: "close-and-top"}}, "Close all <i>and</i> to top")
+    )
+  ).appendTo($(`body`));
   const logUlDims = $(`#log2screen`).first$(`li:first-child`).dimensions;
-  back2TopElem.style({left: `${logUlDims.left + logUlDims.width - 24}px`});
+  back2TopElem.style({right: `${document.body.scrollWidth - (logUlDims.left + logUlDims.width) - 5}px`});  
 }
 
 async function createCodeElement($) {
@@ -1437,13 +1451,25 @@ async function fetchTemplates($S, $) {
 
 function setDelegates($) {
   $.delegate(`click`, `#codeVwr, #performance`, codeViewerAndPerformanceClickHandler);
-  $.delegate(`click`, `.back-to-top`, backToTopHandler);
+  $.delegate(`click`, `.back-to-top .menu [data-action]`, topMenuHandler);
   $.delegate(`click`, `[data-link-to]`, linkToLinkHandler);
 }
 
-function backToTopHandler() {
-  closeAllContentDetails();
-  $.node(`#top`).scrollIntoView({behavior: "smooth"});
+
+function topMenuHandler(evt) {
+  switch(evt.target.dataset.action) {
+    case `content`: return $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
+    case `top`: return $.node(`#top`).scrollIntoView({behavior: "smooth"});
+    case `close-all`: return closeAllContentDetails();
+    case `open-all`: console.log(`wtf`); return openAllContentDetails();
+    case `close-and-content`: {
+      closeAllContentDetails(); 
+      return $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
+    }
+    default: { 
+      closeAllContentDetails(); 
+      return $.node(`#top`).scrollIntoView({behavior: "smooth"}); }
+  }
 }
 
 function codeViewerAndPerformanceClickHandler(evt) {
@@ -1481,12 +1507,20 @@ function linkToLinkHandler(_, me) {
   return linkElement.showOnTop();
 }
 
-function closeAllContentDetails(detailsElementToOpen) {
-  $(`details.in-content[open]`).each(el => el.removeAttribute(`open`));
-  
-  if (detailsElementToOpen?.constructor === HTMLDetailsElement) {
-    requestAnimationFrame(_ => detailsElementToOpen.open = true);
+function checkScrollPositionBeyondLastExample() {
+  const lastExample = $(`li:last-child`);
+  if (lastExample.dimensions.top < 0) {
+    $.node(`h2#chapter-method`).scrollIntoView({behavior: "smooth"});
   }
+}
+
+function closeAllContentDetails() {
+  $(`details.in-content[open]`).each(el => el.removeAttribute(`open`));
+  checkScrollPositionBeyondLastExample();
+}
+
+function openAllContentDetails() {
+  $(`details.in-content`).each(el => el.open = true);
 }
 
 async function initialize({useBundle = false} = {}) {
@@ -1529,7 +1563,7 @@ function finish() {
     toc.push(detailElem);
   });
   
-  const tocElem = $($.node(`.lastHeaderElement`)).append($.h2({id: "TOCElem", class: `head code`}, `Content`));
+  const tocElem = $($.node(`.lastHeaderElement`)).append($.h2({id: "TOCElem", class: `head`}, `Content`));
   toc.forEach(chapter => tocElem.append(chapter));
   load.done();
 }
