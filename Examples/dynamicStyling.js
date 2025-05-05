@@ -9,7 +9,7 @@ function initStyling($, $S) {
   const arrowRepeat = $S` ⬇ `.repeat(5).enclose(`"`);
   $.editCssRules(
     `:root {
-      --grey-default: rgb(112, 92, 92);
+      --grey-default: rgba(112, 92, 92, 0.9);
       --code-color: rgb(12, 13, 14);
     }`,
     `body {
@@ -115,7 +115,7 @@ function initStyling($, $S) {
        text-align: center;
      }`,
     `h4.between { margin: 0.4em 0 0.2em 0; }`,
-    `h1.head { line-height: 1.4em; }`,
+    `h1.head { line-height: 1.6em; }`,
     `#log2screen li:not(.head) { 
       line-height: 1.4em; 
       list-style: none;
