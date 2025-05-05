@@ -233,6 +233,7 @@ function initStyling($, $S) {
       }`,
     `.back-to-top {
       position: fixed;
+      background-color: white;
       scroll-margin-top: 10px;
       top: 1rem;
       cursor: pointer;
@@ -262,7 +263,6 @@ function initStyling($, $S) {
       }
       &:hover {
         &:before { content: ""; }
-        background-color: white;
         padding: 0.6rem;
         border: none;
         box-shadow: 2px 2px 6px #AAA;
