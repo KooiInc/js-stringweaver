@@ -29,20 +29,10 @@ function CustomStringConstructor(str, ...args) {
   return Object.freeze(instance);
 }
 
-function clone(instance) {
-  const newInstance = CustomStringConstructor(instance.value);
-  newInstance.history = [...instance.history];
-  return newInstance;
-}
-
 function resolveTemplateString(str, ...args) {
   return str?.raw
-      ? String.raw({ raw: str }, ...args)
-      : getStringValue(str).length ? str : "";
-}
-
-function getStringValue(string) {
-  return string?.value || (string?.constructor === String && string) || ``;
+    ? String.raw({ raw: str }, ...args)
+    : getStringValue(str).length ? str : "";
 }
 
 function checkType(type, item, includeInstances) {
@@ -55,18 +45,44 @@ function isArrayOf(type, value, includeInstances = true) {
   return Array.isArray(value) && value.length > 0 && !value.find(v => checkType(type, v, includeInstances));
 }
 
+function clone(instance) {
+  const newInstance = CustomStringConstructor(instance.value);
+  newInstance.history = [...instance.history];
+  return newInstance;
+}
+
+function getStringValue(string) {
+  return string?.value || (string?.constructor === String && string) || ``;
+}
+
 function isNumber(value) {
   return value?.constructor === Number && !Number.isNaN(value);
 }
 
-function getSWInformation(notChainable) {
-  const firstLines = CustomStringConstructor(decode());
-  const plainValues = {
+function escapeRE(reString, modifiers) {
+  return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
+}
+
+function escape4RE(reString) {
+  return reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
+}
+
+function infoValue(key, infoValue) {
+  return `${key} (${infoValue})`;
+}
+
+function getPlainValues() {
+  return {
     value: `getter/setter`,
     clone: `chainable getter`,
     notEmpty: `chainable getter|undefined`,
     quote: `Object. See [constructor].quoteInfo`,
   };
+}
+
+function getSWInformation(notChainable) {
+  const firstLines = CustomStringConstructor(decode());
+  const plainValues = getPlainValues();
   
   return firstLines.split(/\n/)
     .concat(
@@ -87,18 +103,51 @@ function getSWInformation(notChainable) {
             case isPlainValue: return infoValue(key, plainValues[key]);
             case isNative: return infoValue(key, native);
             case isMethod: return infoValue(key, method);
-            case isGetter: return infoValue(key, getter);
-            default: return infoValue(key, `property`);
-          }
+            case isGetter: return infoValue(key, getter); 
+         }
         }
       )
     );
 }
 
-function infoValue(key, infoValue) {
-  return `${key} (${infoValue})`;
+function decode() {
+  return atob`Rm9yIHRoZSByZWNvcmQ6CltjbV0gY2hhaW5hYmxlIGdldHRlcnMvbWV0aG9kcyBtb2RpZnkgdGhlIGluc3RhbmNlIHN0cmluZwpbY21dIGluZGV4T2Ygb3ZlcnJpZGVzIHJldHVybnMgW3VuZGVmaW5lZF0gaWYgbm90aGluZyB3YXMgZm91bmQgKHNvIG9uZSBjYW4gdXNlIFtsYXN0SV1pbmRleE9mKFtzb21lIHN0cmluZyB2YWx1ZV0pID8/IDAKW2NtXSBpbmNsdWRlcyBpbmZvcm1hdGlvbiBmb3IgY3VzdG9tIG1ldGhvZHMvZ2V0dGVycyBpZiBhcHBsaWNhYmxl`.replace(/\[cm]/g, `\u2714`);
 }
 
+function defineQuotingStyles() {
+  // see https://en.wikipedia.org/wiki/Quotation_mark
+  const quots = {
+    backtick: ["`", "`"],
+    bracket: [`{`, `}`],
+    curlyDoubleInward: [`”`, `“`],
+    curlyDouble: [`“`, `”`],
+    curlyDoubleEqual: [`“`, `“`],
+    curlyLHDouble: [`„`, `”`],
+    curlyLHDoubleInward: [`„`, `“`],
+    curlyLHSingle: [`‚`, `’`],
+    curlyLHSingleInward: [`‚`, `‘`],
+    curlySingle: [`‛`, `’`],
+    curlySingleEqual: [`‛`, `‛`],
+    curlySingleInward: [`’`, `‛`],
+    double: [`"`, `"`],
+    guillemets: [`«`, `»`],
+    guillemetsInward: [`»`, `«`],
+    guillemetsSingle: [`‹`, `›`],
+    guillemetsSingleInward: [`›`, `‹`],
+    single: [`'`, `'`],
+    squareBrackets: [`[`, `]`],
+  };
+  const regExpValues = escape4RE([...new Set(
+    Object.values(quots)
+      .filter(v => Array.isArray(v))
+      .flat())].join(``));
+  quots.re = RegExp(`^[${regExpValues}]|[${regExpValues}]$`, "g");
+
+  return quots;
+}
+
+/* this function is not (directly) tested */
+/* node:coverage disable */
 function createExtendedCTOR(ctor, customMethods) {
   Symbol.toSB = Symbol.for(`toStringBuilder`);
   Object.defineProperty(String.prototype, Symbol.toSB, { 
@@ -123,10 +172,13 @@ function createExtendedCTOR(ctor, customMethods) {
     addCustom: {
       value( { name, method, enumerable = false, isGetter = false } = {} ) {
         if (CustomStringConstructor``[name]) {
-          return console.error(`addCustom: the property "${name}" exists and can not be redefined`);
+          console.error(`addCustom: the property "${name}" exists and can not be redefined`);
+          return `addCustom: the property "${name}" exists and can not be redefined`;
         }
+        
         if (name?.constructor === String && method?.constructor === Function && method.length > 0) {
           customMethods[name] = {method, enumerable, isGetter};
+          return `addCustom: the ${isGetter ? `getter` : `method`} named "${name}" is added`;
         }
       }
     },
@@ -164,52 +216,4 @@ function createExtendedCTOR(ctor, customMethods) {
   
   return ctor;
 }
-
-function escapeRE(reString, modifiers) {
-  return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
-}
-
-function escape4RE(reString) {
-  return reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
-}
-
-function decode() {
-  return atob`Rm9yIHRoZSByZWNvcmQ6CltjbV0gY2hhaW5hYmxlIGdldHRlcnMvbWV0aG9kcyBtb2RpZnkgdGhlIGluc3RhbmNlIHN0cmluZwpbY21dIGluZGV4T2Ygb3ZlcnJpZGVzIHJldHVybnMgW3VuZGVmaW5lZF0gaWYgbm90aGluZyB3YXMgZm91bmQgKHNvIG9uZSBjYW4gdXNlIFtsYXN0SV1pbmRleE9mKFtzb21lIHN0cmluZyB2YWx1ZV0pID8/IDAKW2NtXSBpbmNsdWRlcyBpbmZvcm1hdGlvbiBmb3IgY3VzdG9tIG1ldGhvZHMvZ2V0dGVycyBpZiBhcHBsaWNhYmxl`.replace(/\[cm\]/g, `\u2714`);
-}
-
-function defineQuotingStyles() {
-  // see https://en.wikipedia.org/wiki/Quotation_mark
-  const custom = (start, end) => {
-    start = getStringValue(start);
-    end = getStringValue(end);
-    return [getStringValue(start), end.length ? end  : start]; 
-  } 
-  const quots = {
-    backtick: ["`", "`"],
-    bracket: [`{`, `}`],
-    curlyDoubleInward: [`”`, `“`],
-    curlyDouble: [`“`, `”`],
-    curlyDoubleEqual: [`“`, `“`],
-    curlyLHDouble: [`„`, `”`],
-    curlyLHDoubleInward: [`„`, `“`],
-    curlyLHSingle: [`‚`, `’`],
-    curlyLHSingleInward: [`‚`, `‘`],
-    curlySingle: [`‛`, `’`],
-    curlySingleEqual: [`‛`, `‛`],
-    curlySingleInward: [`’`, `‛`],
-    custom,
-    double: [`"`, `"`],
-    guillemets: [`«`, `»`],
-    guillemetsInward: [`»`, `«`],
-    guillemetsSingle: [`‹`, `›`],
-    guillemetsSingleInward: [`›`, `‹`],
-    single: [`'`, `'`],
-    squareBrackets: [`[`, `]`],
-  };
-  const regExpValues = escape4RE([...new Set(
-    Object.values(quots)
-    .filter(v => Array.isArray(v))
-    .flat())].join(``));
-  quots.re = RegExp(`^[${regExpValues}]|[${regExpValues}]$`, "g");
-  return quots;
-}
+/* node:coverage enable */

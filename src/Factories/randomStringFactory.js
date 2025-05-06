@@ -1,3 +1,5 @@
+/* node:coverage disable */
+/* For StringWeaver tests we are not interested in coverage for this file */
 const { randomString, uuid4 } = randomStringGeneratorFactory();
 export { randomString as default, randomString, uuid4 };
 

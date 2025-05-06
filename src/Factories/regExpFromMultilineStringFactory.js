@@ -1,4 +1,5 @@
-import {resolveTemplateString} from "../genericMethods.js";
+/* node:coverage disable */
+/* For StringWeaver tests we are not interested in coverage for this file */
 
 export default createRegExp
 

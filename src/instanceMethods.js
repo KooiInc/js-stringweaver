@@ -36,12 +36,12 @@ function checkAndRun(string, fn, or) {
   return string.length > 0 ? fn(string) : or || string;
 }
 
-function format(string, ...tokens) {
-  return checkAndRun(string, () => `${interpolate(string, ...tokens)}`); 
+function ucFirst(string) {
+  return checkAndRun(string, () => `${string[0].toUpperCase()}${string.slice(1)}`);
 }
 
-function ucFirst(string) {
-  return checkAndRun(string, () => `${string[0].toUpperCase()}${string.slice(1)}`); 
+function format(string, ...tokens) {
+  return checkAndRun(string, () => `${interpolate(string, ...tokens)}`);
 }
 
 function surroundWith(string, start, end) {
@@ -53,7 +53,7 @@ function surroundWith(string, start, end) {
 }
 
 function toDashedNotation(string) {
-  return checkAndRun(string, () => 
+  return checkAndRun(string, () =>
     string
       .replace(/\s/g, '')
       .replace(/[A-Z]/g, a => `-${a.toLowerCase()}`)
@@ -82,7 +82,7 @@ function wordsFirstUp(string) {
 }
 
 function toCamelcase(string) {
-  return checkAndRun(string, () => 
+  return checkAndRun(string, () =>
     string.toLowerCase()
       .trim()
       .split(/[- ]/)
@@ -92,29 +92,37 @@ function toCamelcase(string) {
   );
 }
 
+function getBoundary(string) {
+  const match = [...string.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1);
+  return match?.index ?? string.length;
+}
+
 function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
+  html = html?.constructor === Boolean && html || false;
+  wordBoundary = wordBoundary?.constructor === Boolean && wordBoundary || false;
   return checkAndRun(string, () => {
     if (string.length <= at) { return string; }
-    
+
     const subString = string.slice(0, at - 1);
     const endwith = html ? "&hellip;" : `...`;
-    const boundary = wordBoundary 
-      ? [...subString.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1)?.index ?? subString.length 
+    const boundary = wordBoundary
+      ? getBoundary(subString)
       : subString.length;
-    
+
     return (wordBoundary
       ? subString.slice(0, boundary+1).trim()
-      : subString) + endwith; 
+      : subString) + endwith;
     }
   );
 }
 
-function trimAll(string,  keepLines) {
+function trimAll(string,  keepLines = false) {
+  keepLines = keepLines?.constructor === Boolean && keepLines || false;
   return checkAndRun(string, () => {
     const lines = string.replace(/\n/gm, `#LF#`)
       .split(/#LF#/)
       .map(line => line.trim().replace(/\s{2,}/g, a => a[0]) );
-    return keepLines 
+    return keepLines
       ? lines.join(`#LF#`).replace(/#LF#/g, `\n`).trim()
       : lines.filter(l => l.length > 0).join(`\n`);
   });
@@ -125,10 +133,10 @@ function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) 
   let replacements2Array = Object.entries(replacements).flat();
   const cando = isArrayOf(String, replacements2Array) && caseSensitive?.constructor === Boolean;
   const modifiers = `g${!caseSensitive ? 'i' : ''}`;
-  
+
   if (cando) {
     replacements2Array = replacements2Array.map(v => getStringValue(v)).filter(v => replacements2Array.length > 0);
-    
+
     if (replacements2Array.length) {
       while (replacements2Array.length) {
         const [initial, replacement] = [replacements2Array.shift(), replacements2Array.shift()];
@@ -137,41 +145,41 @@ function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) 
       }
     }
   }
-  
+
   return string;
 }
 
 // SEE https://youtu.be/99Zacm7SsWQ?t=2101
-function indexOf(string, findMe, fromIndex) {
+function indexOf(string, findMe, fromIndex = 0) {
   string = getStringValue(string);
-  fromIndex = isNumber(fromIndex) ? fromIndex : 0;
+  fromIndex = isNumber(fromIndex) && fromIndex || 0;
   const index = string.indexOf(findMe, fromIndex || 0);
-  return index < 0 ? undefined : index;  
+  return index < 0 ? undefined : index;
 }
 
-function lastIndexOf(string, findMe, beforeIndex) {
+function lastIndexOf(string, findMe, beforeIndex = 0) {
   string = getStringValue(string);
-  beforeIndex = isNumber(beforeIndex) ? beforeIndex : string.length;
+  beforeIndex = isNumber(beforeIndex) && beforeIndex || string.length;
   const index = string.lastIndexOf(findMe, beforeIndex);
   return index < 0 ? undefined : index;
 }
 
 function insert(string, { value, values, at = 0 } = {}) {
   string = getStringValue(string);
-  at = isNumber(at) ? at : 0;
+  at = isNumber(at) && at || 0;
   const valuesMaybeValue = getStringValue(values);
-  values = getStringValue(value).length 
+  values = getStringValue(value).length
     ? value
     : valuesMaybeValue.length
     ? valuesMaybeValue
-    : isArrayOf(String, values) 
-      ? values.map(v => getStringValue(v)).join(``) 
+    : isArrayOf(String, values)
+      ? values.map(v => getStringValue(v)).join(``)
       : [];
-  
+
   return values.length <= 1
     ? string
-    : string.length === 0 
-      ? `${values}${string}` 
+    : string.length === 0
+      ? `${values}${string}`
       : `${string.slice(0, at)}${values}${string.slice(at)}`;
 }
 
@@ -182,16 +190,16 @@ function prefix(string, ...strings) {
 
 function append(string, ...strings2Append) {
   strings2Append = isArrayOf(String, strings2Append) && strings2Append;
-  
+
   if (strings2Append && strings2Append.length > 0) {
     return `${getStringValue(string)}`.concat(strings2Append.join(``))
   }
-  
+
   return getStringValue(string);
 }
 
 function quotGetters(instance, wrap) {
-  return { 
+  return {
     value: {
       get backtick() { return instance.enclose(...quotingStyles.backtick); },
       get bracket() { return instance.enclose(...quotingStyles.bracket); },
@@ -213,7 +221,7 @@ function quotGetters(instance, wrap) {
       get remove() { return wrap(`${instance.value.replace(quotingStyles.re, ``)}`); },
       get single() { return instance.enclose(...quotingStyles.single); },
       get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
-    }, 
+    },
     enumerable: false,
     configurable: false,
   };

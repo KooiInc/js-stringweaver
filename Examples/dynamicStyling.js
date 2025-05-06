@@ -271,7 +271,7 @@ function initStyling($, $S) {
         left: auto;
         position: relative;
         opacity: 1;
-        transition: opacity 0.8s ease-in;
+        transition: all 0.5s ease-in;
       }
       &:before {
         content: "\\2630";

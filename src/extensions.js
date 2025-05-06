@@ -45,7 +45,7 @@ function instanceCreator({initialstring} = {}) {
     lastIndexOf: { ...descriptorProps, value(str) { return lastIndexOf(actualValue, str); } },
     prefix: { ...descriptorProps, value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
     replaceWords: { ...descriptorProps, value({caseSensitive = false, replacements = {}} = {}) {
-      return wrap(replaceWords(actualValue, {replacements, caseSensitive}));
+      return wrap(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive }));
     } },
     toString: { ...descriptorProps, value() { return actualValue; } },
     truncate: { ...descriptorProps, value({at, html = false, wordBoundary = false} = {}) {
@@ -137,6 +137,7 @@ function instanceCreator({initialstring} = {}) {
     if (history.length === 1) {
       return wrap(history[0]);
     }
+    
     history.pop();
     actualValue = history.at(-1);
     return wrap(actualValue, false);

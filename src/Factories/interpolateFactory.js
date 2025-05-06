@@ -1,3 +1,6 @@
+/* node:coverage disable */
+/* For StringWeaver tests we are not interested in coverage for this file */
+
 const defaultInterpolator = interpolateFactory();
 export {defaultInterpolator as default, interpolateFactory};
 
@@ -81,6 +84,7 @@ function interpolateFactory(defaultReplacer = "") {
    * @param {object} tokenObject - The token object containing arrays of values.
    * @returns {object[]} - Array of token objects.
    */
+  /* node:coverage disable (internal method, not covered by tests)*/
   function convertTokensFromArrayValues(tokenObject) {
     const converted = [];
     
