@@ -27,7 +27,7 @@ In html
 ```html
   <script type="module" src="[location of index.js or index.min.js]"></script>
   <!-- OR load minified directly from unpkg -->
-  <script 
+  <script
       type="module"
       src="https://app.unpkg.com/stringweaver@latest/files/Bundle/index.min.js">
   </script>
@@ -46,4 +46,4 @@ const myNextString = "** "[SB].append(myBrandNewString).toUpperCase().append(`!`
 ```
 
 ### Unit testing
-Use `npm test` to run all tests
+Use `npm test` to run all tests (with coverage report)
