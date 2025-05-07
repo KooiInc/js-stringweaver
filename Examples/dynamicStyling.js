@@ -19,11 +19,11 @@ function initStyling($, $S) {
       margin: 0px auto;
       width: 900px;
     }`,
-    `.green { 
-        color: green; 
+    `.green {
+        color: green;
     }`,
-    `.red { 
-        color: red; 
+    `.red {
+        color: red;
     }`,
     `button[data-code-visible="hidden"]:before {
       content: 'Display code';
@@ -79,7 +79,7 @@ function initStyling($, $S) {
         font-style: normal;
         font-weight: normal;
       }`,
-    `code.codeblock { 
+    `code.codeblock {
         background-color: rgb(227, 230, 232);
         color: rgb(12, 13, 14);
         border: none;
@@ -103,21 +103,21 @@ function initStyling($, $S) {
       margin-bottom: 0.4rem;
     }`,
     `h2.head { scroll-margin-top: 20px; }`,
-    `h3.head { 
+    `h3.head {
       font-size: 1.1rem;
      }`,
-    `h3.head.between { 
+    `h3.head.between {
         margin-top: 0.4rem;
      }`,
-    `h2.head, h1.head { 
+    `h2.head, h1.head {
        border: 1px dotted var(--grey-default);
-       padding: 0.3rem; 
+       padding: 0.3rem;
        text-align: center;
      }`,
     `h4.between { margin: 0.4em 0 0.2em 0; }`,
     `h1.head { line-height: 1.6em; }`,
-    `#log2screen li:not(.head) { 
-      line-height: 1.4em; 
+    `#log2screen li:not(.head) {
+      line-height: 1.4em;
       list-style: none;
      }`,
     `#log2screen li div.normal li {
@@ -132,18 +132,23 @@ function initStyling($, $S) {
     }`,
     `details.in-content {
       scroll-margin-top: 20px;
-  
+
       summary {
         cursor: pointer;
-        
+        &:hover {
+          background-color: #EEE;
+        }
         h3.summary {
-        cursor: pointer: !important;
-        font-family: monospace;
-        color: rgb(98 109 147);
-        font-size: 1.1em;
-        display: inline;
-        z-index: 100;
-      }
+          cursor: pointer: !important;
+          font-family: monospace;
+          color: rgb(98 109 147);
+          font-size: 1.1em;
+          display: inline;
+          z-index: 100;
+          &:hover {
+            color: green;
+          }
+        }
       }
     }`,
     `details.in-content:not(:open) + .chapterContent {
@@ -167,7 +172,7 @@ function initStyling($, $S) {
       background-color: transparent;
       font-style: normal;
     }`,
-    `a.ExternalLink.arrow:hover::after, .toc:hover::after, .internalLink:hover::after { 
+    `a.ExternalLink.arrow:hover::after, .toc:hover::after, .internalLink:hover::after {
         fontSize: 0.7rem;
         position: absolute;
         zIndex: 2;
@@ -252,8 +257,8 @@ function initStyling($, $S) {
         margin: 0.2rem 0;
         cursor: pointer;
         color: rgb(119, 119, 119);
-    
-        &:hover { 
+
+        &:hover {
           color: green;
           background-color: rgb(238, 238, 238);
         }
@@ -298,19 +303,19 @@ function initStyling($, $S) {
     `table:not(.hljs-ln) th { backgroundColor: #999; color: #FFF; }`,
     `table:not(.hljs-ln) tr td:first-child,
      table:not(.hljs-ln) tr th:first-child {text-align: right; padding-right: 0.5rem; width:50%}`,
-    `th { 
+    `th {
       font-weight: bold;
       text-align: left;
-      border-bottom: 1px solid #999; 
+      border-bottom: 1px solid #999;
     }`,
     `.largeArrowDown:before{
       content: ${arrowRepeat};
-      color: #555; 
+      color: #555;
     }`,
-    `.notifyHeader { 
+    `.notifyHeader {
       color: #555;
       &:before {
-        content: '* ';} 
+        content: '* ';}
     }`,
     `.bottomSpacer {
       min-height: 100vh;
