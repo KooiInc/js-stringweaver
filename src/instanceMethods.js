@@ -92,10 +92,6 @@ function toCamelcase(string) {
   );
 }
 
-function getBoundary(string) {
-  const match = [...string.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1);
-  return match?.index ?? string.length;
-}
 
 function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
   html = html?.constructor === Boolean && html || false;
@@ -134,16 +130,12 @@ function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) 
   const cando = isArrayOf(String, replacements2Array) && caseSensitive?.constructor === Boolean;
   const modifiers = `g${!caseSensitive ? 'i' : ''}`;
 
-  if (cando) {
-    replacements2Array = replacements2Array.map(v => getStringValue(v)).filter(v => replacements2Array.length > 0);
+  if (!cando) { return string; }
 
-    if (replacements2Array.length) {
-      while (replacements2Array.length) {
-        const [initial, replacement] = [replacements2Array.shift(), replacements2Array.shift()];
-        const re = escapeRE(initial, modifiers);
-        string = string.replace(re, replacement);
-      }
-    }
+  while (replacements2Array.length) {
+    const [initial, replacement] = [replacements2Array.shift(), replacements2Array.shift()];
+    const re = escapeRE(initial, modifiers);
+    string = string.replace(re, replacement);
   }
 
   return string;
@@ -198,6 +190,8 @@ function append(string, ...strings2Append) {
   return getStringValue(string);
 }
 
+/* Not (directly) tested */
+/* node:coverage disable */
 function quotGetters(instance, wrap) {
   return {
     value: {
@@ -212,7 +206,7 @@ function quotGetters(instance, wrap) {
       get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
       get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
       get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
-      custom(start, end) { return instance.enclose(...[start, end ?? start]); },
+      get custom() { return (start, end) => instance.enclose(...[start, end ?? start]); },
       get double() { return instance.enclose(...quotingStyles.double);  },
       get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
       get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },
@@ -226,3 +220,9 @@ function quotGetters(instance, wrap) {
     configurable: false,
   };
 }
+
+function getBoundary(string) {
+  const match = [...string.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1);
+  return match?.index ?? string.length;
+}
+/* node:coverage enable */

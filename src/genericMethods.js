@@ -8,7 +8,7 @@ const quotingStyles = defineQuotingStyles();
 export {
   customMethods,
   CustomStringConstructor,
-  isNumber, 
+  isNumber,
   isArrayOf,
   defineQuotingStyles,
   getStringValue,
@@ -23,7 +23,7 @@ createExtendedCTOR(CustomStringConstructor, customMethods);
 
 function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
-  Object.defineProperty( instance, 
+  Object.defineProperty( instance,
     `constructor`, { get() { return CustomStringConstructor; }, enumerable: false}
   );
   return Object.freeze(instance);
@@ -33,12 +33,6 @@ function resolveTemplateString(str, ...args) {
   return str?.raw
     ? String.raw({ raw: str }, ...args)
     : getStringValue(str).length ? str : "";
-}
-
-function checkType(type, item, includeInstances) {
-  return type === String && includeInstances
-    ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
-    : item?.constructor !== type;
 }
 
 function isArrayOf(type, value, includeInstances = true) {
@@ -83,7 +77,7 @@ function getPlainValues() {
 function getSWInformation(notChainable) {
   const firstLines = CustomStringConstructor(decode());
   const plainValues = getPlainValues();
-  
+
   return firstLines.split(/\n/)
     .concat(
       Object.entries(Object.getOwnPropertyDescriptors(firstLines))
@@ -98,12 +92,12 @@ function getSWInformation(notChainable) {
         const getter = isGetter && isChainable ? `chainable getter${custom}` : `getter`;
         const method = isMethod && isChainable ? `chainable method${custom}` : `method`;
         const native = isNative && `${descriptr.get ? `getter` : `method`} (override)`;
-        
+
         switch (true) {
             case isPlainValue: return infoValue(key, plainValues[key]);
             case isNative: return infoValue(key, native);
             case isMethod: return infoValue(key, method);
-            case isGetter: return infoValue(key, getter); 
+            case isGetter: return infoValue(key, getter);
          }
         }
       )
@@ -146,12 +140,12 @@ function defineQuotingStyles() {
   return quots;
 }
 
-/* this function is not (directly) tested */
+/* Not (directly) tested */
 /* node:coverage disable */
 function createExtendedCTOR(ctor, customMethods) {
   Symbol.toSB = Symbol.for(`toStringBuilder`);
-  Object.defineProperty(String.prototype, Symbol.toSB, { 
-    get() { return ctor(this); }, 
+  Object.defineProperty(String.prototype, Symbol.toSB, {
+    get() { return ctor(this); },
     enumerable: false,
     configurable: false });
   const notChainable =  `constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`);
@@ -175,7 +169,7 @@ function createExtendedCTOR(ctor, customMethods) {
           console.error(`addCustom: the property "${name}" exists and can not be redefined`);
           return `addCustom: the property "${name}" exists and can not be redefined`;
         }
-        
+
         if (name?.constructor === String && method?.constructor === Function && method.length > 0) {
           customMethods[name] = {method, enumerable, isGetter};
           return `addCustom: the ${isGetter ? `getter` : `method`} named "${name}" is added`;
@@ -186,9 +180,9 @@ function createExtendedCTOR(ctor, customMethods) {
       get() { return getSWInformation(notChainable); }
     },
     keys: {
-      get() { 
+      get() {
         return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``)).sort( (a,b) => a.localeCompare(b) )
-          .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v); 
+          .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v);
       }
     },
     quoteInfo: {
@@ -208,12 +202,18 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
-        return CustomStringConstructor(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic})); 
+        return CustomStringConstructor(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic}));
       }
     },
     regExp: { value: createRegExp }
   });
-  
+
   return ctor;
+}
+
+function checkType(type, item, includeInstances) {
+  return type === String && includeInstances
+    ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
+    : item?.constructor !== type;
 }
 /* node:coverage enable */
