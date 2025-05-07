@@ -1,7 +1,7 @@
 import {
   isArrayOf,
   isNumber,
-  quotingStyles,
+  quotGetters4Instance as quotGetters,
   getStringValue,
   escapeRE,
   customMethods,
@@ -92,6 +92,10 @@ function toCamelcase(string) {
   );
 }
 
+function getWordBoundary(string) {
+  const match = [...string.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1);
+  return match?.index ?? string.length;
+}
 
 function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
   html = html?.constructor === Boolean && html || false;
@@ -102,7 +106,7 @@ function truncate(string, {at, html = false, wordBoundary = false} = {} ) {
     const subString = string.slice(0, at - 1);
     const endwith = html ? "&hellip;" : `...`;
     const boundary = wordBoundary
-      ? getBoundary(subString)
+      ? getWordBoundary(subString)
       : subString.length;
 
     return (wordBoundary
@@ -189,40 +193,3 @@ function append(string, ...strings2Append) {
 
   return getStringValue(string);
 }
-
-/* Not (directly) tested */
-/* node:coverage disable */
-function quotGetters(instance, wrap) {
-  return {
-    value: {
-      get backtick() { return instance.enclose(...quotingStyles.backtick); },
-      get bracket() { return instance.enclose(...quotingStyles.bracket); },
-      get curlyDouble() { return instance.enclose(...quotingStyles.curlyDouble); },
-      get curlyDoubleInward() { return instance.enclose(...quotingStyles.curlyDoubleInward); },
-      get curlyDoubleEqual() { return instance.enclose(...quotingStyles.curlyDoubleEqual); },
-      get curlyLHDoubleInward() { return instance.enclose(...quotingStyles.curlyLHDoubleInward); },
-      get curlyLHSingle() { return instance.enclose(...quotingStyles.curlyLHSingle); },
-      get curlyLHSingleInward() { return instance.enclose(...quotingStyles.curlyLHSingleInward); },
-      get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
-      get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
-      get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
-      get custom() { return (start, end) => instance.enclose(...[start, end ?? start]); },
-      get double() { return instance.enclose(...quotingStyles.double);  },
-      get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
-      get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },
-      get guillemetsSingle() { return instance.enclose(...quotingStyles.guillemetsSingle); },
-      get guillemetsSingleInward() { return instance.enclose(...quotingStyles.guillemetsSingleInward); },
-      get remove() { return wrap(`${instance.value.replace(quotingStyles.re, ``)}`); },
-      get single() { return instance.enclose(...quotingStyles.single); },
-      get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
-    },
-    enumerable: false,
-    configurable: false,
-  };
-}
-
-function getBoundary(string) {
-  const match = [...string.matchAll(/\p{Pe}|\p{Z}/gu)].at(-1);
-  return match?.index ?? string.length;
-}
-/* node:coverage enable */

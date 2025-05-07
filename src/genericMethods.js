@@ -11,6 +11,7 @@ export {
   isNumber,
   isArrayOf,
   defineQuotingStyles,
+  quotGetters4Instance,
   getStringValue,
   escapeRE,
   resolveTemplateString,
@@ -104,6 +105,36 @@ function getSWInformation(notChainable) {
     );
 }
 
+function quotGetters4Instance(instance, wrap) {
+  wrap = wrap ?? function(me) { return me; };
+  return {
+    value: {
+      get backtick() { return instance.enclose(...quotingStyles.backtick); },
+      get bracket() { return instance.enclose(...quotingStyles.bracket); },
+      get curlyDouble() { return instance.enclose(...quotingStyles.curlyDouble); },
+      get curlyDoubleInward() { return instance.enclose(...quotingStyles.curlyDoubleInward); },
+      get curlyDoubleEqual() { return instance.enclose(...quotingStyles.curlyDoubleEqual); },
+      get curlyLHDoubleInward() { return instance.enclose(...quotingStyles.curlyLHDoubleInward); },
+      get curlyLHSingle() { return instance.enclose(...quotingStyles.curlyLHSingle); },
+      get curlyLHSingleInward() { return instance.enclose(...quotingStyles.curlyLHSingleInward); },
+      get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
+      get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
+      get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
+      get custom() { return (start, end) => instance.enclose(...[start, end ?? start]); },
+      get double() { return instance.enclose(...quotingStyles.double);  },
+      get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
+      get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },
+      get guillemetsSingle() { return instance.enclose(...quotingStyles.guillemetsSingle); },
+      get guillemetsSingleInward() { return instance.enclose(...quotingStyles.guillemetsSingleInward); },
+      get remove() { return wrap(`${instance.value.replace(quotingStyles.re, ``)}`); },
+      get single() { return instance.enclose(...quotingStyles.single); },
+      get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
+    },
+    enumerable: false,
+    configurable: false,
+  };
+}
+
 function decode() {
   return atob`Rm9yIHRoZSByZWNvcmQ6CltjbV0gY2hhaW5hYmxlIGdldHRlcnMvbWV0aG9kcyBtb2RpZnkgdGhlIGluc3RhbmNlIHN0cmluZwpbY21dIGluZGV4T2Ygb3ZlcnJpZGVzIHJldHVybnMgW3VuZGVmaW5lZF0gaWYgbm90aGluZyB3YXMgZm91bmQgKHNvIG9uZSBjYW4gdXNlIFtsYXN0SV1pbmRleE9mKFtzb21lIHN0cmluZyB2YWx1ZV0pID8/IDAKW2NtXSBpbmNsdWRlcyBpbmZvcm1hdGlvbiBmb3IgY3VzdG9tIG1ldGhvZHMvZ2V0dGVycyBpZiBhcHBsaWNhYmxl`.replace(/\[cm]/g, `\u2714`);
 }
@@ -140,9 +171,8 @@ function defineQuotingStyles() {
   return quots;
 }
 
-/* Not (directly) tested */
-/* node:coverage disable */
 function createExtendedCTOR(ctor, customMethods) {
+  const instanceQuotGetters4Info = quotGetters4Instance(ctor());
   Symbol.toSB = Symbol.for(`toStringBuilder`);
   Object.defineProperty(String.prototype, Symbol.toSB, {
     get() { return ctor(this); },
@@ -187,13 +217,14 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     quoteInfo: {
       get() {
-        const qStyles = {...defineQuotingStyles()};
-        delete qStyles.re;
-        return Object.entries(qStyles)
+        return Object.entries(Object.getOwnPropertyDescriptors(instanceQuotGetters4Info.value))
           .sort( (a,b) => a[0].localeCompare(b[0]) )
           .reduce((acc, [k, v]) => {
-            const val = v.constructor === Function ? `(start:string[, end:string])` : ` (${v.join(` [instance value] `)})`;
-            return [...acc, `[instance].quote.${k}${val}`];
+            if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
+            if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
+
+            const val = ctor(` [instance] `).quote[k];
+            return [...acc, `[instance].quote.${k} (${val})`];
           }, []);
       }
     },
@@ -216,4 +247,3 @@ function checkType(type, item, includeInstances) {
     ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
     : item?.constructor !== type;
 }
-/* node:coverage enable */
