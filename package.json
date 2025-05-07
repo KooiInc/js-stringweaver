@@ -16,7 +16,7 @@
     "Classfree Object Oriented"
   ],
   "scripts": {
-    "test": "@node --test --experimental-test-coverage  --test-reporter tap  ./tests/UnitTests.js"
+    "test": "@node --test --experimental-test-coverage --test-coverage-include src/*.js --test-reporter tap tests/UnitTests.js"
   },
   "author": "KooiInc",
   "license": "MIT",
