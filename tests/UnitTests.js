@@ -3,10 +3,82 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S, CustomStringConstructor} from "../index.js";
-import {quotingStyles} from "../src/genericMethods.js";
+import {quotingStyles, isArrayOf, quotGetters4Instance} from "../src/genericMethods.js";
 
 describe(`Basics constructor`, () => {
   describe(`Instantiation`, () => {
+    it(`Constructor keys are not enumerable`, () => {
+      const keys = Object.keys($S);
+      assert.strictEqual(keys.length, 0);
+    });
+
+    it(`Constructor is extended`, () => {
+      const extensions = Object.entries(Object.getOwnPropertyDescriptors($S)).reduce( (a, [k, v]) => {
+        return {...a, ...{[k]: {isGetter: !!v.get, isValue: !!v.value}}}
+      }, {});
+      assert.deepStrictEqual(
+        extensions, {
+        "length": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "name": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "prototype": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "create": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "constructor": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "format": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "addCustom": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "info": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "keys": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "quoteInfo": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "uuid4": {
+          "isGetter": true,
+          "isValue": false
+        },
+        "randomString": {
+          "isGetter": false,
+          "isValue": true
+        },
+        "regExp": {
+          "isGetter": false,
+          "isValue": true
+        }
+      });
+    });
+
+    it(`Symbolic String extension in place`, () => {
+        const test = `hello world`[Symbol.toSB];
+        assert.strictEqual(test.constructor, CustomStringConstructor);
+        assert.strictEqual(test.value, `hello world`);
+    });
+
     it(`constructor can be used as regular function`, () => {
       const hi = $S(`Hello world`);
       assert.strictEqual(String(hi), `Hello world`);
@@ -87,6 +159,10 @@ describe(`Basics constructor`, () => {
   });
 
   describe(`Constructor static methods`, () => {
+    it(`$S.constructor as expected`, () => {
+      assert.strictEqual($S.constructor, CustomStringConstructor);
+    });
+
     it(`$S.keys delivers all keys`, () => {
       const keysShouldbe = [
         'append',
@@ -160,28 +236,37 @@ describe(`Basics constructor`, () => {
       assert.deepStrictEqual(info.slice(info.findIndex(v => v.startsWith(`append`))), keysShouldbe);
     });
 
+    it(`$S.keys for custom getter => *custom* displayed`, () => {
+      $S.addCustom({
+        name: `tested`,
+        method: me => {return me.toUpperCase().quote.curlyDouble; },
+        enumerable: true,
+        isGetter: true});
+      assert.strictEqual($S.keys.find(v => v.startsWith(`tested`)), `tested *custom*`, $S.keys);
+    })
+
     it(`$S.keys.quoteInfo as expected`, () => {
       const shouldBe = [
-        '[instance].quote.backtick (` [instance value] `)',
-        '[instance].quote.bracket ({ [instance value] })',
-        '[instance].quote.curlyDouble (“ [instance value] ”)',
-        '[instance].quote.curlyDoubleEqual (“ [instance value] “)',
-        '[instance].quote.curlyDoubleInward (” [instance value] “)',
-        '[instance].quote.curlyLHDouble („ [instance value] ”)',
-        '[instance].quote.curlyLHDoubleInward („ [instance value] “)',
-        '[instance].quote.curlyLHSingle (‚ [instance value] ’)',
-        '[instance].quote.curlyLHSingleInward (‚ [instance value] ‘)',
-        '[instance].quote.curlySingle (‛ [instance value] ’)',
-        '[instance].quote.curlySingleEqual (‛ [instance value] ‛)',
-        '[instance].quote.curlySingleInward (’ [instance value] ‛)',
-        '[instance].quote.double (" [instance value] ")',
-        '[instance].quote.guillemets (« [instance value] »)',
-        '[instance].quote.guillemetsInward (» [instance value] «)',
-        '[instance].quote.guillemetsSingle (‹ [instance value] ›)',
-        '[instance].quote.guillemetsSingleInward (› [instance value] ‹)',
-        "[instance].quote.single (' [instance value] ')",
-        '[instance].quote.squareBrackets ([ [instance value] ])'
-      ];
+        '[instance].quote.backtick (` [instance] `)',
+        '[instance].quote.bracket ({ [instance] })',
+        '[instance].quote.curlyDouble (“ [instance] ”)',
+        '[instance].quote.curlyDoubleEqual (“ [instance] “)',
+        '[instance].quote.curlyDoubleInward (” [instance] “)',
+        '[instance].quote.curlyLHDoubleInward („ [instance] “)',
+        '[instance].quote.curlyLHSingle (‚ [instance] ’)',
+        '[instance].quote.curlyLHSingleInward (‚ [instance] ‘)',
+        '[instance].quote.curlySingle (‛ [instance] ’)',
+        '[instance].quote.curlySingleEqual (‛ [instance] ‛)',
+        '[instance].quote.curlySingleInward (’ [instance] ‛)',
+        '[instance].quote.custom(start:string, end:string)',
+        '[instance].quote.double (" [instance] ")',
+        '[instance].quote.guillemets (« [instance] »)',
+        '[instance].quote.guillemetsInward (» [instance] «)',
+        '[instance].quote.guillemetsSingle (‹ [instance] ›)',
+        '[instance].quote.guillemetsSingleInward (› [instance] ‹)',
+        '[instance].quote.remove (only predefined)',
+        "[instance].quote.single (' [instance] ')",
+        '[instance].quote.squareBrackets ([ [instance] ])' ];
       assert.deepStrictEqual($S.quoteInfo, shouldBe);
     });
 
@@ -218,14 +303,6 @@ describe(`Basics constructor`, () => {
         $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().quote.curlyDouble; }, enumerable: true, isGetter: true}),
         `addCustom: the property "upperQuoted" exists and can not be redefined`);
     });
-
-    it(`non enumerable custom getter NOT in instance keys`, () => {
-      assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined );
-    });
-
-    it(`custom enumerable getter in instance keys`, () => {
-      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted` );
-    })
 
     it(`$S.format works as expected`, () => {
       const mymy = $S.format(`hello {wrld}`, {wrld: `there - `}, {wrld: `world`});
@@ -298,6 +375,41 @@ describe(`Basics constructor`, () => {
       rs = $S.randomString({includeUppercase: false, includeSymbols: true, startAlphabetic: true});
       assert.strictEqual(/^[a-z]/.test(rs), true, rs + `lowercase only, symbols, startalphabetic`);
     });
+  });
+
+  describe(`Miscellaneous`, () => {
+    it(`isArrayOf (strings)`, () => {
+      const arrOfString = [`a`, `b`];
+      assert.strictEqual(isArrayOf(String, arrOfString), true);
+    });
+
+    it(`isArrayOf (Map)`, () => {
+      const arrOfMaps = [new Map(), new Map()];
+      assert.strictEqual(isArrayOf(Map, arrOfMaps), true);
+    });
+
+    it(`isArrayOf (numbers)`, () => {
+      const arrOfNumbers = [1, 2, 3];
+      assert.strictEqual(isArrayOf(Number, arrOfNumbers), true);
+    });
+
+    it(`isArrayOf (number, not all numbers)`, () => {
+      const arrOfNumbers = [1, 2, `3`];
+      assert.strictEqual(isArrayOf(Number, arrOfNumbers), false);
+    });
+
+    it(`non enumerable custom getter NOT in instance keys`, () => {
+      assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined );
+    });
+
+    it(`custom enumerable getter in instance keys`, () => {
+      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted` );
+    });
+
+    it(`quotGetters4Instance with dummy wrapper`, () => {
+      const quotes4Instance = quotGetters4Instance($S``);
+      assert.strictEqual(quotes4Instance.value.remove, ``);
+    })
   });
 });
 
@@ -666,7 +778,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
   describe(`quoting`, () => {
     it(`[instance].quote[quotingStyle] for all possibilities as expected`, () => {
       const testme =  Object.keys($S.create.quote).map((key) => {
-        if (/^remove$|^custom$/.test(key)) { return false; }
+        if (key === "remove") { return $S`${key}: ` + $S(`quoting`).quote.double.quote.remove; }
+        if (key === "custom") { return $S`${key}: ` + $S(`quoting`).quote[key](`!!`); }
         return $S`${key}: ` + $S(`quoting`).quote[key];
       }).filter(k => k);
 
@@ -682,11 +795,13 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
         "curlySingle: ‛quoting’",
         "curlySingleEqual: ‛quoting‛",
         "curlySingleInward: ’quoting‛",
+        "custom: !!quoting!!",
         "double: \"quoting\"",
         "guillemets: «quoting»",
         "guillemetsInward: »quoting«",
         "guillemetsSingle: ‹quoting›",
         "guillemetsSingleInward: ›quoting‹",
+        "remove: quoting",
         "single: 'quoting'",
         "squareBrackets: [quoting]"
       ]);
@@ -775,6 +890,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`truncate (not html entity, wordBoundary true) as expected`, () => {
       const hi = $S`Hello, (universe) say no more`;
       assert.strictEqual(hi.truncate({at: 8, wordBoundary: true}).value, `Hello,...`);
+    });
+
+    it(`truncate (no wordBoundaries, wordBoundary true) as expected`, () => {
+      const hi = $S`Hellouniversesaynomore`;
+      assert.strictEqual(hi.truncate({at: 8, wordBoundary: true}).value, `Helloun...`);
     });
 
     it(`truncate (html entity) as expected`, () => {
