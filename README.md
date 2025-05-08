@@ -16,6 +16,7 @@ A constructor to create *mutable* strings.
 - retains history of changes
 - no external dependencies
 - instances can use/chain native String getters/methods (e.g. `length`, `split`)
+- 100% test coverage
 
 **<a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Demonstration / Documentation</a>**
 
