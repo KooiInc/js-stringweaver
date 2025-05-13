@@ -35,15 +35,14 @@ function printInitializationExamples() {
     createChapter(
       $S`Initialize using tagged template function`.toTag("h3", "summary"),
       $S`${exampleCode.asTaggedTemplateExample}`
-        .append(`=> `)
-        .append($S`hello world`.qcd),
+        .append($S`hello world`.qcd.prefix(`=> `).asSpacedDiv),
       "initialization-astt"
     ),
 
     createChapter(
       $S`Initialize using function call`.toTag("h3", "summary"),
       $S`$S("hello world")`.toCode
-        .append($S(`hello world`).qcd.prefix(` => `)),
+        .append($S(`hello world`).qcd.prefix(` => `).asSpacedDiv),
       "initialization-asfn"
     ),
 
@@ -53,9 +52,9 @@ function printInitializationExamples() {
         .asDiv
         .append($S`With it, one can create a StringWeaver instance from a plain JS string.`.asDiv)
         .append(exampleCode.SymbolicExtensionExample)
-        .appendDiv(`b5`, "ex1"[SB].toCode.append(ex1.qcd.prefix(` => `)))
-        .appendDiv(`b5`, "ex2"[SB].toCode.append(ex2.qcd.prefix(` => `)))
-        .appendDiv(`b5`, "ex3"[SB].toCode.append(ex3.qcd.prefix(` => `))),
+        .append("ex1"[SB].toCode.append(ex1.qcd.prefix(` => `)).asSpacedDiv)
+        .append("ex2"[SB].toCode.append(ex2.qcd.prefix(` => `)).asSpacedDiv)
+        .append("ex3"[SB].toCode.append(ex3.qcd.prefix(` => `)).asSpacedDiv),
       "initialization-symbolic"
     ),
 
@@ -63,24 +62,25 @@ function printInitializationExamples() {
       $S`Instantiation always returns an instance with a string`.toTag("h3", "summary"),
       $S`Everything one throws at the constructor will result in an instance with a string value. If the parameter
         is not a string or template string, the instance value will be an empty string`.toTag("div", "normal b5")
-        .append($S`$S()`.toCode.append($S().qcd.prefix(` => `)).asDiv)
-        .append($S`$S("hello world")`.toCode.append($S(`hello world`).qcd.prefix(` => `)).asDiv)
-        .append($S`$S([1,2,3])`.toCode.append($S([1,2,3]).qcd.prefix(` => `)).asDiv),
+        .append($S`$S()`.toCode.append($S().qcd.prefix(` => `)).asSpacedDiv)
+        .append($S`$S("hello world")`.toCode.append($S(`hello world`).qcd.prefix(` => `)).asSpacedDiv)
+        .append($S`$S([1,2,3])`.toCode.append($S([1,2,3]).qcd.prefix(` => `)).asSpacedDiv),
       "initialization-alwaysstring"
     ),
 
     createChapter(
       $S`Instance methods are chainable`.toTag("h3", "summary"),
-      $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode.asDiv
-        .append(`=> `, $S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd).asDiv,
+      $S`\$S("hello").append(" ", "world").firstUp.enclose("&amp;lt;", "&amp;gt;")`.toCode
+        .append($S("hello").append(" ", "world").firstUp.enclose("&lt;", "&gt;").qcd.prefix(`=> `).asSpacedDiv),
       "initialization-instance-chainable"
     ),
 
     createChapter(
       $S`Native string function results are chainable`.toTag("h3", "summary"),
       $S`<code>\$S("hello world").<i class="red">toUpperCase</i>().<i class="red">replace</i>(/world/i, "UNIVERSE")
-        .quote.guillemetsInward</code>`.asDiv
-        .append(``, `=> `,  $S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`).quote.guillemetsInward).asDiv,
+        .quote.guillemetsInward</code>`
+        .append($S("hello world").toUpperCase().replace(/world/i, `UNIVERSE`)
+          .quote.guillemetsInward.prefix(`=> `).asSpacedDiv),
       "initialization-native-chainable"
     ),
 
@@ -90,11 +90,11 @@ function printInitializationExamples() {
           or use the <code>[string].toString</code> or <code>[string].valueOf</code> overrides.
           `.toTag("div", "normal b5")
 
-      .appendDiv(``,
-        $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").value`.toCode
-          .appendDiv(`b5`, `=> `,
-            $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.value)
-        )
+      .append($S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").value`.toCode
+        .append(
+          $S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").qcd.prefix(`=> `).asSpacedDiv
+        ).asDiv
+      )
 
       .appendDiv(``,
         $S`$S("hello world").toUpperCase().replace(/world/i, "UNIVERSE").toString()`.toCode
@@ -1417,6 +1417,7 @@ function addCustomized($S) {
   });
   $S.addCustom({name: `qcd`, method(me) { return me.quote.curlyDouble; }, isGetter: true});
   $S.addCustom({name: `asDiv`, method(me) { return me.toTag("div", "normal"); }, isGetter: true});
+  $S.addCustom({name: `asSpacedDiv`, method(me) { return me.toTag("div", "normal b5"); }, isGetter: true});
   $S.addCustom({name: `appendDiv`, method: (me, classNames, ...strings) =>
     me.append($S(strings.join(``)).toTag("div", `normal${classNames ? ` ${classNames} ` : ``}`))});
   $S.addCustom({name: `toCode`, method: me => me.trimAll.toTag(`code`), isGetter: true});
