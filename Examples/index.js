@@ -135,6 +135,7 @@ function printInitializationExamples() {
   print2Document(
     chapterHeader("Initialization", "chapter-initialization"),
     ...allExamples);
+  $(`#chapter-initialization`).data.set({chapterTop: "1"});
 }
 
 function printStaticConstructorFunctionExamples() {
@@ -1351,8 +1352,7 @@ function createTopMenuElement() {
       $.div({data:{action: "top"}}, "Page top"),
       $.div({data:{action: "content"}}, "Content"),
       $.div({data:{action: "open-all"}}, "Open all examples"),
-      $.div({data:{action: "close-all"}}, "Close all examples"),
-      $.div({data:{action: "close-and-content"}}, "Close all <i>and</i> to content"),
+      $.div({data:{action: "close-and-content"}}, "Close all examples"),
       $.div({data:{action: "close-and-top"}}, "Close all <i>and</i> to top")
     )
   ).appendTo($(`body`));
@@ -1472,8 +1472,10 @@ function topMenuHandler(evt) {
   switch(evt.target.dataset.action) {
     case `content`: return $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
     case `top`: return $.node(`#top`).scrollIntoView({behavior: "smooth"});
-    case `close-all`: return closeAllContentDetails();
-    case `open-all`: return openAllContentDetails();
+    case `open-all`: {
+      openAllContentDetails();
+      return $.node(`[data-chapter-top]`).scrollIntoView({behavior: "smooth"});
+    }
     case `close-and-content`: {
       closeAllContentDetails();
       return $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
