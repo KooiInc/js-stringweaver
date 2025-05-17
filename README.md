@@ -5,7 +5,7 @@
 </div>
 
 
-## js-stringweaver
+## js-stringweaver - a js-stringbuilder
 
 A JS "stringbuilder" module
 
