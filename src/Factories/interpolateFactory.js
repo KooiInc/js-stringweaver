@@ -55,7 +55,7 @@ function interpolateFactory(defaultReplacer = "") {
 
   /**
    * Create a lambda function for replacing placeholders in the string.
-   * @param {object<string, string>} token - The token object containing replacement values.
+   * @param {object} token - The token object containing replacement values.
    * @returns {Function} - The replacer lambda function.
    */
   function getReplacerLambda(token) {
