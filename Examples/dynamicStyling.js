@@ -290,24 +290,38 @@ function initStyling($, $S) {
       font-family: verdana;
       font-size: 0.9rem;
       border-collapse: collapse;
+      vertical-align: top;
       max-width: 100%;
+
+      td, th {
+        padding: 2px 4px;
+        font-size: 14px;
+        height: 18px;
+        vertical-align: top;
+      }
+
+      th {
+        font-weight: bold;
+        text-align: left;
+        border-bottom: 1px solid #999;
+        background-color: #999;
+        color: #FFF;
+      }
+
+      td:first-child, th:first-child {
+        text-align: right; padding-right: 5px;
+        min-width: 12px;
+        max-width: 36px;
+      }
+      caption {
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        font-size: 14px;
+        white-space: nowrap;
+       }
+
+       tbody tr:nth-child(even) { background-color: #ddd; }
      }`,
-    `table caption {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      font-size: 14px;
-      white-space: nowrap;
-     }`,
-    `table:not(.hljs-ln) tbody tr:nth-child(even) { background-color: #eee; }`,
-    `table:not(.hljs-ln) td, table th { padding: 2px 4px; font-size: 14px; height: 18px}`,
-    `table:not(.hljs-ln) th { backgroundColor: #999; color: #FFF; }`,
-    `table:not(.hljs-ln) tr td:first-child,
-     table:not(.hljs-ln) tr th:first-child {text-align: right; padding-right: 0.5rem; width:50%}`,
-    `th {
-      font-weight: bold;
-      text-align: left;
-      border-bottom: 1px solid #999;
-    }`,
     `.largeArrowDown:before{
       content: ${arrowRepeat};
       color: #555;

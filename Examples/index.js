@@ -907,15 +907,18 @@ function formatEx() {
       "niente", "rien", "ничего"]
   ];
 
-  const tableRows = $S("<tr><td>{pre}</td><td>{last}</td></tr>").format(...theNames);
+  const tableRows = $S("<tr><td>{index}</td><td>{pre}</td><td>{last}</td></tr>").format(...theNames);
 
   const tableTemplate = $S(
     "<table>\
       <caption>{caption}</caption>\
+      <thead>\
       <tr>\
+        <th>#</th>\
         <th>prename</th>\
         <th>surname</th>\
       </tr>\
+      </thead>\
       <tbody>{rows}</tbody>\
     </table>");
 
