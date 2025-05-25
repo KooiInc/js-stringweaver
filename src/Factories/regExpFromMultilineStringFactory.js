@@ -1,6 +1,3 @@
-/* node:coverage disable */
-/* For StringWeaver tests we are not interested in coverage for this file */
-
 export default createRegExp
 
 function createRegExp(str, ...args) {
@@ -9,7 +6,7 @@ function createRegExp(str, ...args) {
     return regExp(str, ...args);
   } catch (err) {
     const flags = resolveFlags();
-    const raw = str.raw || str; 
+    const raw = str.raw || str;
     return `Error creating Regular Expression from string "${raw}" with flags ${flags}` +
       `\nRegExp error message: "${err.message}"`;
   }
@@ -25,7 +22,7 @@ function regExp(regexStr, ...args) {
   const flags = resolveFlags(...args);
   args = [];
   const raw = regexStr.raw || [regexStr];
-  
+
   return new RegExp(
     (args.length &&
       raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``) ||
