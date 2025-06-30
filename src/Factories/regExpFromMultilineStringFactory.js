@@ -1,33 +1,72 @@
-export default createRegExp
+export default RegExpFactory();
 
-function createRegExp(str, ...args) {
-  args = !str.raw ? [args] : args;
-  try {
-    return regExp(str, ...args);
-  } catch (err) {
-    const flags = resolveFlags();
-    const raw = str.raw || str;
-    return `Error creating Regular Expression from string "${raw}" with flags ${flags}` +
-      `\nRegExp error message: "${err.message}"`;
+function RegExpFactory() {
+  return creator;
+
+  function creator(regExStr, ...args) {
+    const lastFlag = args.at(-1);
+    const flags = Array.isArray(lastFlag) ? lastFlag.join(``) : ``;
+    args = flags.length > 0 ? args.slice(0, -1) : args;
+
+    const initial = args.length > 0
+      ? regExStr.raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``)
+      : regExStr.raw.join(``);
+    const regExp = new RegExp(
+      initial.split(`\n`).map( line => cleanup(line) ).join(``),
+      cleanupFlags(flags)
+    );
+
+    return createInstance(regExp);
   }
-}
 
-function resolveFlags(...args) {
-  return args.length > 0
-    ? Array.isArray(args.slice(-1))
-      ? args.pop().join(``) : args.join(``) : ``;
-}
+  function createInstance(regExp) {
+    const instance = new Proxy(Object.defineProperties({}, {
+      re: { get() { return regExp; }, enumerable: false},
+      toString: { value: () => regExp.toString(), enumerable: false },
+      valueOf: { value: () => regExp, enumerable: false },
+      flags: { value(flags) {
+          regExp = addFlags(flags, regExp);
+          return instance;
+        }, enumerable: false },
+    }), getterTrap(regExp));
 
-function regExp(regexStr, ...args) {
-  const flags = resolveFlags(...args);
-  args = [];
-  const raw = regexStr.raw || [regexStr];
+    return instance;
+  }
 
-  return new RegExp(
-    (args.length &&
-      raw.reduce( (a, v, i ) => a.concat(args[i-1] || ``).concat(v), ``) ||
-      raw?.join(``))
-      .split(`\n`)
-      .map( line => line.replace(/\s|\/\/.*$/g, ``).trim().replace(/(@s!)/g, ` `) )
-      .join(``), flags);
+  function getterTrap(regExp) {
+    return {
+      get(target, key) {
+        const fromTarget = Reflect.get(target, key);
+        const fromRE = Reflect.get(regExp, key);
+        switch(true) {
+          case !!fromTarget: return fromTarget;
+          case !!fromRE && fromRE.constructor === Function: return fromRE.bind(target.re);
+          default: return target.re[key]
+        }
+      },
+    };
+  }
+
+  function cleanupFlags(flags, currentFlags) {
+    currentFlags = currentFlags ?? ``;
+    flags = currentFlags.concat(flags.constructor === String && flags.length ? flags : ``);
+    return [...new Set([...flags])].join(``).replace(/[^dgimsuvy]/g, ``);
+  }
+
+  function addFlags(flags, re) {
+    switch(true) {
+      case flags === `-r`: return new RegExp(re.source, ``);
+      case flags.constructor === String && flags.length > 0:
+        return new RegExp(re.source, cleanupFlags(flags, re.flags));
+      default: return re;
+    }
+  }
+
+  function cleanup(str) {
+    return str
+      .replace(/\/\*(?:[^*]|\*+[^*\/])*\*+\/|(?<!:|\\\|')\/\/.*/g, ``)
+      .replace(/\s/g, ``)
+      .trim()
+      .replace(/<!([^>]\d+)>/g, (a, b) => String.fromCharCode(+b) ?? a);
+  }
 }

@@ -1,3 +1,5 @@
+// noinspection JSValidateTypes
+
 const {
   $, $S, codeOverlay, exampleCode, SB,
   print2Document, useBundle, load} = await initialize({useBundle: true});
@@ -245,15 +247,35 @@ function regExpEx() {
       ^[\p{L}]              //=> always start with a letter
       [\p{L}_\.#\-\d+~=!]+  //=> followed by letters including _ . # - 0-9 ~ = or !
       ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
+  const replacerRE = $S.regExp`
+    /* find 'hi'or 'universe' */
+    hi
+    |
+    universe`;
+  const currentReplacer = () => $S`replacerRE`.toCode.append(` now ${$S(String(replacerRE)).toCode}`);
+  const replacements = {hi: `Hello`, universe: `world!`};
+  const example1 = `HI universe`.replace(replacerRE.flags(`g`), a => replacements[a.toLowerCase()]);
+  const re1 = currentReplacer();
+  const example2 = `HI universe`.replace(replacerRE.flags(`i`), a => replacements[a.toLowerCase()]);
+  const re2 = currentReplacer();
+  const example3 = `HI Universe`.replace(replacerRE.flags(`-r`).flags(`g`), a => replacements[a.toLowerCase()]);
+  const re3 = currentReplacer();
   return createChapter(
     itemHeader(`$S.regExp`),
     (`$S.regExp`[SB].toCode + ` enables creating a regular expression from a
-      multiline (template) string, including comments`)[SB].asDiv
-    .appendDiv(`b5`, $S` can only be used as tagged template function`.asNote)
+      multiline (template) string, including comments.
+      <a target="_blank" href="https://github.com/KooiInc/RegexHelper">See also</a>`)[SB].asDiv
+    .appendDiv(`b5`, $S` can <b>only</b> be used as tagged template [function]`.asNote)
     .appendDiv(``,
       $S(exampleCode.regExpExample)
-      .append($S`Result`.toTag(`b`).prefix(`=> `)
-      .append(`: `, $S(reDemo.toString()).toCode))
+        .append($S`Result`.toTag(`b`).prefix(`=> `)
+        .append(`: `, $S(reDemo.toString()).toCode))
+      )
+      .appendDiv(`b5`, $S`<h3 class="head">[string].replace example</h3>`)
+      .appendDiv(``, $S(exampleCode.regExpExample2)
+        .append($S`Example1`.toCode, ` => `, $S(example1).qcd, ` (${$S(re1)})`)
+        .appendDiv(``, $S`Example2`.toCode, ` => `, $S(example2).qcd, ` (${$S(re2)})`)
+        .appendDiv(``, $S`Example3`.toCode, ` => `, $S(example3).qcd, ` (${$S(re3)})`)
     ),
     "static-regexp"
   );

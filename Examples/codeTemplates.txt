@@ -67,6 +67,18 @@ $S.regExp`
   ${[...'gui']}         //=> flags ([g]lobal, case [i]nsensitive, [u]nicode)`;
 </template>
 
+<template id="regExpExample2">
+const replacerRE = $S.regExp`
+  /* find 'hi' or 'universe' */
+  hi
+  |
+  universe`;
+const replacements = {hi: `Hello`, universe: `world!`};
+const example1 = `HI universe`.replace(replacerRE.flags(`g`), a => replacements[a.toLowerCase()]);
+const example2 = `HI universe`.replace(replacerRE.flags(`i`), a => replacements[a.toLowerCase()]);
+const example3 = `HI Universe`.replace(replacerRE.flags(`-r`).flags(`g`), a => replacements[a.toLowerCase()]);
+</template>
+
 <template id="taggedTemplateExample">
 const wrld = "world";
 $S`hello ${wrld}`
