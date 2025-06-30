@@ -313,28 +313,50 @@ describe(`Basics constructor`, () => {
       const re = $S.regExp`
         [a-z] // only lowercase a-z
         | [0-3] // or numbers 0-3
-        ${["g", "i"]} // globally`;
-      assert.strictEqual(re.constructor, RegExp);
-      assert.deepStrictEqual(re, /[a-z]|[0-3]/gi);
+        ${["g", "i"]} // globally case insensitive`;
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/gi);
     });
 
-    it(`$S.regExp (function call) as expected`, () => {
-      const re = $S.regExp(`
+    it(`$S.regExp flags as expected`, () => {
+      const re = $S.regExp`
         [a-z] // only lowercase a-z
-        | [0-3] // or numbers 0-3`,
-        `g`,
-        `im`);
-      assert.strictEqual(re.constructor, RegExp);
-      assert.deepStrictEqual(re, /[a-z]|[0-3]/gim);
+        | [0-3] // or numbers 0-3`.flags(`gim`);
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/gim);
     });
 
-    it(`$S.regExp invalid returns string with error message`, () => {
-      const re = $S.regExp(`
+    it(`$S.regExp flags chainability as expected`, () => {
+      const re = $S.regExp`
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3`.flags(`g`).flags(`i`).flags(`m`);
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/gim);
+    });
+
+    it(`$S.regExp remove flags (-r) as expected`, () => {
+      const re = $S.regExp`
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3`.flags(`gim`);
+      re.flags(`-r`);
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/);
+    });
+
+    it(`$S.regExp change flags (-r|) as expected`, () => {
+      const re = $S.regExp`
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3`.flags(`gim`);
+      re.flags(`-r|iv`);
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/iv);
+    });
+
+    it(`$S.regExp invalid ( /([a-z]/ ) throws an error`, () => {
+      assert.throws( () => $S.regExp`
         ([a-z] // only lowercase a-z (a non terminated group)`,
-        `g`,
-        `im`);
-      assert.strictEqual(/Error creating/.test(re), true);
-      assert.strictEqual(/error message/.test(re), true);
+        { name: /^SyntaxError$/,
+          message: /^Invalid regular expression:/});
     });
 
     it(`$S.uuid4 as expected`, () => {
