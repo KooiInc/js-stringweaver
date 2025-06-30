@@ -1,5 +1,7 @@
 /* node:coverage disable */
 /* For StringWeaver tests we are not interested in coverage for this file */
+// noinspection RegExpRedundantEscape,JSValidateTypes
+
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S, CustomStringConstructor} from "../index.js";

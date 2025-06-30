@@ -266,6 +266,9 @@ function regExpEx() {
       multiline (template) string, including comments.
       <a target="_blank" href="https://github.com/KooiInc/RegexHelper">See also</a>`)[SB].asDiv
     .appendDiv(`b5`, $S` can <b>only</b> be used as tagged template [function]`.asNote)
+    .appendDiv(`b5`, $S` you have to check the input.
+      Invalid input (e.g. "([a-z]") will throw a <code>SyntaxError</code>.
+      <br>Flags on the other hand will be automatically sanitized.`.asNote)
     .appendDiv(``,
       $S(exampleCode.regExpExample)
         .append($S`Result`.toTag(`b`).prefix(`=> `)
