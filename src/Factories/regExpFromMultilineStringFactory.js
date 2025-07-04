@@ -1,6 +1,4 @@
-Object.defineProperties(instanceCreator, {escape: {value: escape4RE, enumerable: true}});
-
-export default instanceCreator;
+export default Object.defineProperties(instanceCreator, {escape: {value: escape4RE, enumerable: true}});
 
 function instanceCreator(regExStr, ...args) {
   const {flags, cleanedArgs} = maybeFlags(...args);
@@ -18,7 +16,7 @@ function maybeFlags(...args) {
   return { flags, cleanedArgs: hasLength(flags) ? args.slice(0, -1) : args };
 }
 
-function getFlags(maybeFlags) {  return Array.isArray(maybeFlags) ? maybeFlags.join(``) : ``; }
+function getFlags(maybeFlags) { return isOfType(maybeFlags, Array) ? maybeFlags.join(``) : ``; }
 
 function createInstance(regExp) {
   const instance = new Proxy(Object.defineProperties({}, {
@@ -34,7 +32,7 @@ function createInstance(regExp) {
 
 function hasLength(variable) { return variable?.length > 0; }
 
-function isOfType(variable, CTOR) { return variable?.constructor === CTOR; }
+function isOfType(any, CTOR) { return any?.constructor === CTOR; }
 
 function maybeProp(target, key, regExp) {
   const fromRegExp = Reflect.get(regExp, key);
@@ -48,7 +46,6 @@ function getterTrap(regExp) {
   return {
     get(target, key) {
       const {fromInstance, fromRegExpMethod} = maybeProp(target, key, regExp);
-
       switch (true) {
         case !!fromInstance: return fromInstance;
         default: return fromRegExpMethod;
@@ -77,8 +74,7 @@ function escape4RE(reString) {
     case !!RegExp.escape: return RegExp.escape(reString);
     default:  return (`\\x${reString.at(0)}` +
       reString.slice(1).replace(/\p{S}|\p{P}/gu, a => `\\${a}`))
-        .replace(/ |\\x /g, `\\x20`);
-  }
+      .replace(/ |\\x /g, `\\x20`); }
 }
 
 function cleanup(str) {
