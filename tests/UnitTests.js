@@ -361,6 +361,10 @@ describe(`Basics constructor`, () => {
           message: /^Invalid regular expression:/});
     });
 
+    it(`$S.regExp.escape as expected`, () => {
+      assert.strictEqual($S.regExp.escape(' '), `\\x20`);
+    });
+
     it(`$S.uuid4 as expected`, () => {
       const uuid = $S.uuid4;
       const splitted = uuid.split(/-/);
