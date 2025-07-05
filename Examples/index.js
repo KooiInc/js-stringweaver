@@ -409,7 +409,7 @@ function getCapitalizeExamples() {
       camel: `equivalent of ${createInternalLink(`getter-camelCase`, `[instance].camelCase`, true)}`,
       snake: `equivalent of ${createInternalLink(`getter-snakeCase`, `[instance].snakeCase`, true)}`,
       first: `equivalent of ${createInternalLink(`getter-firstUp`, `[instance].firstUp`, true)}`,
-      kebab: `equivalent of <code>capitalize.dashed</code>`,
+      kebab: `alias of <code>capitalize.dashed</code>`,
       words: `equivalent of ${createInternalLink(`getter-wordsUCFirst`, `[instance].wordUCFirst`, true)}`,
       dashed: `equivalent of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`, })
     .sort(([k1,], [k2,]) => k1.localeCompare(k2))
