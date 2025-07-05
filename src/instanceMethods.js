@@ -29,6 +29,7 @@ export {
   toSnakeCase,
   customMethods,
   clone,
+  capitalizerFactory,
 };
 
 function checkAndRun(string, fn, or) {
@@ -55,10 +56,10 @@ function surroundWith(string, start, end) {
 function toDashedNotation(string) {
   return checkAndRun(string, () =>
     string
-      .replace(/\s/g, '')
-      .replace(/[A-Z]/g, a => `-${a.toLowerCase()}`)
-      .replace(/-{2,}/g, `-`)
+      .replace(/\s/g, '-')
+      .replace(/[A-Z_]/g, a => `-${a.toLowerCase()}`)
       .replace(/[^a-z-]/g, ``)
+      .replace(/-{2,}/g, `-`)
       .replace(/^-|-$/, ``)
   );
 }
@@ -192,4 +193,33 @@ function append(string, ...strings2Append) {
   }
 
   return getStringValue(string);
+}
+
+function capitalizerFactory(instance, wrap) {
+  return {
+    get full() {
+      return wrap(instance.value.toUpperCase());
+    },
+    get none() {
+      return wrap(instance.value.toLowerCase());
+    },
+    get camel() {
+      return wrap(toCamelcase(instance.value));
+    },
+    get snake() {
+      return wrap(toSnakeCase(instance.value));
+    },
+    get first() {
+      return wrap(ucFirst(instance.value));
+    },
+    get kebab() {
+      return wrap(toDashedNotation(instance.value));
+    },
+    get words() {
+      return wrap(wordsFirstUp(instance.value));
+    },
+    get dashed() {
+      return wrap(toDashedNotation(instance.value));
+    },
+  }
 }

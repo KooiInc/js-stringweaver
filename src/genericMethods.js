@@ -10,7 +10,6 @@ export {
   CustomStringConstructor,
   isNumber,
   isArrayOf,
-  defineQuotingStyles,
   quotGetters4Instance,
   getStringValue,
   escapeRE,

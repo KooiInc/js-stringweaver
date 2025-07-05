@@ -457,7 +457,6 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.value, `Hello world`);
   });
 
-  // todo
   describe(`case`, () => {
     it(`camelCase`, () => {
       const hello = $S`Hello World`.camelCase;
@@ -537,6 +536,108 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`wordsUCFirst`, () => {
       const hello = $S`hello world What a day 't is`.wordsUCFirst;
       assert.strictEqual(hello.value, `Hello World What A Day 't Is`);
+    });
+  });
+
+  describe(`capitalize`, () => {
+    it(`camel`, () => {
+      const hello = $S`Hello World`.capitalize.camel;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+
+    it(`camel from dashed`, () => {
+      const hello = $S`hello-world`.capitalize.camel;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+
+    it(`dashed from camel`, () => {
+      const hello = $S`hello-world`.capitalize.camel;
+      assert.strictEqual(hello.capitalize.dashed.value, `hello-world`);
+    });
+
+    it(`camel /w multiple spaces`, () => {
+      const hello = $S` hello    world   `.capitalize.camel;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+
+    it(`camel /w multiple dashes`, () => {
+      const hello = $S`-hello---world   `.capitalize.camel;
+      assert.strictEqual(hello.value, `helloWorld`);
+    });
+
+    it(`kebab regular`, () => {
+      const hello = $S`helloWorld`.capitalize.kebab;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`kebab /w numbers`, () => {
+      const hello = $S`hello42World`.capitalize.kebab;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`kebab /w spaces`, () => {
+      const hello = $S`hello   World`.capitalize.kebab;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`kebab /w diacriticals`, () => {
+      const hello = $S`hello   Woërld`.capitalize.kebab;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`kebab /w non alphabetic`, () => {
+      const hello = $S`hello $#!  World!`.capitalize.kebab;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`dashed === kebab`, () => {
+      const hello = $S`hello $#!  World!`.capitalize.dashed;
+      assert.strictEqual(hello.value, `hello-world`);
+    });
+
+    it(`snake regular`, () => {
+      const hello = $S`helloWorld`.capitalize.snake;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+
+    it(`snake /w numbers`, () => {
+      const hello = $S`hello42World`.capitalize.snake;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+
+    it(`snake /w spaces`, () => {
+      const hello = $S`hello   World`.capitalize.snake;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+
+    it(`snake /w diacriticals`, () => {
+      const hello = $S`hello   Woërld`.capitalize.snake;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+
+    it(`snake /w non alphabetic`, () => {
+      const hello = $S`hello $#!  World!`.capitalize.snake;
+      assert.strictEqual(hello.value, `hello_world`);
+    });
+
+    it(`first`, () => {
+      const hello = $S`hello world`.capitalize.first;
+      assert.strictEqual(hello.value, `Hello world`);
+    });
+
+    it(`words`, () => {
+      const hello = $S`hello world What a day 't is`.capitalize.words;
+      assert.strictEqual(hello.value, `Hello World What A Day 't Is`);
+    });
+
+    it(`full`, () => {
+      const hello = $S`hello world What a day 't is`.capitalize.full;
+      assert.strictEqual(hello.value, `HELLO WORLD WHAT A DAY 'T IS`);
+    });
+
+    it(`none`, () => {
+      const hello = $S`HELLO WORLD WHAT A DAY 'T IS`.capitalize.none;
+      assert.strictEqual(hello.value, `hello world what a day 't is`);
     });
   });
 
