@@ -67,10 +67,10 @@ function toDashedNotation(string) {
 function toSnakeCase(string) {
   return checkAndRun(string, () =>
     string
-      .replace(/\s/g, '')
+      .replace(/\s/g, '_')
       .replace(/[A-Z]/g, a => `_${a.toLowerCase()}`)
-      .replace(/_{2,}/g, `_`)
       .replace(/[^a-z_]/g, ``)
+      .replace(/_{2,}/g, `_`)
       .replace(/^_|_$/, ``)
   );
 }
