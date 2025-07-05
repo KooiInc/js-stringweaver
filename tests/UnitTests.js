@@ -169,6 +169,7 @@ describe(`Basics constructor`, () => {
       const keysShouldbe = [
         'append',
         'camelCase',
+        'capitalize',
         'clone',
         'constructor',
         'empty',
@@ -205,6 +206,7 @@ describe(`Basics constructor`, () => {
       const keysShouldbe = [
         'append (chainable method)',
         'camelCase (chainable getter)',
+        'capitalize (getter. Object with chainable getters: [full, none, camel, snake, first, kebab, words, dashed])',
         'clone (chainable getter)',
         'constructor (getter (override))',
         'empty (getter)',
@@ -234,7 +236,7 @@ describe(`Basics constructor`, () => {
         'wordsUCFirst (chainable getter)'
       ];
       const info = $S.info;
-      // the first lines may vary and is not relevant for the test
+      // the first lines may vary and are not relevant for the test
       assert.deepStrictEqual(info.slice(info.findIndex(v => v.startsWith(`append`))), keysShouldbe);
     });
 

@@ -66,11 +66,13 @@ function infoValue(key, infoValue) {
 }
 
 function getPlainValues() {
+  const capitalizerKeys = Object.keys(CustomStringConstructor.create.capitalize);
   return {
     value: `getter/setter`,
     clone: `chainable getter`,
     notEmpty: `chainable getter|undefined`,
     quote: `Object. See [constructor].quoteInfo`,
+    capitalize: `getter. Object with chainable getters: [${capitalizerKeys.join(`, `)}]`,
   };
 }
 
