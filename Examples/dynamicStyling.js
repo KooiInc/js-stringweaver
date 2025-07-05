@@ -95,6 +95,15 @@ function initStyling($, $S) {
        font-family: system-ui, sans-serif;
        color: var(--grey-default);
        margin: 3px auto;
+       ul {
+        margin-left: 1.2em;
+        li {
+          list-style: "✓" !important;
+          &:last-child {
+            margin-bottom: 1em !important;
+          }
+        }
+       }
      }`,
     `.b5 { margin-bottom: 0.5rem; }`,
     `h1.head, h2.head, h3.head {

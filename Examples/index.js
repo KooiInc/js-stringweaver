@@ -159,6 +159,7 @@ function printGetterExamples() {
   print2Document(
     chapterHeader("Instance getters", "chapter-getter"),
     camelCaseEx(),
+    capitalizeEx(),
     cloneEx(),
     emptyEx(),
     firstUpEx(),
@@ -385,6 +386,48 @@ function camelCaseEx() {
             .camelCase.qcd.prefix(" => ")) ),
       "getter-camelcase",
     );
+}
+
+function createInternalLink(linkTo, linkToText, isCode) {
+  const link = $S`<span
+    class="internalLink"
+    data-link-to="#${linkTo}">${linkToText}</span>`;
+  return isCode ? link.enclose(`<code>`, `</code>`) : link;
+}
+
+function capitalizeEx() {
+  const availableCapitalizers = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b));
+  const examplesObj = availableCapitalizers.reduce((acc, capitalizer) => {
+    return {...acc, [capitalizer]: $S`<code>$S("hello World").capitalize.${capitalizer}"</code> => ${
+      $S`hello world`.capitalize[capitalizer].qcd}`};
+  }, {});
+  const examples = $S`<ul>${Object.entries(examplesObj)
+    .reduce((acc, [, value]) => acc.concat($S(value).enclose(`<li>`, `</li>`)), ``)}</ul>`;
+  const capitalizers = Object.entries({
+    full: `equivalent of <code>String.toUpperCase()</code>`,
+    none: `equivalent of <code>String.toLowerCase()</code>`,
+    camel: `equivalent of ${createInternalLink(`getter-camelCase`, `[instance].camelCase`, true)}`,
+    snake: `equivalent of ${createInternalLink(`getter-snakeCase`, `[instance].snakeCase`, true)}`,
+    first: `equivalent of ${createInternalLink(`getter-firstUp`, `[instance].firstUp`, true)}`,
+    kebab: `equivalent of <code>capitalize.dashed</code>`,
+    words: `equivalent of ${createInternalLink(`getter-wordsUCFirst`, `[instance].wordUCFirst`, true)}`,
+    dashed: `equivalent of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`, })
+  .sort(([k1,], [k2,]) => k1.localeCompare(k2))
+  .reduce((acc, [key, value]) => acc.concat(`<li><code>capitalize.${key}</code>: ${value}</li>`), ``);
+  return createChapter(
+    $S(".capitalize").toTag("h3", "summary"),
+    $S`The different ways of 'capitalizing' instance values (e.g. <code>[instance].snakeCase</code>
+        can also be accomplished using <code>[instance].capitalize</code>.
+        <div class="b5">It returns an object with
+        properties to capitalize the instance value in different ways.</div>`
+      .toTag("div", "normal b5")
+    .append($S`<h4 class="between">The available properties are:</h4>`)
+    .append($S`<div class="normal"><ul>`.append(capitalizers).append(`</ul></div>`))
+    .append($S`<h4 class="between">Example</h4>`)
+    .append(exampleCode.capitalizerExample)
+    .append($S`<h4 class="between"><code>examples</code> =></h4>`)
+    .append(`<div class="normal">${examples}</div>`),
+    "getter-capitalize");
 }
 
 function cloneEx() {
