@@ -396,13 +396,12 @@ function createInternalLink(linkTo, linkToText, isCode) {
 }
 
 function getCapitalizeExamples() {
-  const availableCapitalizers = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b));
-  const examplesObj = availableCapitalizers.reduce((acc, capitalizer) => {
-    return {...acc, [capitalizer]: $S`<code>$S("hello World").capitalize.${capitalizer}"</code> => ${
-        $S`hello world`.capitalize[capitalizer].qcd}`};
-  }, {});
-  const examples = $S`<ul>${Object.entries(examplesObj)
-    .reduce((acc, [, value]) => acc.concat($S(value).enclose(`<li>`, `</li>`)), ``)}</ul>`;
+  const examplesObj = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b))
+    .reduce((acc, capitalizer) =>
+      [...acc, $S`<code>$S("hello World").capitalize.${capitalizer}"</code> => ${
+          $S`hello world`.capitalize[capitalizer].qcd}`.enclose(`<li>`, `</li>`)], [])
+    .join(``);
+  const examples = $S(examplesObj).enclose(`<ul>`, `</ul>`);
   const capitalizers = Object.entries({
       full: `equivalent of <code>String.toUpperCase()</code>`,
       none: `equivalent of <code>String.toLowerCase()</code>`,

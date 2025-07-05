@@ -260,13 +260,11 @@ const exampleTable = tableTemplate.format({
 </template>
 
 <template id="capitalizerExample">
-const availableCapitalizers = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b));
-const examplesObj = availableCapitalizers.reduce((acc, capitalizer) => {
-  return {...acc, [capitalizer]: $S`<code>$S("hello World".capitalize.${capitalizer}"</code> => ${
-    $S`hello world`.capitalize[capitalizer].qcd}`};
-}, {});
-const examples = $S(
-  Object.entries(examplesObj)
-  .reduce((acc, [, value]) => acc.concat($S(value).enclose(`&amp;lt;li>`, `&amp;lt;/li>`)), "")}
-).enclose(`&amp;lt;ul>`, `&amp;lt;/ul>`);
+const examplesObj = Object.keys($S.create.capitalize)
+  .sort((a, b) => a.localeCompare(b))
+  .reduce((acc, capitalizer) =>
+    [...acc, $S`&amp;lt;code>$S("hello World").capitalize.${capitalizer}&amp;lt;/code> => ${
+        $S("hello world").capitalize[capitalizer].qcd}`.enclose("&amp;lt;li>", "&amp;lt;/li>")], [])
+  .join(``);
+const examples = $S(examplesObj).enclose("&amp;lt;ul>", "&amp;lt;/ul>");
 </template>
