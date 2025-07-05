@@ -395,28 +395,34 @@ function createInternalLink(linkTo, linkToText, isCode) {
   return isCode ? link.enclose(`<code>`, `</code>`) : link;
 }
 
-function capitalizeEx() {
+function getCapitalizeExamples() {
   const availableCapitalizers = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b));
   const examplesObj = availableCapitalizers.reduce((acc, capitalizer) => {
     return {...acc, [capitalizer]: $S`<code>$S("hello World").capitalize.${capitalizer}"</code> => ${
-      $S`hello world`.capitalize[capitalizer].qcd}`};
+        $S`hello world`.capitalize[capitalizer].qcd}`};
   }, {});
   const examples = $S`<ul>${Object.entries(examplesObj)
     .reduce((acc, [, value]) => acc.concat($S(value).enclose(`<li>`, `</li>`)), ``)}</ul>`;
   const capitalizers = Object.entries({
-    full: `equivalent of <code>String.toUpperCase()</code>`,
-    none: `equivalent of <code>String.toLowerCase()</code>`,
-    camel: `equivalent of ${createInternalLink(`getter-camelCase`, `[instance].camelCase`, true)}`,
-    snake: `equivalent of ${createInternalLink(`getter-snakeCase`, `[instance].snakeCase`, true)}`,
-    first: `equivalent of ${createInternalLink(`getter-firstUp`, `[instance].firstUp`, true)}`,
-    kebab: `equivalent of <code>capitalize.dashed</code>`,
-    words: `equivalent of ${createInternalLink(`getter-wordsUCFirst`, `[instance].wordUCFirst`, true)}`,
-    dashed: `equivalent of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`, })
-  .sort(([k1,], [k2,]) => k1.localeCompare(k2))
-  .reduce((acc, [key, value]) => acc.concat(`<li><code>capitalize.${key}</code>: ${value}</li>`), ``);
+      full: `equivalent of <code>String.toUpperCase()</code>`,
+      none: `equivalent of <code>String.toLowerCase()</code>`,
+      camel: `equivalent of ${createInternalLink(`getter-camelCase`, `[instance].camelCase`, true)}`,
+      snake: `equivalent of ${createInternalLink(`getter-snakeCase`, `[instance].snakeCase`, true)}`,
+      first: `equivalent of ${createInternalLink(`getter-firstUp`, `[instance].firstUp`, true)}`,
+      kebab: `equivalent of <code>capitalize.dashed</code>`,
+      words: `equivalent of ${createInternalLink(`getter-wordsUCFirst`, `[instance].wordUCFirst`, true)}`,
+      dashed: `equivalent of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`, })
+    .sort(([k1,], [k2,]) => k1.localeCompare(k2))
+    .reduce((acc, [key, value]) => acc.concat(`<li><code>capitalize.${key}</code>: ${value}</li>`), ``);
+  return {examples, capitalizers};
+}
+
+function capitalizeEx() {
+  const {capitalizers, examples} = getCapitalizeExamples();
+
   return createChapter(
     $S(".capitalize").toTag("h3", "summary"),
-    $S`The different ways of 'capitalizing' instance values (e.g. <code>[instance].snakeCase</code>
+    $S`The different ways of 'capitalizing' instance values (e.g. <code>[instance].snakeCase</code>)
         can also be accomplished using <code>[instance].capitalize</code>.
         <div class="b5">It returns an object with
         properties to capitalize the instance value in different ways.</div>`
