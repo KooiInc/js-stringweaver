@@ -21,12 +21,12 @@ export {
   isNumber,
   prefix,
   getStringValue,
-  toCamelcase,
+  parseCamelcase,
   wordsFirstUp,
-  toDashedNotation,
+  parseKebabCase,
+  parseSnakeCase,
   quotGetters,
   surroundWith,
-  toSnakeCase,
   customMethods,
   clone,
   capitalizerFactory,
@@ -35,10 +35,6 @@ export {
 function checkAndRun(string, fn, or) {
   string = getStringValue(string);
   return string.length > 0 ? fn(string) : or || string;
-}
-
-function ucFirst(string) {
-  return checkAndRun(string, () => `${string[0].toUpperCase()}${string.slice(1)}`);
 }
 
 function format(string, ...tokens) {
@@ -53,25 +49,48 @@ function surroundWith(string, start, end) {
   return `${start}${string}${end || start}`;
 }
 
-function toDashedNotation(string) {
-  return checkAndRun(string, () =>
-    string
-      .replace(/\s/g, '-')
-      .replace(/[A-Z_]/g, a => `-${a.toLowerCase()}`)
-      .replace(/[^a-z-]/g, ``)
-      .replace(/-{2,}/g, `-`)
-      .replace(/^-|-$/, ``)
-  );
+function ucFirst(string) {
+  return checkAndRun(string, () => `${string[0].toUpperCase()}${string.slice(1).toLowerCase()}`);
 }
 
-function toSnakeCase(string) {
+function parseKebabCase(str) {
+  let result = ``;
+
+  for (const s of [...str]) {
+    switch(true) {
+      case !/[a-z _]/i.test(s): break;
+      case /[ _]/.test(s): result += `-`; break;
+      case s === s.toUpperCase(): result += `-${s.toLowerCase()}`; break;
+      default: result += s;
+    }
+  }
+
+  return result.replace(/-{2,}/g, `-`).replace(/^-|-$/g, ``);
+}
+
+function parseSnakeCase(str) {
+  let result = ``;
+
+  for (const s of [...str]) {
+    switch(true) {
+      case !/[a-z _-]/i.test(s): break;
+      case /[ -]/.test(s): result += `_`; break;
+      case s === s.toUpperCase(): result += `_${s.toLowerCase()}`; break;
+      default: result += s;
+    }
+  }
+
+  return result.replace(/_{2,}/g, `_`).replace(/^_|_$/g, ``);
+}
+
+function parseCamelcase(string) {
   return checkAndRun(string, () =>
-    string
-      .replace(/\s/g, '_')
-      .replace(/[A-Z]/g, a => `_${a.toLowerCase()}`)
-      .replace(/[^a-z_]/g, ``)
-      .replace(/_{2,}/g, `_`)
-      .replace(/^_|_$/, ``)
+    string.toLowerCase()
+      .trim()
+      .split(/[-\s]/)
+      .filter(l => l && l.length > 0)
+      .map( (str, i) => i > 0 && `${ucFirst(str)}` || str)
+      .join(``)
   );
 }
 
@@ -80,17 +99,6 @@ function wordsFirstUp(string) {
       acc + ( !/\p{L}|[-']/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
     string[0].toUpperCase()
   ));
-}
-
-function toCamelcase(string) {
-  return checkAndRun(string, () =>
-    string.toLowerCase()
-      .trim()
-      .split(/[- ]/)
-      .filter(l => l && l.length > 0)
-      .map( (str, i) => i > 0 && `${ucFirst(str)}`|| str)
-      .join(``)
-  );
 }
 
 function getWordBoundary(string) {
@@ -204,22 +212,22 @@ function capitalizerFactory(instance, wrap) {
       return wrap(instance.value.toLowerCase());
     },
     get camel() {
-      return wrap(toCamelcase(instance.value));
+      return wrap(parseCamelcase(instance.value));
     },
     get snake() {
-      return wrap(toSnakeCase(instance.value));
+      return wrap(parseSnakeCase(instance.value));
     },
     get first() {
       return wrap(ucFirst(instance.value));
     },
     get kebab() {
-      return wrap(toDashedNotation(instance.value));
+      return wrap(parseKebabCase(instance.value));
     },
     get words() {
       return wrap(wordsFirstUp(instance.value));
     },
     get dashed() {
-      return wrap(toDashedNotation(instance.value));
+      return wrap(parseKebabCase(instance.value));
     },
   }
 }
