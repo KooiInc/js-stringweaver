@@ -993,6 +993,28 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert(`${hi}`, `stringified`);
   });
 
+  describe(`trim override`, () => {
+    it(`trim() equals String.trim`, () => {
+      assert.strictEqual($S`  hello world  `.trim().value, "hello world");
+    });
+
+    it(`trim("*") removes all "*" from start and end`, () => {
+      assert.strictEqual($S`**hello world**`.trim("*").value, "hello world");
+    });
+
+    it(`trim("*", "!") removes all "*" from start and "!" from end`, () => {
+      assert.strictEqual($S`******hello world?!!!`.trim("*", "!").value, "hello world?");
+    });
+
+    it(`trim("#!", "!#") removes all "#!" from start and "!#" from end`, () => {
+      assert.strictEqual($S`#!hello world!#`.trim("#!", "!#").value, "hello world");
+    });
+
+    it(`trim(null, "!#") removes all "!#" from end`, () => {
+      assert.strictEqual($S`#!hello world!#`.trim(null, "!#").value, "#!hello world");
+    });
+  })
+
   describe(`trimAll`, () => {
     it(`trimAll removes all excessive whitespace`, () => {
       // excessive whitespace: all consecutive whitespaces (so 2 or more tabs, spaces, line feeds etc)
