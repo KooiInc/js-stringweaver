@@ -6,7 +6,7 @@ import {
   escapeRE,
   customMethods,
   interpolate,
-  createRegExp,
+  createRegExp as $RE,
   clone } from "./genericMethods.js";
 
 export {
@@ -105,15 +105,12 @@ function wordsFirstUp(string) {
 
 function trim(string, start, end) {
   return checkAndRun(string, () => {
-    if (!end && !start) {
-      return string.trim();
-    }
+    if (!end && !start) { return string.trim(); }
 
-    end = createRegExp.escape(end || start);
-    start = createRegExp.escape(start);
-    const re = createRegExp`^(${start})+ | (${end})+$`.flags(`gm`);
+    end = $RE.escape(end || start);
+    start = $RE.escape(start);
 
-    return string.replace(re, ``);
+    return string.replace($RE`^(${start})+ | (${end})+$`.flags(`gm`), ``);
   });
 }
 
