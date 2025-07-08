@@ -17,6 +17,7 @@ export {
   clone,
   interpolate,
   quotingStyles,
+  createRegExp,
 };
 
 createExtendedCTOR(CustomStringConstructor, customMethods);
@@ -212,7 +213,8 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     keys: {
       get() {
-        return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``)).sort( (a,b) => a.localeCompare(b) )
+        return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``))
+          .sort( (a,b) => a.localeCompare(b) )
           .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v);
       }
     },

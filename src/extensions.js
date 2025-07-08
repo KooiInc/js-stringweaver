@@ -19,6 +19,7 @@ import {
   customMethods,
   isNumber,
   clone,
+  trim,
   capitalizerFactory,
 } from "./instanceMethods.js";
 
@@ -50,6 +51,7 @@ function instanceCreator({initialstring} = {}) {
       return wrap(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive }));
     } },
     toString: { ...descriptorProps, value() { return actualValue; } },
+    trim: {...descriptorProps, value(start, end) { return wrap(trim(actualValue, start, end)); } },
     truncate: { ...descriptorProps, value({at, html = false, wordBoundary = false} = {}) {
       return wrap(truncate(actualValue, {at, html, wordBoundary})); } },
     valueOf: { ...descriptorProps, value() { return actualValue; } },

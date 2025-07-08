@@ -6,6 +6,7 @@ import {
   escapeRE,
   customMethods,
   interpolate,
+  createRegExp,
   clone } from "./genericMethods.js";
 
 export {
@@ -30,6 +31,7 @@ export {
   customMethods,
   clone,
   capitalizerFactory,
+  trim,
 };
 
 function checkAndRun(string, fn, or) {
@@ -99,6 +101,20 @@ function wordsFirstUp(string) {
       acc + ( !/\p{L}|[-']/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
     string[0].toUpperCase()
   ));
+}
+
+function trim(string, start, end) {
+  return checkAndRun(string, () => {
+    if (!end && !start) {
+      return string.trim();
+    }
+
+    end = createRegExp.escape(end || start);
+    start = createRegExp.escape(start);
+    const re = createRegExp`^(${start})+ | (${end})+$`.flags(`gm`);
+
+    return string.replace(re, ``);
+  });
 }
 
 function getWordBoundary(string) {
