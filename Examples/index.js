@@ -189,6 +189,7 @@ function printMethodExamples() {
     lastIndexOfEx(),
     prefixEx(),
     replaceWordsEx(),
+    trimEx(),
     truncateEx(),
     undoLastEx(),
   );
@@ -1307,6 +1308,44 @@ function truncateEx() {
     itemHeader(" .truncate({at:number, html:boolean=false, wordBoundary:boolean=false})"),
     allInOne,
     "method-truncate"
+  );
+}
+
+function trimEx() {
+  const str2Trim = "  *Hello world!**  ";
+  const [ex1, ex2, ex3, ex4] = [
+    $S(str2Trim).trim(),
+    $S(str2Trim).trim().trim(`*`),
+    $S(str2Trim).trim().trim(`*`, `!**`),
+    $S(str2Trim).trim().trim(null, `*`),
+  ];
+
+  return createChapter(
+    itemHeader(" .trim(start:string, end:string)"),
+    $S`Override of <code>String.prototype.trim</code>.
+      Trims the instance string value with or without parameters.`.toTag(`div`, `b5 normal`)
+    .append($S`
+      Without parameters it will behave like the usual <code>[someString].trim</code>
+      (so remove all <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#white_space"
+        >whitespace</a> from the start and end of the instance string).`
+      .toTag("div", "normal")
+      .append($S`When [start] (a character or string) is given, all values of <code>start</code>
+        will be removed from the start and end of the instance string`.toTag("div", "normal"))
+      .append($S`When [start] and [end] are given, all values of <code>start</code> will be
+        removed from the start of the instance string, the values of <code>end</code>
+        from its end`.toTag("div", "normal"))
+      .append($S`When [start] has no value and [end] is given, all values of <code>end</code>
+        will be removed from the end of the instance string`.toTag("div", "normal"))
+    )
+    .append(`<h4 class="between">Example</h4>`)
+    .append(exampleCode.trimExample)
+    .append($S`<div class="normal b5"><ul>
+      <li><code>str2Trim</code> => ${$S(str2Trim).qcd}</li>
+      <li><code>ex1</code> => ${ex1.qcd}</li>
+      <li><code>ex2</code> => ${ex2.qcd}</li>
+      <li><code>ex3</code> => ${ex3.qcd}</li>
+      <li><code>ex4</code> => ${ex4.qcd}</li></ul></div>`),
+    "method-trim"
   );
 }
 

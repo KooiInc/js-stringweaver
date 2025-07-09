@@ -268,3 +268,14 @@ const examplesObj = Object.keys($S.create.capitalize)
   .join(``);
 const examples = $S(examplesObj).enclose("&amp;lt;ul>", "&amp;lt;/ul>");
 </template>
+
+
+<template id="trimExample">
+const str2Trim = "  *Hello world!**  ";
+const [ex1, ex2, ex3, ex4] = [
+  $S(str2Trim).trim(),
+  $S(str2Trim).trim().trim(`*`),
+  $S(str2Trim).trim().trim(`*`, `!**`),
+  $S(str2Trim).trim().trim(null, `*`),
+];
+</template>
