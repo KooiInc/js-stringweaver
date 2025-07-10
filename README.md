@@ -23,10 +23,11 @@ The repository is moved to [Codeberg](https://codeberg.org/KooiInc/js-stringweav
 
 For now it is kept in sync with the original repository @[Github](https://github.com/KooiInc/js-stringweaver).
 
-Depending on prospective US/Microsoft/Github policies the Github version maybe discontinued in the future.
+Depending on prospective USA/Microsoft/Github policies the Github version maybe discontinued in the future.
 In other words, starting july 10 2025 the Codeberg repository is *authorative*.
 
-**<a target="_blank" href="https://kooiinc.codeberg.page/js-stringweaver/Examples/">Demonstration / Documentation</a>**
+**<a href="https://kooiinc.codeberg.page/js-stringweaver/Examples/">Demonstration / Documentation</a>**.
+**Idem [@Github](https://kooiinc.github.io/js-stringweaver/Examples)**
 
 ### Install module
 Use `npm install stringweaver` to install the module locally.
