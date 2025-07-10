@@ -18,7 +18,15 @@ A constructor to create *mutable* strings.
 - instances can use/chain native String getters/methods (e.g. `length`, `split`)
 - 100% test coverage
 
-**<a target="_blank" href="https://kooiinc.github.io/js-stringweaver/Examples">Demonstration / Documentation</a>**
+### Repository moved
+The repository is moved to [Codeberg](https://codeberg.org/KooiInc/js-stringweaver).
+
+For now it is kept in sync with the original repository @[Github](https://github.com/KooiInc/js-stringweaver).
+
+Depending on prospective US/Microsoft/Github policies the Github version maybe discontinued in the future.
+In other words, starting july 10 2025 the Codeberg repository is *authorative*.
+
+**<a target="_blank" href="https://kooiinc.codeberg.page/js-stringweaver/Examples/">Demonstration / Documentation</a>**
 
 ### Install module
 Use `npm install stringweaver` to install the module locally.
