@@ -1,5 +1,4 @@
 // noinspection JSValidateTypes
-
 const {
   $, $S, codeOverlay, exampleCode, SB,
   print2Document, useBundle, load} = await initialize({useBundle: true});
@@ -1407,10 +1406,19 @@ function createChapter(header, content, id) {
 }
 
 function printHeader() {
+  const href = location.href;
+  $.link({rel: `icon`, href: /github/i.test(href) ? "https://github.githubassets.com/favicons/favicon.png" : "./codebergicon.ico"})
+    .render.appendTo($(`head`));
+  const backLink =
+    /localhost/i.test(href)
+      ? $S`[Local test, no backlink ...]`
+    : /codeberg/i.test(href)
+      ? $S`<a class="ExternalLink arrow" data-backto="Codeberg repository"
+          target="_top" href="https://codeberg.org/KooiInc/js-stringweaver">Codeberg repository</a>`
+      : $S`<a class="ExternalLink arrow" data-backto="GitHub repository"
+          target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`;
   print2Document(
-    $S`<a class="ExternalLink arrow" data-backto="GitHub repository"
-        target="_top" href="https://github.com/KooiInc/js-stringweaver">GitHub repository</a>`
-      .value,
+    backLink.value,
     $S`js-stringweaver: a stringbuilder utility`.toTag(`h1`, `head`).value,
     createHeaderText(),
     createThisDocumentChapter(),
@@ -1461,7 +1469,7 @@ function createThisDocumentChapter() {
 }
 
 function createTopMenuElement() {
-  const back2TopElem = $.div_jql(
+  const back2TopElem = $.div(
     {class: "back-to-top"},
     $.div({class: "menu"},
       $.div({data:{action: "top"}}, "Page top"),
@@ -1477,7 +1485,7 @@ function createTopMenuElement() {
 
 async function createCodeElement($) {
   const code = await(fetch("./index.js")).then(res => res.text());
-  return $.div_jql(
+  return $.div(
     {id: "codeOverlay"},
     $.pre({class: "codebox", id: "overlayed"},
       $.code({class: "hljs language-javascript"},
@@ -1570,7 +1578,7 @@ function spaceIndicator() {
 async function fetchTemplates($S, $) {
   $.allowTag(`template`);
   return getCodeblocks(
-    $.div_jql(
+    $.div(
       await fetch(`./codeTemplates.txt`)
         .then(r => r.text()) ),
     $S );
@@ -1654,6 +1662,7 @@ function openAllContentDetails() {
 
 async function initialize({useBundle = false} = {}) {
   const load = pageLoadDurationFactory();
+  // DOMhelpers update 20250710
   const {$, logFactory} = await import("./DOMhelpers.min.js")
     .then(r => ({$: r.$, logFactory: r.logFactory}))
     .then(r => r);
@@ -1677,7 +1686,7 @@ function finish() {
   const toc = [];
   chapters.forEach((chapter) => {
     const lemmaX = chapter.id.split(`-`).pop();
-    const detailElem = $.details_jql(
+    const detailElem = $.details(
       {data: {toc: 1}},
       $.summary(chapter.textContent)
     );
@@ -1686,7 +1695,7 @@ function finish() {
       .forEach( lemma => {
         let text = $.node(`summary h3`, lemma).textContent;
         text = /\(/.test(text) ? text.slice(0, text.indexOf(`(`)+1).trim() + `...)` : text;
-        detailElem.append($.div_jql({class: "lemma", textContent: text, data: {linkTo: `#${lemma.id}`}}));
+        detailElem.append($.div({class: "lemma", textContent: text, data: {linkTo: `#${lemma.id}`}}));
       });
 
     toc.push(detailElem);
