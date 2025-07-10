@@ -1322,7 +1322,8 @@ function trimEx() {
   return createChapter(
     itemHeader(" .trim(start:string, end:string)"),
     $S`Override of <code>String.prototype.trim</code>.
-      Trims the instance string value with or without parameters.`.toTag(`div`, `b5 normal`)
+      Trims the instance string value with or without parameters.`
+    .toTag(`div`, `b5 normal`)
     .append($S`
       Without parameters it will behave like the usual <code>[someString].trim</code>
       (so remove all <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#white_space"
