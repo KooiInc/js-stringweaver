@@ -399,7 +399,7 @@ function createInternalLink(linkTo, linkToText, isCode) {
 function getCapitalizeExamples() {
   const examplesObj = Object.keys($S.create.capitalize).sort((a, b) => a.localeCompare(b))
     .reduce((acc, capitalizer) =>
-      [...acc, $S`<code>$S("hello World").capitalize.${capitalizer}"</code> => ${
+      [...acc, $S`<code>$S("hello World").capitalize.${capitalizer}</code> => ${
           $S`hello world`.capitalize[capitalizer].qcd}`.enclose(`<li>`, `</li>`)], [])
     .join(``);
   const examples = $S(examplesObj).enclose(`<ul>`, `</ul>`);
