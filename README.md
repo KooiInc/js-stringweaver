@@ -4,13 +4,20 @@
   <a target="_blank" href="https://www.npmjs.com/package/stringweaver"><img src="https://img.shields.io/npm/v/stringweaver.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
 </div>
 
+### *Moved to Codeberg.org
+> This repository is moved to [Codeberg.org](https://codeberg.org/KooiInc/js-stringweaver).
+>
+> For now it is kept in sync with the original repository @[Github](https://github.com/KooiInc/js-stringweaver).
+>
+> Depending on future USA/Microsoft/Github policies the Github version maybe discontinued later.
+>
+> In other words, *starting july 10 2025 the Codeberg repository is ***authorative****.
 
-## js-stringweaver - a js-stringbuilder
+## js-stringweaver
 
-A JS "stringbuilder" module
+An ES/JS "stringbuilder" utility module. The module delivers a constructor to create *mutable* strings.
 
-A constructor to create *mutable* strings.
-
+### Highlights
 - small footprint
 - extendable with custom getters/methods
 - retains history of changes
@@ -18,14 +25,7 @@ A constructor to create *mutable* strings.
 - instances can use/chain native String getters/methods (e.g. `length`, `split`)
 - 100% test coverage
 
-### Repository moved
-The repository is moved to [Codeberg](https://codeberg.org/KooiInc/js-stringweaver).
-
-For now it is kept in sync with the original repository @[Github](https://github.com/KooiInc/js-stringweaver).
-
-Depending on prospective USA/Microsoft/Github policies the Github version maybe discontinued in the future.
-In other words, starting july 10 2025 the Codeberg repository is *authorative*.
-
+### Documentation
 **<a href="https://kooiinc.codeberg.page/js-stringweaver/Examples/">Demonstration / Documentation</a>**.
 **Idem [@Github](https://kooiinc.github.io/js-stringweaver/Examples)**
 
