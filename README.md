@@ -22,7 +22,7 @@ An ES/JS "stringbuilder" utility module. The module delivers a constructor to cr
 - [x] extendable with custom getters/methods
 - [x] retains history of changes
 - [x] no external dependencies
-- [x] instances can use/chain native String getters/methods (e.g. `length`, `split`)
+- [x] instances can use and/or chain native String getters/methods (e.g. `replace`, `split`, `length`)
 - [x] 100% test coverage
 
 ### Documentation
