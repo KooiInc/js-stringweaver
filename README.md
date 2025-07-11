@@ -4,7 +4,7 @@
   <a target="_blank" href="https://www.npmjs.com/package/stringweaver"><img src="https://img.shields.io/npm/v/stringweaver.svg?labelColor=cb3837&logo=npm&color=dcfdd9"></a>
 </div>
 
-## *Moved to Codeberg.org
+> [!NOTE]
 > This repository is moved to [Codeberg.org](https://codeberg.org/KooiInc/js-stringweaver).
 >
 > For now it is kept in sync with the original repository @[Github](https://github.com/KooiInc/js-stringweaver).
