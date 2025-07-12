@@ -324,6 +324,21 @@ describe(`Basics constructor`, () => {
       assert.deepStrictEqual(re.re, /[a-z]|[0-3]/gi);
     });
 
+    it(`$S.regExp multiline comments as expected`, () => {
+      const re = $S.regExp`
+        /*
+          This comment should be removed
+          from the result (otherwise the
+          regular expression will throw an
+          error)
+        */
+        [a-z] // only lowercase a-z
+        | [0-3] // or numbers 0-3
+        ${["g", "i"]} // globally case insensitive`;
+      assert.strictEqual(re.valueOf().constructor, RegExp);
+      assert.deepStrictEqual(re.re, /[a-z]|[0-3]/gi);
+    });
+
     it(`$S.regExp flags as expected`, () => {
       const re = $S.regExp`
         [a-z] // only lowercase a-z
