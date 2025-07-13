@@ -32,21 +32,14 @@ An ES/JS "stringbuilder" utility module. The module delivers a constructor to cr
 ### Install module
 Use `npm install stringweaver` to install the module locally.
 
-### In browser
-In html
-```html
-  <script type="module" src="[location of index.js or index.min.js]"></script>
-  <!-- OR load minified directly from unpkg -->
-  <script
-      type="module"
-      src="https://app.unpkg.com/stringweaver@latest/files/Bundle/index.min.js">
-  </script>
-```
 ### Import/use (NodeJS or browser client file)
 ```javascript
-// note: for NodeJS, make sure the project is of type "module"
-// import as $S
+/* notes:
+   - make sure the script/node project is of type "module"
+   - the bundled module can be found @ https://unpkg.com/stringweaver/Bundle/index.min.js
+   - the module is imported as $S here */
 import $S from "[location of index.js or Bundle/index.min.js]";
+
 // assign the symbolic string extension
 const SB = Symbol.toSB;
 const myBrandNewString = $S`Hello`.append(" world");
