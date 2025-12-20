@@ -207,18 +207,18 @@ const examples = {
 </template>
 
 <template id="formatExample">
-const tableTemplate = $S(
-"&amp;lt;table>\
-  &amp;lt;caption>{caption}&amp;lt;/caption>\
-  &amp;lt;thead>\
+const tableTemplate = $S`
+&amp;lt;table>
+  &amp;lt;caption>{caption}&amp;lt;/caption>
+  &amp;lt;thead>
   &amp;lt;tr>
-    &amp;lt;th>#&amp;lt;/th>\
-    &amp;lt;th>prename&amp;lt;/th>\
-    &amp;lt;th>surname&amp;lt;/th>\
-  &amp;lt;/tr>\
-  &amp;lt;/thead>\
-  &amp;lt;tbody>{rows}&amp;lt;/tbody>\
-&amp;lt;/table>");
+    &amp;lt;th>#&amp;lt;/th>
+    &amp;lt;th>prename&amp;lt;/th>
+    &amp;lt;th>surname&amp;lt;/th>
+  &amp;lt;/tr>
+  &amp;lt;/thead>
+  &amp;lt;tbody>{rows}&amp;lt;/tbody>
+&amp;lt;/table>`;
 // the tokens used for tableRowTemplate
 const theNames = [
   { pre: "Mary", last: "Peterson" },

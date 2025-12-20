@@ -1017,6 +1017,7 @@ function formatEx() {
       .append(exampleTable),
     "method-format"
   );
+
 }
 
 function indexOfEx() {
@@ -1565,10 +1566,11 @@ function getCodeblocks(templates, $S) {
   const exampleBlocks = templates.find(`template[id]`);
 
   return [...exampleBlocks].reduce( (acc, block) => {
-    const codeTemplate = $S`<pre class="codebox"><code class="language-javascript">{code}</code></pre>`;
+    const codeTemplate = $S`<pre class="codebox"><code>{code}</code></pre>`;
     return {
       ...acc,
-      [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}` };
+      [block.id]: `${codeTemplate.clone.format({code: block.content.textContent.trim()})}`
+    };
   }, {});
 }
 
@@ -1580,19 +1582,19 @@ async function fetchTemplates($S, $) {
   $.allowTag(`template`);
   return getCodeblocks(
     $.div(
-      await fetch(`./codeTemplates.txt`)
-        .then(r => r.text()) ),
+      await fetch(`./codeTemplates.html`)
+        .then(r => $.escHtml(r.text())) ),
     $S );
 }
 
 function setDelegates($) {
-  $.delegate(`click`, `#codeVwr, #performance`, codeViewerAndPerformanceClickHandler);
+  $.handle({type: `click`, selector: `#codeVwr, #performance`, handler: codeViewerAndPerformanceClickHandler});
   $.delegate(`click`, `.back-to-top .menu [data-action]`, topMenuHandler);
   $.delegate(`click`, `[data-link-to]`, linkToLinkHandler);
 }
 
 
-function topMenuHandler(evt) {
+function topMenuHandler({evt}) {
   switch(evt.target.dataset.action) {
     case `content`: return $.node(`#TOCElem`).scrollIntoView({behavior: "smooth"});
     case `top`: return $.node(`#top`).scrollIntoView({behavior: "smooth"});
@@ -1610,11 +1612,14 @@ function topMenuHandler(evt) {
   }
 }
 
-function codeViewerAndPerformanceClickHandler(evt) {
-    if (evt.target.id === "performance") {
-      $.Popup.show({content: `<b class="spin">Working</b>`, modal: true});
-      return setTimeout(runAndReportPerformance);
+function codeViewerAndPerformanceClickHandler({me}) {
+    if (me.node.id === "performance") {
+      me.HTML.set(`<b class="spin">Working</b>`);
+      //setTimeout($.Popup.show({content: `<b class="spin">Working</b>`, modal: true}));
+      setTimeout(runAndReportPerformance);
+      return;
     }
+
     const bttn = evt.target;
     const parentLi = bttn.closest(`li`);
     const isVisible = bttn.dataset?.codeVisible === `visible`;
@@ -1633,7 +1638,7 @@ function codeViewerAndPerformanceClickHandler(evt) {
     return bttn.dataset.codeVisible = `visible`;
 }
 
-function linkToLinkHandler(_, me) {
+function linkToLinkHandler({me}) {
   const linkElement = $(me.data.get(`link-to`));
 
   if (!me.closest(`.lemma`).is.empty) {
@@ -1716,11 +1721,12 @@ function singlePerformanceTest() {
 }
 
 function runAndReportPerformance() {
-  const testResults = [...Array(10)].map(_ => singlePerformanceTest())
+  const testResults = [...Array(10)].map(_ => singlePerformanceTest());
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
-  $.Popup.show({content:
+  $(`#performance`).text(`Performance`);
+  return $.Popup.show({ content:
     $S.create
       .append($S`Page load`.toTag(`h3`, `head between`))
       .append($S`This examples page used the StringWeaver module to create the bulk of the html.`.asDiv)
@@ -1747,8 +1753,14 @@ function runAndReportPerformance() {
         Proxies are <a target="_blank" class="ExternalLink arrow"
             href="https://thecodebarbarian.com/thoughts-on-es6-proxies-performance">notoriously slow</a>.
         Still, if one does't need to manipulate hundreds of thousands of strings,
-        StringWeaver's performance should not get in the way`.asNote.asDiv)
-    .value});
+        StringWeaver's performance should not get in the way`.asNote.asDiv).value,
+  });
+}
+
+function debug(...things2Log) {
+  if (/localhost/i.test(location.href)) {
+    things2Log.forEach(thing => console.warn(thing));
+  }
 }
 
 function pageLoadDurationFactory() {
