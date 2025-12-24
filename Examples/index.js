@@ -1620,7 +1620,7 @@ function codeViewerAndPerformanceClickHandler({me}) {
       return;
     }
 
-    const bttn = evt.target;
+    const bttn = me.node;
     const parentLi = bttn.closest(`li`);
     const isVisible = bttn.dataset?.codeVisible === `visible`;
 
