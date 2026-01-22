@@ -1,6 +1,9 @@
 <div align="center">
 
-[![](https://badgen.net/bundlephobia/min/stringweaver)](https://bundlephobia.com/package/stringweaver)
+<!--
+  bundlephobia is probably a lost case
+  [![](https://badgen.net/bundlephobia/min/stringweaver)](https://bundlephobia.com/package/stringweaver)
+-->
 [![](https://img.shields.io/npm/v/stringweaver.svg?labelColor=cb3837&logo=npm&color=dcfdd9)](https://www.npmjs.com/package/stringweaver)
 [![](https://depx.co/api/badge/stringweaver)](https://depx.co/pkg/stringweaver)
 
