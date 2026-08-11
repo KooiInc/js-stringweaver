@@ -1446,7 +1446,7 @@ function createHeaderText() {
       Instances can use native String methods and a number of custom methods.
       <b>js-stringweaver</b> is programmed as a <a target="_blank"
           class="ExternalLink arrow"
-          href="https://depth-first.com/articles/2019/03/04/class-free-object-oriented-programming"
+          href="https://kooi.dev/ClassFreeArchived/"
           >class free object oriented</a> module (<a class="ExternalLink arrow"
           href="https://www.researchgate.net/publication/347727033_How_JavaScript_Works#pf83"
           >See also</a> (chapter 17))`
