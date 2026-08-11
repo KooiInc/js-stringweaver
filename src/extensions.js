@@ -92,7 +92,7 @@ function instanceCreator({initialstring} = {}) {
   function getTraps(extensions) {
     return {
       get( target, key ) {
-        return key in extensions
+        return Object.hasOwn(extensions, key)
           ? extensions[key]
           : canWrapNative(String(key))
             ? wrapNative(key)
