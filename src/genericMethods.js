@@ -224,7 +224,7 @@ function createExtendedCTOR(ctor, customMethods) {
       get() {
         return Object.entries(Object.getOwnPropertyDescriptors(instanceQuotGetters4Info.value))
           .sort( (a,b) => a[0].localeCompare(b[0]) )
-          .reduce((acc, [k, v]) => {
+          .reduce((acc, [k,]) => {
             if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
             if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
 
