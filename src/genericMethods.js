@@ -112,7 +112,8 @@ function quotGetters4Instance(instance, wrap) {
   return {
     value: {
       get backtick() { return instance.enclose(...quotingStyles.backtick); },
-      get bracket() { return instance.enclose(...quotingStyles.bracket); },
+      get parentheses() { return instance.enclose(...quotingStyles.parentheses); },
+      get curlyBrackets() { return instance.enclose(...quotingStyles.curlyBrackets); },
       get curlyDouble() { return instance.enclose(...quotingStyles.curlyDouble); },
       get curlyDoubleInward() { return instance.enclose(...quotingStyles.curlyDoubleInward); },
       get curlyDoubleEqual() { return instance.enclose(...quotingStyles.curlyDoubleEqual); },
@@ -145,7 +146,8 @@ function defineQuotingStyles() {
   // see https://en.wikipedia.org/wiki/Quotation_mark
   const quots = {
     backtick: ["`", "`"],
-    bracket: [`{`, `}`],
+    parentheses: [`(`, `)`],
+    curlyBrackets: [`{`, `}`],
     curlyDoubleInward: [`”`, `“`],
     curlyDouble: [`“`, `”`],
     curlyDoubleEqual: [`“`, `“`],
@@ -226,8 +228,8 @@ function createExtendedCTOR(ctor, customMethods) {
             if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
             if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
 
-            const val = ctor(` [instance] `).quote[k];
-            return [...acc, `[instance].quote.${k} (${val})`];
+            const val = ctor(`[instance]`).quote[k];
+            return [...acc, `[instance].quote.${k} ( ${val} )`];
           }, []);
       }
     },
