@@ -1668,7 +1668,6 @@ function openAllContentDetails() {
 
 async function initialize({useBundle = false} = {}) {
   const load = pageLoadDurationFactory();
-  // DOMhelpers update 20250710
   const {$, logFactory} = await import("./DOMhelpers.min.js")
     .then(r => ({$: r.$, logFactory: r.logFactory}))
     .then(r => r);
