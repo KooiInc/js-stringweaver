@@ -254,13 +254,14 @@ function initStyling($, $S) {
       z-index: 5;
       border: 1px solid #777;
       text-align: center;
-      padding: 2px 2px 4px;
+      padding: 0 6px;
       border-radius: 4px;
       .menu {
         text-align: left;
         position: absolute;
         opacity: 0;
         left: -200vw;
+        font-family: system-ui, sans-serif;
       }
       .menu [data-action] {
         margin: 0.2rem 0;
