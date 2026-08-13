@@ -23,7 +23,7 @@ function printInitializationExamples() {
   const ex2 = "hello world"[SB].append(`!`).firstUp;
   const wrld = `world`;
   const ex3 = `hello ${wrld}`[SB].firstUp.quote.custom(`¡`, `!`);
-  const allExamples = [
+  let allExamples = [
        $S.create
       .append($S`js-stringweaver 'constructor' was imported as <code>$S</code>`.asNote.asDiv)
       .append($S`output string values in this document are intentionally `
@@ -137,6 +137,7 @@ function printInitializationExamples() {
     chapterHeader("Initialization", "chapter-initialization"),
     ...allExamples);
   $(`#chapter-initialization`).data.set({chapterTop: "1"});
+  allExamples = null;
 }
 
 function printStaticConstructorFunctionExamples() {
@@ -1720,7 +1721,7 @@ function singlePerformanceTest() {
 }
 
 function runAndReportPerformance() {
-  const testResults = [...Array(10)].map(_ => singlePerformanceTest());
+  let testResults = [...Array(10)].map(_ => singlePerformanceTest());
   const mean = testResults.reduce((acc, val) => acc + val, 0) / 10;
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
@@ -1754,6 +1755,7 @@ function runAndReportPerformance() {
         Still, if one does't need to manipulate hundreds of thousands of strings,
         StringWeaver's performance should not get in the way`.asNote.asDiv).value,
   });
+  testResults = null;
 }
 
 function debug(...things2Log) {
