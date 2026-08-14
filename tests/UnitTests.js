@@ -49,16 +49,16 @@ describe(`Basics constructor`, () => {
           "isValue": true
         },
         "info": {
-          "isGetter": true,
-          "isValue": false
+          "isGetter": false,
+          "isValue": true,
         },
         "keys": {
           "isGetter": true,
           "isValue": false
         },
         "quoteInfo": {
-          "isGetter": true,
-          "isValue": false
+          "isGetter": false,
+          "isValue": true,
         },
         "uuid4": {
           "isGetter": true,
@@ -253,26 +253,28 @@ describe(`Basics constructor`, () => {
 
     it(`$S.keys.quoteInfo as expected`, () => {
       const shouldBe = [
-        '[instance].quote.backtick (` [instance] `)',
-        '[instance].quote.bracket ({ [instance] })',
-        '[instance].quote.curlyDouble (“ [instance] ”)',
-        '[instance].quote.curlyDoubleEqual (“ [instance] “)',
-        '[instance].quote.curlyDoubleInward (” [instance] “)',
-        '[instance].quote.curlyLHDoubleInward („ [instance] “)',
-        '[instance].quote.curlyLHSingle (‚ [instance] ’)',
-        '[instance].quote.curlyLHSingleInward (‚ [instance] ‘)',
-        '[instance].quote.curlySingle (‛ [instance] ’)',
-        '[instance].quote.curlySingleEqual (‛ [instance] ‛)',
-        '[instance].quote.curlySingleInward (’ [instance] ‛)',
-        '[instance].quote.custom(start:string, end:string)',
-        '[instance].quote.double (" [instance] ")',
-        '[instance].quote.guillemets (« [instance] »)',
-        '[instance].quote.guillemetsInward (» [instance] «)',
-        '[instance].quote.guillemetsSingle (‹ [instance] ›)',
-        '[instance].quote.guillemetsSingleInward (› [instance] ‹)',
-        '[instance].quote.remove (only predefined)',
-        "[instance].quote.single (' [instance] ')",
-        '[instance].quote.squareBrackets ([ [instance] ])' ];
+        "[instance].quote.backtick ( `[instance]` )",
+        "[instance].quote.curlyBrackets ( {[instance]} )",
+        "[instance].quote.curlyDouble ( “[instance]” )",
+        "[instance].quote.curlyDoubleEqual ( “[instance]“ )",
+        "[instance].quote.curlyDoubleInward ( ”[instance]“ )",
+        "[instance].quote.curlyLHDoubleInward ( „[instance]“ )",
+        "[instance].quote.curlyLHSingle ( ‚[instance]’ )",
+        "[instance].quote.curlyLHSingleInward ( ‚[instance]‘ )",
+        "[instance].quote.curlySingle ( ‛[instance]’ )",
+        "[instance].quote.curlySingleEqual ( ‛[instance]‛ )",
+        "[instance].quote.curlySingleInward ( ’[instance]‛ )",
+        "[instance].quote.custom(start:string, end:string)",
+        "[instance].quote.double ( \"[instance]\" )",
+        "[instance].quote.guillemets ( «[instance]» )",
+        "[instance].quote.guillemetsInward ( »[instance]« )",
+        "[instance].quote.guillemetsSingle ( ‹[instance]› )",
+        "[instance].quote.guillemetsSingleInward ( ›[instance]‹ )",
+        "[instance].quote.parentheses ( ([instance]) )",
+        "[instance].quote.remove (only predefined)",
+        "[instance].quote.single ( '[instance]' )",
+        "[instance].quote.squareBrackets ( [[instance]] )"
+      ];
       assert.deepStrictEqual($S.quoteInfo, shouldBe);
     });
 
@@ -933,7 +935,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
       assert.deepStrictEqual(testme, [
         "backtick: `quoting`",
-        "bracket: {quoting}",
+        "parentheses: (quoting)",
+        "curlyBrackets: {quoting}",
         "curlyDouble: “quoting”",
         "curlyDoubleInward: ”quoting“",
         "curlyDoubleEqual: “quoting“",
@@ -958,7 +961,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`quotingStyles.re is what we expect`, () => {
       assert.deepStrictEqual(
         quotingStyles.re,
-        /^[\`\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]|[\`\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]$/g);
+        /^[\`\(\)\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]|[\`\(\)\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]$/g
+      );
     });
 
     it(`[instance.quote.remove for all possibilities as expected]`, () => {
@@ -973,7 +977,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       });
       assert.deepStrictEqual(testme, [
         "backtick: quoting",
-        "bracket: quoting",
+        "parentheses: quoting",
+        "curlyBrackets: quoting",
         "curlyDouble: quoting",
         "curlyDoubleInward: quoting",
         "curlyDoubleEqual: quoting",
