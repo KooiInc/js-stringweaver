@@ -1,4 +1,3 @@
-// v1.2.6
 export default Object.defineProperties(instanceCreator, {escape: {value: escape4RE, enumerable: true}});
 
 function instanceCreator(regExStr, ...args) {
@@ -28,7 +27,7 @@ function createInstance(regExp) {
     flags: { value(flags) { regExp = modifyFlags(flags, regExp); return instance; }, enumerable: false },
     clone: { get() { return clone(instance); }, enumerable: false },
   }), getterTrap(regExp) );
-
+  
   return instance;
 }
 

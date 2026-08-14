@@ -1,7 +1,8 @@
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
-import interpolate from "./Factories/interpolateFactory.js";
+import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import createInstance from "./extensions.js";
+import {capitalizerFactory} from "./instanceMethods.js";
 const customMethods = {};
 const quotingStyles = defineQuotingStyles();
 
@@ -67,7 +68,7 @@ function infoValue(key, infoValue) {
 }
 
 function getPlainValues() {
-  const capitalizerKeys = Object.keys(CustomStringConstructor.create.capitalize);
+  const capitalizerKeys = Object.keys(capitalizerFactory());
   return {
     value: `getter/setter`,
     clone: `chainable getter`,
@@ -175,14 +176,27 @@ function defineQuotingStyles() {
   return quots;
 }
 
+function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
+  return Object.entries(Object.getOwnPropertyDescriptors(instanceQuotGetters4Info.value))
+    .sort( (a,b) => a[0].localeCompare(b[0]) )
+    .reduce((acc, [k,]) => {
+      if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
+      if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
+
+      const val = ctor(`[instance]`).quote[k];
+      return [...acc, `[instance].quote.${k} ( ${val} )`];
+    }, []);
+}
+
 function createExtendedCTOR(ctor, customMethods) {
-  const instanceQuotGetters4Info = quotGetters4Instance(ctor());
+  const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
+  const swInfo = getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`));
   Symbol.toSB = Symbol.for(`toStringBuilder`);
   Object.defineProperty(String.prototype, Symbol.toSB, {
     get() { return ctor(this); },
     enumerable: false,
     configurable: false });
-  const notChainable =  `constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`);
+
   Object.defineProperties(ctor, {
     create: {
       get() { return ctor(); },
@@ -210,9 +224,7 @@ function createExtendedCTOR(ctor, customMethods) {
         }
       }
     },
-    info: {
-      get() { return getSWInformation(notChainable); }
-    },
+    info: { value: swInfo, },
     keys: {
       get() {
         return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``))
@@ -220,22 +232,8 @@ function createExtendedCTOR(ctor, customMethods) {
           .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v);
       }
     },
-    quoteInfo: {
-      get() {
-        return Object.entries(Object.getOwnPropertyDescriptors(instanceQuotGetters4Info.value))
-          .sort( (a,b) => a[0].localeCompare(b[0]) )
-          .reduce((acc, [k,]) => {
-            if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
-            if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
-
-            const val = ctor(`[instance]`).quote[k];
-            return [...acc, `[instance].quote.${k} ( ${val} )`];
-          }, []);
-      }
-    },
-    uuid4: {
-      get() { return CustomStringConstructor(uuid4()); }
-    },
+    quoteInfo: { value: quoteInfo },
+    uuid4: { get() { return CustomStringConstructor(uuid4()); } },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
         return CustomStringConstructor(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic}));
@@ -244,7 +242,7 @@ function createExtendedCTOR(ctor, customMethods) {
     regExp: { value: createRegExp }
   });
 
-  return ctor;
+  return;
 }
 
 function checkType(type, item, includeInstances) {

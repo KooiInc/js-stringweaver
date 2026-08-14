@@ -1,7 +1,7 @@
 // noinspection JSValidateTypes
 const {
   $, $S, codeOverlay, exampleCode, SB,
-  print2Document, useBundle, load} = await initialize({useBundle: true});
+  print2Document, useBundle, load} = await initialize({useBundle: false});
 main();
 
 function main() {
@@ -141,7 +141,7 @@ function printInitializationExamples() {
 }
 
 function printStaticConstructorFunctionExamples() {
-  print2Document(
+  let allChapters = [
     chapterHeader(`Static constructor properties/methods`, "chapter-static"),
     addCustomEx(),
     constructorEx(),
@@ -152,11 +152,13 @@ function printStaticConstructorFunctionExamples() {
     randomStringEx(),
     regExpEx(),
     uuid4Ex(),
-  );
+  ];
+  print2Document(...allChapters);
+  allChapters = null;
 }
 
 function printGetterExamples() {
-  print2Document(
+  let allChapters = [
     chapterHeader("Instance getters", "chapter-getter"),
     camelCaseEx(),
     capitalizeEx(),
@@ -174,11 +176,13 @@ function printGetterExamples() {
     undoAllEx(),
     valueEx(),
     wordsUCFirst()
-  );
+  ]
+  print2Document(...allChapters);
+  allChapters = null;
 }
 
 function printMethodExamples() {
-  print2Document(
+  let allChapters = [
     chapterHeader("Instance methods", "chapter-method"),
     appendEx(),
     encloseEx(),
@@ -192,7 +196,9 @@ function printMethodExamples() {
     trimEx(),
     truncateEx(),
     undoLastEx(),
-  );
+  ];
+  print2Document(...allChapters);
+  allChapters = null;
 }
 
 /* region static constructor function examples */
@@ -1616,9 +1622,7 @@ function topMenuHandler({evt}) {
 function codeViewerAndPerformanceClickHandler({me}) {
     if (me.node.id === "performance") {
       me.HTML.set(`<b class="spin">Working</b>`);
-      //setTimeout($.Popup.show({content: `<b class="spin">Working</b>`, modal: true}));
-      setTimeout(runAndReportPerformance);
-      return;
+      return setTimeout(runAndReportPerformance);
     }
 
     const bttn = me.node;
@@ -1631,7 +1635,7 @@ function codeViewerAndPerformanceClickHandler({me}) {
     }
 
     if (!parentLi.querySelector(`#codeOverlay`)) {
-      codeOverlay.toDOM(parentLi).appendTo($(bttn).parent);
+      codeOverlay.renderTo($(bttn).parent);
       hljs.highlightElement($.node(`#overlayed code`));
     }
 
@@ -1726,7 +1730,7 @@ function runAndReportPerformance() {
   const sd = Math.sqrt(testResults.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0));
   const perSecond = Math.round(1000/mean);
   $(`#performance`).text(`Performance`);
-  return $.Popup.show({ content:
+  $.Popup.show({ content:
     $S.create
       .append($S`Page load`.toTag(`h3`, `head between`))
       .append($S`This examples page used the StringWeaver module to create the bulk of the html.`.asDiv)
@@ -1755,7 +1759,8 @@ function runAndReportPerformance() {
         Still, if one does't need to manipulate hundreds of thousands of strings,
         StringWeaver's performance should not get in the way`.asNote.asDiv).value,
   });
-  testResults = null;
+   testResults = null;
+  return;
 }
 
 function debug(...things2Log) {
@@ -1768,7 +1773,7 @@ function pageLoadDurationFactory() {
   let startTime = performance.now();
   let pageDuration = 0;
   return {
-    get duration() {return pageDuration;},
+    get duration() { return pageDuration; },
     done() { pageDuration = performance.now() - startTime; },
   };
 }
