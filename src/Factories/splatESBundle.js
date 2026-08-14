@@ -1,1 +1,194 @@
-var u=h(),v=p(),N=p("");window.IS=u;function p(r,f={}){let{useSymbolicExtensions:a}=f;return r=u(r,String,Number)?String(r):void 0,a&&O(),function(n,...t){return d(n,y(t))};function s(n,t){return t&&u(r,String,Number)?String(r):`{${n}}`}function e(n,t){let i=n in t;return i&&u(t[n],String,Number)?String(t[n]):s(n,i)}function o(n){return(...t)=>{let i=t.find(c=>c.key);return e(i?i.key:"_",n)}}function l(n,t){return n.replace(/\{(?<key>[a-z_\d]+)}/gim,o(t))}function b(n){let t=[];return Object.entries(n).forEach(([i,c])=>{c.forEach((m,S)=>(t[S]??={},t[S][i]=m))}),t}function g(n){return n.length===1&&Object.values(n[0]).every(Array.isArray)}function y(n){return g(n)?b(n[0]):n}function d(n,t){let i=t?.length?t.filter(c=>u(c,Object)).map((c,m)=>l(n,{...c,index:m+1})).join(""):n;return u(r,void 0)?i:i.replace(/\{[a-z_\d].+\}/gim,String(r))}}function O(){return String.prototype[Symbol.for("interpolate")]||Object.defineProperties(String.prototype,{[Symbol.for("interpolate")]:{value(...r){return v(this,...r)}},[Symbol.for("interpolate$")]:{value(...r){return N(this,...r)}}}),[Symbol.for("interpolate"),Symbol.for("interpolate$")]}function h(){let r=new Intl.Collator("en",{sensitivity:"base"}),f=e=>typeof e=="function"?e?.name||e?.constructor?.name:"noCTOR";function a(e,o){return o===Number&&(Number.isNaN(e)||!Number.isFinite(e))?!1:r.compare(Object.prototype.toString.call(e),`[object ${f(o)}]`)===0||e?.name===o?.name}function s(e,...o){if(o.length>1){for(let l of o)if(a(e,l))return!0;return!1}return a(e,o?.shift())}return s}export{O as addSymbolicStringExtensions,v as default,N as interpolateClear,p as interpolateFactory};
+const IS = typeCheckFactory();
+const interpolateDefault = interpolateFactory();
+const interpolateClear = interpolateFactory("");
+
+export {
+  interpolateDefault as default,
+  interpolateClear,
+  addSymbolicStringExtensions,
+  interpolateFactory,
+};
+
+/**
+ * Factory function to create an interpolate function with a default replacer.
+ * @param {string|number} defaultReplacer - Default value to use for missing tokens.
+ * @returns {Function} - The interpolation function.
+ */
+function interpolateFactory(defaultReplacer, specs = {}) {
+  const {useSymbolicExtensions} = specs;
+  defaultReplacer = IS(defaultReplacer, String, Number) ?
+    String(defaultReplacer) : undefined;
+  
+  if (!!useSymbolicExtensions) {
+    addSymbolicStringExtensions();
+  }
+  
+  /**
+   * Main interpolation function.
+   * @param {string} str - The string with placeholders.
+   * @param {...object} tokens - Objects containing replacement values.
+   * @returns {string} - The interpolated string.
+   */
+  return function(str, ...tokens) {
+    return interpolate(str, processTokens(tokens));
+  }
+  
+  /**
+   * Handle invalid keys by returning the default replacer or the key in braces.
+   * @param {string} key - The placeholder key.
+   * @param {boolean} keyExists - Flag indicating if the key exists in the token.
+   * @returns {string} - The replacement value.
+   */
+  function invalidate(key, keyExists) {
+    if (keyExists && IS(defaultReplacer, String, Number)) {
+      return String(defaultReplacer);
+    }
+    
+    return `{${key}}`;
+  }
+  
+  /**
+   * Get the replacement value for a key from the token.
+   * @param {string} key - The placeholder key.
+   * @param {object} token - The token object containing replacement values.
+   * @returns {string} - The replacement value.
+   */
+  function replacement(key, token) {
+    const isValid = key in token;
+    return isValid && IS(token[key], String, Number) ? String(token[key]) : invalidate(key, isValid);
+  }
+  
+  /**
+   * Create a lambda function for replacing placeholders in the string.
+   * @param {object} token - The token object containing replacement values.
+   * @returns {Function} - The replacer lambda function.
+   */
+  function getReplacerLambda(token) {
+    return (...args) => {
+      const replacementObject = args.find(a => a.key);
+      return replacement((replacementObject ? replacementObject.key : `_`), token);
+    };
+  }
+  
+  /**
+   * Replace placeholders in the string with values from the token.
+   * @param {string} str - The string with placeholders.
+   * @param {object} token - The token object containing replacement values.
+   * @returns {string} - The interpolated string.
+   */
+  function replace(str, token) {
+    return str.replace(/\{(?<key>[a-z_\d]+)}/gim, getReplacerLambda(token));
+  }
+  
+  /**
+   * Convert token object to array of token Objects
+   * when it's values are arrays of values.
+   * @param {object} tokenObject - The token object containing arrays of values.
+   * @returns {object[]} - Array of token objects.
+   */
+  function convertTokensFromArrayValues(tokenObject) {
+    const converted = [];
+    
+    Object.entries(tokenObject).forEach(([key, value]) => {
+      value.forEach((v, i) => (converted[i] ??= {}, converted[i][key] = v));
+    });
+    
+    return converted;
+  }
+  
+  /**
+   * Check if single token and its values are arrays.
+   * @param {object[]} tokens - The tokens to check.
+   * @returns {boolean} - True if tokens contains one Object
+   *  and all it's values are of type Array.
+   */
+  function isMultiLineWithArrays(tokens) {
+    return tokens.length === 1 && Object.values(tokens[0]).every(Array.isArray);
+  }
+  
+  /**
+   * Process tokens to handle multi-line formats.
+   * @param {object[]} tokens - The tokens to process.
+   * @returns {object[]} - Processed tokens.
+   */
+  function processTokens(tokens) {
+    return isMultiLineWithArrays(tokens) ? convertTokensFromArrayValues(tokens[0]) : tokens;
+  }
+  
+  /**
+   * Interpolate the string with the given tokens.
+   * @param {string} str - The string with placeholders.
+   * @param {object[]} tokens - The tokens containing replacement values.
+   * @returns {string} - The interpolated string.
+   */
+  function interpolate(str, tokens) {
+    const injected = !tokens?.length ? str : tokens
+      .filter(token => IS(token, Object))
+      .map((token, i) => replace(str, {...token, index: i + 1}))
+      .join(``);
+    
+    return IS(defaultReplacer, undefined)
+      ? injected : injected.replace(/\{[a-z_\d].+\}/gim, String(defaultReplacer));
+  }
+}
+
+/**
+ * Extend String.prototype using the above two
+ * interpolate methods.
+ * Note: Symbols are unique, so there is no risk the
+ * methods will conflict with native String methods or
+ * methods in other ES libraries.
+ */
+function addSymbolicStringExtensions() {
+  if (!String.prototype[Symbol.for(`interpolate`)]) {
+    Object.defineProperties(String.prototype, {
+      [Symbol.for(`interpolate`)]: {
+        value(...args) {
+          return interpolateDefault(this, ...args);
+        }
+      },
+      [Symbol.for(`interpolate$`)]: {
+        value(...args) {
+          return interpolateClear(this, ...args);
+        }
+      },
+    });
+  }
+  
+  return [Symbol.for("interpolate"), Symbol.for(`interpolate$`)];
+}
+
+/**
+ * Simple 'type' checking factory
+ * @returns {(function(*, ...[*]): (boolean|*))|*}
+ */
+function typeCheckFactory() {
+  const collate = new Intl.Collator(`en`, {sensitivity: 'base'});
+  const nameOf = type2Check => typeof type2Check === `function`
+    ? type2Check?.name || type2Check?.constructor?.name : `noCTOR`;
+  
+  function checkSingleType(obj, type2Check) {
+    if (type2Check === Number && (Number.isNaN(obj) || !Number.isFinite(obj))) {
+      return false;
+    }
+    
+    return 0 === collate.compare(
+      Object.prototype.toString.call(obj),
+      `[object ${nameOf(type2Check)}]`
+    ) || obj?.name === type2Check?.name;
+  }
+  
+  function checkType(obj, ...type2Check) {
+    if (type2Check.length > 1) {
+      for (const chkType of type2Check) {
+        if (checkSingleType(obj, chkType)) { return true; }
+      }
+      
+      return false;
+    }
+    
+    return checkSingleType(obj, type2Check?.shift());
+  }
+  
+  return checkType;
+}

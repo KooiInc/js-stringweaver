@@ -191,11 +191,16 @@ function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
 function createExtendedCTOR(ctor, customMethods) {
   const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
   const swInfo = getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`));
-  Symbol.toSB = Symbol.for(`toStringBuilder`);
-  Object.defineProperty(String.prototype, Symbol.toSB, {
-    get() { return ctor(this); },
-    enumerable: false,
-    configurable: false });
+  Symbol.toSB = Symbol(`toStringBuilder`);
+  Object.defineProperty(
+    String.prototype,
+    Symbol.toSB, {
+      get() { return ctor(this); },
+      enumerable: false,
+      configurable: false
+    }
+  );
+
 
   Object.defineProperties(ctor, {
     create: {

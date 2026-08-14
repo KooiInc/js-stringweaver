@@ -1,7 +1,7 @@
 // noinspection JSValidateTypes
 const {
   $, $S, codeOverlay, exampleCode, SB,
-  print2Document, useBundle, load} = await initialize({useBundle: false});
+  print2Document, useBundle, load} = await initialize({useBundle: true});
 main();
 
 function main() {
@@ -1012,8 +1012,8 @@ function formatEx() {
       <code>{[key]}</code>) with values from the <code>token</code>(s) given.`.toTag("div", "normal b5")
 
       .appendDiv(`b5`,
-        $S`Visit the <a target="_blank" class="externalLink arrow" href="https://github.com/KooiInc/StringInterpolator"
-      >StringInterpolator</a>  module to learn more.`)
+        $S`Visit the <a target="_blank" class="externalLink arrow" href="https://codeberg.org/KooiInc/splatES"
+      >SplatES</a> module to learn more.`)
 
       .append(exampleCode.formatExample)
 
