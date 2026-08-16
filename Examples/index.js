@@ -1644,15 +1644,15 @@ function codeViewerAndPerformanceClickHandler({me}) {
 }
 
 function linkToLinkHandler({me}) {
-  const linkElement = $(me.data.get(`link-to`));
-
+  const linkElement = $(me.data.get(`link-to`).toLowerCase());
+  console.log(linkElement.node);
   if (!me.closest(`.lemma`).is.empty) {
     $(`[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
   }
 
   linkElement.first().open = true;
-  return linkElement.showOnTop();
+  return linkElement.node.scrollIntoView({behavior: "smooth"});
 }
 
 function checkScrollPositionBeyondLastExample() {
