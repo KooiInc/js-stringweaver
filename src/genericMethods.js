@@ -1,7 +1,7 @@
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
-import createInstance from "./extensions.js";
+import createInstance from "./instanceCreator.js";
 import {capitalizerFactory} from "./instanceMethods.js";
 const customMethods = {};
 const quotingStyles = defineQuotingStyles();
