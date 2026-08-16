@@ -14,15 +14,14 @@ export {
  * @param {string|number} defaultReplacer - Default value to use for missing tokens.
  * @returns {Function} - The interpolation function.
  */
-function interpolateFactory(defaultReplacer, specs = {}) {
-  const {useSymbolicExtensions} = specs;
+function interpolateFactory(defaultReplacer, { useSymbolicExtensions = false } = {}) {
   defaultReplacer = IS(defaultReplacer, String, Number) ?
     String(defaultReplacer) : undefined;
-  
+
   if (!!useSymbolicExtensions) {
     addSymbolicStringExtensions();
   }
-  
+
   /**
    * Main interpolation function.
    * @param {string} str - The string with placeholders.
@@ -32,7 +31,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
   return function(str, ...tokens) {
     return interpolate(str, processTokens(tokens));
   }
-  
+
   /**
    * Handle invalid keys by returning the default replacer or the key in braces.
    * @param {string} key - The placeholder key.
@@ -43,10 +42,10 @@ function interpolateFactory(defaultReplacer, specs = {}) {
     if (keyExists && IS(defaultReplacer, String, Number)) {
       return String(defaultReplacer);
     }
-    
+
     return `{${key}}`;
   }
-  
+
   /**
    * Get the replacement value for a key from the token.
    * @param {string} key - The placeholder key.
@@ -57,7 +56,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
     const isValid = key in token;
     return isValid && IS(token[key], String, Number) ? String(token[key]) : invalidate(key, isValid);
   }
-  
+
   /**
    * Create a lambda function for replacing placeholders in the string.
    * @param {object} token - The token object containing replacement values.
@@ -69,7 +68,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
       return replacement((replacementObject ? replacementObject.key : `_`), token);
     };
   }
-  
+
   /**
    * Replace placeholders in the string with values from the token.
    * @param {string} str - The string with placeholders.
@@ -79,7 +78,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
   function replace(str, token) {
     return str.replace(/\{(?<key>[a-z_\d]+)}/gim, getReplacerLambda(token));
   }
-  
+
   /**
    * Convert token object to array of token Objects
    * when it's values are arrays of values.
@@ -88,14 +87,14 @@ function interpolateFactory(defaultReplacer, specs = {}) {
    */
   function convertTokensFromArrayValues(tokenObject) {
     const converted = [];
-    
+
     Object.entries(tokenObject).forEach(([key, value]) => {
       value.forEach((v, i) => (converted[i] ??= {}, converted[i][key] = v));
     });
-    
+
     return converted;
   }
-  
+
   /**
    * Check if single token and its values are arrays.
    * @param {object[]} tokens - The tokens to check.
@@ -105,7 +104,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
   function isMultiLineWithArrays(tokens) {
     return tokens.length === 1 && Object.values(tokens[0]).every(Array.isArray);
   }
-  
+
   /**
    * Process tokens to handle multi-line formats.
    * @param {object[]} tokens - The tokens to process.
@@ -114,7 +113,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
   function processTokens(tokens) {
     return isMultiLineWithArrays(tokens) ? convertTokensFromArrayValues(tokens[0]) : tokens;
   }
-  
+
   /**
    * Interpolate the string with the given tokens.
    * @param {string} str - The string with placeholders.
@@ -126,7 +125,7 @@ function interpolateFactory(defaultReplacer, specs = {}) {
       .filter(token => IS(token, Object))
       .map((token, i) => replace(str, {...token, index: i + 1}))
       .join(``);
-    
+
     return IS(defaultReplacer, undefined)
       ? injected : injected.replace(/\{[a-z_\d].+\}/gim, String(defaultReplacer));
   }
@@ -155,7 +154,7 @@ function addSymbolicStringExtensions() {
       },
     });
   }
-  
+
   return [Symbol.for("interpolate"), Symbol.for(`interpolate$`)];
 }
 
@@ -167,7 +166,7 @@ function typeCheckFactory() {
   const collate = new Intl.Collator(`en`, {sensitivity: 'base'});
   const nameOf = type2Check => typeof type2Check === `function`
     ? type2Check?.name || type2Check?.constructor?.name : `noCTOR`;
-  
+
   /**
    * check obj to be of [type2Check]
    * @param {*} obj
@@ -178,13 +177,13 @@ function typeCheckFactory() {
     if (type2Check === Number && (Number.isNaN(obj) || !Number.isFinite(obj))) {
       return false;
     }
-    
+
     return 0 === collate.compare(
       Object.prototype.toString.call(obj),
       `[object ${nameOf(type2Check)}]`
     ) || obj?.name === type2Check?.name;
   }
-  
+
   /**
    *
    * @param {*} obj
@@ -196,12 +195,12 @@ function typeCheckFactory() {
       for (const chkType of type2Check) {
         if (checkSingleType(obj, chkType)) { return true; }
       }
-      
+
       return false;
     }
-    
+
     return checkSingleType(obj, type2Check?.shift());
   }
-  
+
   return checkType;
 }
