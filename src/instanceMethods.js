@@ -1,13 +1,9 @@
+import { customMethods, clone, } from "./CTORCreator.js";
+
 import {
-  isArrayOf,
-  isNumber,
-  quotGetters4Instance as quotGetters,
-  getStringValue,
-  escapeRE,
-  customMethods,
-  interpolate,
-  createRegExp as $RE,
-  clone } from "./genericMethods.js";
+  createRegExp as $RE, getStringValue, isArrayOf, interpolate,
+  isNumber, escapeRE, quotGetters4Instance as quotGetters,
+} from "./helpers.js";
 
 export {
   format,
@@ -30,7 +26,6 @@ export {
   surroundWith,
   customMethods,
   clone,
-  capitalizerFactory,
   trim,
 };
 
@@ -214,33 +209,4 @@ function append(string, ...strings2Append) {
   }
 
   return getStringValue(string);
-}
-
-function capitalizerFactory(instance, wrap) {
-  return {
-    get full() {
-      return wrap(instance.value.toUpperCase());
-    },
-    get none() {
-      return wrap(instance.value.toLowerCase());
-    },
-    get camel() {
-      return wrap(parseCamelcase(instance.value));
-    },
-    get snake() {
-      return wrap(parseSnakeCase(instance.value));
-    },
-    get first() {
-      return wrap(ucFirst(instance.value));
-    },
-    get kebab() {
-      return wrap(parseKebabCase(instance.value));
-    },
-    get words() {
-      return wrap(wordsFirstUp(instance.value));
-    },
-    get dashed() {
-      return wrap(parseKebabCase(instance.value));
-    },
-  }
 }

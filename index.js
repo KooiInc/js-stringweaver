@@ -1,4 +1,3 @@
-import { CustomStringConstructor } from "./src/genericMethods.js";
-const defaultStringCTOR = CustomStringConstructor;
+import { CustomStringConstructor as defaultStringCTOR} from "./src/CTORCreator.js";
 
-export {defaultStringCTOR as default, CustomStringConstructor};
+export default defaultStringCTOR;

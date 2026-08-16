@@ -20,12 +20,11 @@ import {
   isNumber,
   clone,
   trim,
-  capitalizerFactory,
 } from "./instanceMethods.js";
 
-export default instanceCreator;
+import { capitalizerFactory, deprecatedRE } from "./helpers.js";
 
-const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i
+export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
   let customStringExtensions = { };
