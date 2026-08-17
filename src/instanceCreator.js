@@ -102,8 +102,7 @@ function instanceCreator({initialstring} = {}) {
   }
 
   function canWrapNative(key) {
-    return !deprecatedRE.test(key)
-      && key in String.prototype;
+    return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
   }
 
   function wrapNative(key) {
