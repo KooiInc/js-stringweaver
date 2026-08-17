@@ -91,11 +91,12 @@ function instanceCreator({initialstring} = {}) {
   function getTraps(customExtensions) {
     return {
       get( target, key ) {
-        return Object.hasOwn(extensions, key)
-          ? extensions[key]
-          : canWrapNative(String(key))
-            ? wrapNative(key)
-            : undefined;
+        switch(true) {
+          case key === Symbol.for("myType"): return `stringWeaver instance (Proxy)`;
+          case Object.hasOwn(customExtensions, key): return customExtensions[key];
+          case canWrapNative(String(key)): return wrapNative(key);
+          default: return wrapNative(key);
+        }
       },
     };
   }
