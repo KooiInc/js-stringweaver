@@ -106,11 +106,12 @@ function instanceCreator({initialstring} = {}) {
   }
 
   function wrapNative(key) {
-    return actualValue[key] instanceof Function
+    return typeof actualValue[key] === `function`
       ? function(...args) {
-        const result = actualValue[key](...args);
-        return result?.constructor === String ? wrap(actualValue[key](...args)) : result;
-      } : actualValue[key];
+          const result = actualValue[key](...args);
+          return result?.constructor === String ? wrap(actualValue[key](...args)) : result;
+        }
+      : actualValue[key];
   }
 
   function undoAll() {
