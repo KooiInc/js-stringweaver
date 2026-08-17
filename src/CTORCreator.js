@@ -1,6 +1,6 @@
 import createInstance from "./instanceCreator.js";
 import { createExtendedCTOR, resolveTemplateString, } from "./helpers.js";
-const customMethods = {};
+const customMethods = Object.create(null, {});
 
 export { customMethods, CustomStringConstructor, clone, };
 
