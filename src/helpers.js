@@ -50,11 +50,6 @@ function escape4RE(str2Escape) {
   return str2Escape.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
 }
 
-function escapeRE(reString, modifiers) {
-  return new RegExp(reString.replace(/\p{S}|\p{P}/gu, a => `\\${a}`), modifiers);
-}
-
-
 function getStringValue(string) {
   return string?.value || (string?.constructor === String && string) || ``;
 }
