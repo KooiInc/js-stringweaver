@@ -151,7 +151,7 @@ function capitalizerFactory(instance, wrap) {
 
 function createExtendedCTOR(ctor, customMethods) {
   const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
-  const swInfo = getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), ctor);
+  const swInfo = () => getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
   Symbol.toSB = Symbol(`toStringBuilder`);
   Object.defineProperty(
     String.prototype,
@@ -183,18 +183,18 @@ function createExtendedCTOR(ctor, customMethods) {
           return `addCustom: the property "${name}" exists and can not be redefined`;
         }
 
-        if (name?.constructor === String && method?.constructor === Function && method.length > 0) {
+        if (typeof name === `string` && typeof method === `function` && method.length > 0) {
           customMethods[name] = {method, enumerable, isGetter};
           return `addCustom: the ${isGetter ? `getter` : `method`} named "${name}" is added`;
         }
       }
     },
-    info: { value: swInfo, },
+    info: { get() { return swInfo(); } },
     keys: {
       get() {
         return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``))
           .sort( (a,b) => a.localeCompare(b) )
-          .map(v => !/constructor|toString|valueOf/.test(v) && v in customMethods ? `${v} *custom*` : v);
+          .map(v => !/constructor|toString|valueOf/.test(v) && Object.hasOwn(customMethods, v) ? `${v} *custom*` : v);
       }
     },
     quoteInfo: { value: quoteInfo },
@@ -220,11 +220,11 @@ function getSWInformation(notChainable, customMethods) {
         .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
         .map(([key, descriptr]) => {
             const isChainable = !notChainable.find(k => k === key);
-            const isGetter = 'get' in descriptr;
-            const isMethod = 'value' in descriptr;
-            const isNative = key in String.prototype;
-            const isPlainValue = !isNative && key in plainValues;
-            const custom = key in customMethods ? ` *custom*` : ``;
+            const isGetter = Object.hasOwn(descriptr, `get`);
+            const isMethod = Object.hasOwn(descriptr, `value`);
+            const isNative = Object.hasOwn(String.prototype, key);
+            const isPlainValue = !isNative && Object.hasOwn(plainValues, key);
+            const custom = Object.hasOwn(customMethods, key) ? ` *custom*` : ``;
             const getter = isGetter && isChainable ? `chainable getter${custom}` : `getter`;
             const method = isMethod && isChainable ? `chainable method${custom}` : `method`;
             const native = isNative && `${descriptr.get ? `getter` : `method`} (override)`;
