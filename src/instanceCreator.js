@@ -31,48 +31,48 @@ function instanceCreator({initialstring} = {}) {
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
-  const descriptorProps = {configurable: false, enumerable: false};
+  const defaultDescriptorProps = {configurable: false, enumerable: false};
 
   Object.defineProperties( customStringExtensions, {
     // methods
-    append: { ...descriptorProps, value(...strings) { return wrap(append(actualValue, ...strings)); } },
-    enclose: { ...descriptorProps, value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
-    format: { ...descriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
-    indexOf: { ...descriptorProps, value(str) { return indexOf(actualValue, str); } },
-    interpolate: { ...descriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
-    insert: { ...descriptorProps, value({ value, values, at } = {}) {
+    append: { ...defaultDescriptorProps, value(...strings) { return wrap(append(actualValue, ...strings)); } },
+    enclose: { ...defaultDescriptorProps, value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
+    format: { ...defaultDescriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    indexOf: { ...defaultDescriptorProps, value(str) { return indexOf(actualValue, str); } },
+    interpolate: { ...defaultDescriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    insert: { ...defaultDescriptorProps, value({ value, values, at } = {}) {
         return wrap(insert(actualValue, { value, values, at }));
       }
     },
-    lastIndexOf: { ...descriptorProps, value(str) { return lastIndexOf(actualValue, str); } },
-    prefix: { ...descriptorProps, value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
-    replaceWords: { ...descriptorProps, value({caseSensitive = false, replacements = {}} = {}) {
+    lastIndexOf: { ...defaultDescriptorProps, value(str) { return lastIndexOf(actualValue, str); } },
+    prefix: { ...defaultDescriptorProps, value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
+    replaceWords: { ...defaultDescriptorProps, value({caseSensitive = false, replacements = {}} = {}) {
       return wrap(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive }));
     } },
-    toString: { ...descriptorProps, value() { return actualValue; } },
-    trim: {...descriptorProps, value(start, end) { return wrap(trim(actualValue, start, end)); } },
-    truncate: { ...descriptorProps, value({at, html = false, wordBoundary = false} = {}) {
+    toString: { ...defaultDescriptorProps, value() { return actualValue; } },
+    trim: {...defaultDescriptorProps, value(start, end) { return wrap(trim(actualValue, start, end)); } },
+    truncate: { ...defaultDescriptorProps, value({at, html = false, wordBoundary = false} = {}) {
       return wrap(truncate(actualValue, {at, html, wordBoundary})); } },
-    valueOf: { ...descriptorProps, value() { return actualValue; } },
-    undoLast: { ...descriptorProps, value(nSteps) { return undoSteps(nSteps); } },
+    valueOf: { ...defaultDescriptorProps, value() { return actualValue; } },
+    undoLast: { ...defaultDescriptorProps, value(nSteps) { return undoSteps(nSteps); } },
 
     // getters
-    camelCase: { ...descriptorProps, get() { return wrap(parseCamelcase(getStringValue(actualValue))); } },
-    capitalize: { ...descriptorProps, value: capitalizerFactory(instance, wrap) },
-    clone: { ...descriptorProps, get() { return clone(instance, customMethods); } },
-    firstUp: { ...descriptorProps, get() { return wrap(ucFirst(getStringValue(actualValue))); } },
-    history: { ...descriptorProps, get() { return history; }, set(value) { history = value; } },
-    empty: { ...descriptorProps, get() { return actualValue.length < 1; } },
-    notEmpty: { ...descriptorProps, get() { return actualValue.length < 1 ? undefined: instance; } },
-    kebabCase: { ...descriptorProps, get() { return wrap(parseKebabCase(getStringValue(actualValue))); } },
+    camelCase: { ...defaultDescriptorProps, get() { return wrap(parseCamelcase(getStringValue(actualValue))); } },
+    capitalize: { ...defaultDescriptorProps, value: capitalizerFactory(instance, wrap) },
+    clone: { ...defaultDescriptorProps, get() { return clone(instance, customMethods); } },
+    firstUp: { ...defaultDescriptorProps, get() { return wrap(ucFirst(getStringValue(actualValue))); } },
+    history: { ...defaultDescriptorProps, get() { return history; }, set(value) { history = value; } },
+    empty: { ...defaultDescriptorProps, get() { return actualValue.length < 1; } },
+    notEmpty: { ...defaultDescriptorProps, get() { return actualValue.length < 1 ? undefined: instance; } },
+    kebabCase: { ...defaultDescriptorProps, get() { return wrap(parseKebabCase(getStringValue(actualValue))); } },
     quote: quotGetters(instance, wrap),
-    snakeCase: { ...descriptorProps, get() { return wrap(parseSnakeCase(getStringValue(actualValue))); } },
-    trimAll: { ...descriptorProps, get() { return wrap(trimAll(actualValue)); } },
-    trimAllKeepLF: { ...descriptorProps, get() { return wrap(trimAll(actualValue, true)); } },
-    undoAll: { ...descriptorProps, get() { return undoAll(); } },
-    undo: { ...descriptorProps, get() { return undoLast(); } },
-    wordsUCFirst: { ...descriptorProps, get() { return wrap(wordsFirstUp(getStringValue(actualValue))); } },
-    value: { ...descriptorProps,
+    snakeCase: { ...defaultDescriptorProps, get() { return wrap(parseSnakeCase(getStringValue(actualValue))); } },
+    trimAll: { ...defaultDescriptorProps, get() { return wrap(trimAll(actualValue)); } },
+    trimAllKeepLF: { ...defaultDescriptorProps, get() { return wrap(trimAll(actualValue, true)); } },
+    undoAll: { ...defaultDescriptorProps, get() { return undoAll(); } },
+    undo: { ...defaultDescriptorProps, get() { return undoLast(); } },
+    wordsUCFirst: { ...defaultDescriptorProps, get() { return wrap(wordsFirstUp(getStringValue(actualValue))); } },
+    value: { ...defaultDescriptorProps,
       get() { return actualValue; },
       set(value) {
         const nwValue = getStringValue(value);
