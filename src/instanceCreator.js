@@ -88,7 +88,7 @@ function instanceCreator({initialstring} = {}) {
 
   return instance;
 
-  function getTraps(extensions) {
+  function getTraps(customExtensions) {
     return {
       get( target, key ) {
         return Object.hasOwn(extensions, key)
