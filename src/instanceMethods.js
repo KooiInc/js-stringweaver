@@ -155,7 +155,7 @@ function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) 
 
   while (replacements2Array.length) {
     const [initial, replacement] = [replacements2Array.shift(), replacements2Array.shift()];
-    const re = escapeRE(initial, modifiers);
+    const re = new RegExp(escapeRE(initial), modifiers);
     string = string.replace(re, replacement);
   }
 
