@@ -27,7 +27,7 @@ import { capitalizerFactory, deprecatedRE } from "./helpers.js";
 export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
-  let customStringExtensions = { };
+  let customStringExtensions = Object.create(null, { });
   let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
