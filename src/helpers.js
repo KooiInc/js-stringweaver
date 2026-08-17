@@ -8,8 +8,8 @@ const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|ital
 
 export {
   capitalizerFactory, createExtendedCTOR, createRegExp, defineQuotingStyles,
-  deprecatedRE, getStringValue, escapeRE, infoValue, interpolate, isArrayOf, isNumber,
-  randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance,
+  deprecatedRE, getStringValue, escape4RE as escapeRE, infoValue, interpolate, isArrayOf,
+  isNumber, randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance,
   quotingStyles, uuid4,
 };
 
