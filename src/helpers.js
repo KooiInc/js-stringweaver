@@ -9,7 +9,8 @@ const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|ital
 export {
   capitalizerFactory, createExtendedCTOR, createRegExp, defineQuotingStyles,
   deprecatedRE, getStringValue, escapeRE, infoValue, interpolate, isArrayOf, isNumber,
-  randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, uuid4,
+  randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance,
+  quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -36,11 +37,17 @@ function defineQuotingStyles() {
     single: [`'`, `'`],
     squareBrackets: [`[`, `]`],
   };
-  quots.re = escapeRE([...new Set(
-    Object.values(quots)
-      .filter(v => Array.isArray(v))
-      .flat())].join(``), "g");
+  quots.re = new RegExp(`[${
+    escape4RE([...new Set(
+      Object.values(quots)
+        .filter(v => Array.isArray(v))
+        .flat())].join(``))
+    }]`, "g");
   return quots;
+}
+
+function escape4RE(str2Escape) {
+  return str2Escape.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
 }
 
 function escapeRE(reString, modifiers) {
@@ -91,6 +98,7 @@ function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
 
 function quotGetters4Instance(instance, wrap) {
   wrap = wrap ?? function(me) { return me; };
+
   return {
     value: {
       get backtick() { return instance.enclose(...quotingStyles.backtick); },
