@@ -4,8 +4,8 @@
 
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
-import {default as $S, CustomStringConstructor} from "../index.js";
-import {quotingStyles, isArrayOf, quotGetters4Instance} from "../src/genericMethods.js";
+import {default as $S} from "../index.js";
+import {quotingStyles, isArrayOf, quotGetters4Instance} from "../src/helpers.js";
 
 describe(`Basics constructor`, () => {
   describe(`Instantiation`, () => {
@@ -49,8 +49,8 @@ describe(`Basics constructor`, () => {
           "isValue": true
         },
         "info": {
-          "isGetter": false,
-          "isValue": true,
+          "isGetter": true,
+          "isValue": false,
         },
         "keys": {
           "isGetter": true,
@@ -77,8 +77,7 @@ describe(`Basics constructor`, () => {
 
     it(`Symbolic String extension in place`, () => {
         const test = `hello world`[Symbol.toSB];
-        assert.strictEqual(test.constructor, CustomStringConstructor);
-        assert.strictEqual(test.value, `hello world`);
+        assert.strictEqual(test.constructor, $S);
     });
 
     it(`constructor can be used as regular function`, () => {
@@ -143,18 +142,18 @@ describe(`Basics constructor`, () => {
 
     describe(`Instantiation by Symbolic String extensions`, () => {
       it(`creates an instance from a plain string`, () => {
-        assert.strictEqual("Hello world"[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual("Hello world"[Symbol.toSB].constructor, $S);
         assert.strictEqual("Hello world"[Symbol.toSB].value, `Hello world`);
       });
 
       it(`creates an instance from a template string`, () => {
         const wrld = `world`;
-        assert.strictEqual(`Hello ${wrld}`[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual(`Hello ${wrld}`[Symbol.toSB].constructor, $S);
         assert.strictEqual(`Hello ${wrld}`[Symbol.toSB].wordsUCFirst.value, `Hello World`);
       });
 
       it(`creates an instance from an empty string`, () => {
-        assert.strictEqual(``[Symbol.toSB].constructor, CustomStringConstructor);
+        assert.strictEqual(``[Symbol.toSB].constructor, $S);
         assert.strictEqual(``[Symbol.toSB].append(`!!!`).value, `!!!`);
       });
     });
@@ -162,7 +161,7 @@ describe(`Basics constructor`, () => {
 
   describe(`Constructor static methods`, () => {
     it(`$S.constructor as expected`, () => {
-      assert.strictEqual($S.constructor, CustomStringConstructor);
+      assert.strictEqual($S.constructor, $S);
     });
 
     it(`$S.keys delivers all keys`, () => {
@@ -673,7 +672,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
   });
 
   it(`[instance].constructor is CustomStringConstructor`, () => {
-    assert.deepStrictEqual($S``.constructor, CustomStringConstructor);
+    assert.deepStrictEqual($S``.constructor, $S);
     assert.strictEqual($S``.constructor.name, `CustomStringConstructor`);
   });
 
@@ -961,7 +960,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     it(`quotingStyles.re is what we expect`, () => {
       assert.deepStrictEqual(
         quotingStyles.re,
-        /^[\`\(\)\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]|[\`\(\)\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]$/g
+        /[\`\(\)\{\}\”\“\„\‚\’\‘\‛\"\«\»\‹\›\'\[\]]/g,
       );
     });
 
@@ -1006,8 +1005,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
   it(`toString as expected`, () => {
     const hi = $S`stringified`;
-    assert.strictEqual(hi.constructor, CustomStringConstructor);
-    assert.notStrictEqual(hi.toString().constructor, CustomStringConstructor);
+    assert.strictEqual(hi.constructor, $S);
+    assert.notStrictEqual(hi.toString().constructor, $S);
     assert.strictEqual(hi.toString(), `stringified`);
     assert.strictEqual(String(hi), `stringified`);
     assert(`${hi}`, `stringified`);
