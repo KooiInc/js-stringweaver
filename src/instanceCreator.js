@@ -10,10 +10,10 @@ export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
   let customStringProperties = Object.create(null, { });
-  let instance = new Proxy(customStringProperties, getTraps({customStringProperties, wrapNative: maybeRevalueNative}));
+  let instance = new Proxy(customStringProperties, getTraps({customStringProperties, maybeRevalueNative}));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
-  maybeInjectCustomMethods({customStringProperties, customMethods, instance, wrap: reValue});
+  maybeInjectCustomMethods({customStringProperties, customMethods, instance, reValue});
 
   Object.defineProperties( customStringProperties, {
     // methods

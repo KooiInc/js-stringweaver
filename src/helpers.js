@@ -83,14 +83,14 @@ function canWrapNative(key) {
   return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
 }
 
-function getTraps({customStringProperties, wrapNative}) {
+function getTraps({customStringProperties, maybeRevalueNative}) {
   return {
     get( target, key ) {
       switch(true) {
         case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
         case Object.hasOwn(customStringProperties, key): return customStringProperties[key];
-        case canWrapNative(String(key)): return wrapNative(key);
-        default: return wrapNative(key);
+        case canWrapNative(String(key)): return maybeRevalueNative(key);
+        default: return maybeRevalueNative(key);
       }
     },
   };
@@ -232,16 +232,15 @@ function createExtendedCTOR(ctor, customMethods) {
 }
 
 function maybeInjectCustomMethods(specs) {
-  const {customMethods, instance, wrap, customStringProperties} = specs;
+  const {customMethods, instance, reValue, customStringProperties} = specs;
 
   return Object.entries(customMethods).length < 1
     ? true
     : Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
         const {enumerable, method, isGetter} = methodContainer;
-        const configurable = false
         const descriptor = isGetter
-          ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
-          : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
+          ? { get() { return reValue(method(instance).value); }, enumerable }
+          : { value(...args) { return reValue(method(instance, ...args).value); }, enumerable };
 
         Object.defineProperty(customStringProperties, methodName, descriptor);
       });
