@@ -27,13 +27,13 @@ import { capitalizerFactory, deprecatedRE } from "./helpers.js";
 export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
-  let customStringExtensions = Object.create(null, { });
-  let instance = new Proxy(customStringExtensions, getTraps(customStringExtensions));
+  let customStringProperties = Object.create(null, { });
+  let instance = new Proxy(customStringProperties, getTraps(customStringProperties));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
   const defaultDescriptorProps = {configurable: false, enumerable: false};
 
-  Object.defineProperties( customStringExtensions, {
+  Object.defineProperties( customStringProperties, {
     // methods
     append: { ...defaultDescriptorProps, value(...strings) { return wrap(append(actualValue, ...strings)); } },
     enclose: { ...defaultDescriptorProps, value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
@@ -149,9 +149,9 @@ function instanceCreator({initialstring} = {}) {
     return wrap(actualValue, false);
   }
 
-  function wrap(result, pushHistory = true) {
+  function wrap(result, push2History = true) {
     const changed = actualValue !== result;
-    changed && pushHistory && history.push(result);
+    changed && push2History && history.push(result);
     actualValue = result;
     return instance;
   }
@@ -164,7 +164,7 @@ function instanceCreator({initialstring} = {}) {
         ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
         : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
 
-      Object.defineProperty(customStringExtensions, methodName, descriptor);
+      Object.defineProperty(customStringProperties, methodName, descriptor);
     });
   }
 }
