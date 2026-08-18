@@ -107,7 +107,7 @@ function instanceCreator({initialstring} = {}) {
     return typeof actualValue[key] === `function`
       ? function(...args) {
         const result = actualValue[key](...args);
-        return result?.constructor === String ? reValue(actualValue[key](...args)) : result;
+        return typeof result === `string` ? reValue(actualValue[key](...args)) : result;
       }
       : actualValue[key];
   }
