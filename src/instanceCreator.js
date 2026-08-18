@@ -31,48 +31,47 @@ function instanceCreator({initialstring} = {}) {
   let instance = new Proxy(customStringProperties, getTraps(customStringProperties));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
-  const defaultDescriptorProps = {configurable: false, enumerable: false};
 
   Object.defineProperties( customStringProperties, {
     // methods
-    append: { ...defaultDescriptorProps, value(...strings) { return wrap(append(actualValue, ...strings)); } },
-    enclose: { ...defaultDescriptorProps, value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
-    format: { ...defaultDescriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
-    indexOf: { ...defaultDescriptorProps, value(str) { return indexOf(actualValue, str); } },
-    interpolate: { ...defaultDescriptorProps, value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
-    insert: { ...defaultDescriptorProps, value({ value, values, at } = {}) {
+    append: { value(...strings) { return wrap(append(actualValue, ...strings)); } },
+    enclose: { value(start, end) { return wrap(surroundWith(actualValue, start, end)); } },
+    format: { value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    indexOf: { value(str) { return indexOf(actualValue, str); } },
+    interpolate: { value(...tokens) { return wrap(format(actualValue, ...tokens)); } },
+    insert: { value({ value, values, at } = {}) {
         return wrap(insert(actualValue, { value, values, at }));
       }
     },
-    lastIndexOf: { ...defaultDescriptorProps, value(str) { return lastIndexOf(actualValue, str); } },
-    prefix: { ...defaultDescriptorProps, value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
-    replaceWords: { ...defaultDescriptorProps, value({caseSensitive = false, replacements = {}} = {}) {
+    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); } },
+    prefix: { value(...strings) { return wrap(prefix(actualValue, ...strings)); } },
+    replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
       return wrap(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive }));
     } },
-    toString: { ...defaultDescriptorProps, value() { return actualValue; } },
-    trim: {...defaultDescriptorProps, value(start, end) { return wrap(trim(actualValue, start, end)); } },
-    truncate: { ...defaultDescriptorProps, value({at, html = false, wordBoundary = false} = {}) {
+    toString: { value() { return actualValue; } },
+    trim: {value(start, end) { return wrap(trim(actualValue, start, end)); } },
+    truncate: { value({at, html = false, wordBoundary = false} = {}) {
       return wrap(truncate(actualValue, {at, html, wordBoundary})); } },
-    valueOf: { ...defaultDescriptorProps, value() { return actualValue; } },
-    undoLast: { ...defaultDescriptorProps, value(nSteps) { return undoSteps(nSteps); } },
+    valueOf: { value() { return actualValue; } },
+    undoLast: { value(nSteps) { return undoSteps(nSteps); } },
 
     // getters
-    camelCase: { ...defaultDescriptorProps, get() { return wrap(parseCamelcase(getStringValue(actualValue))); } },
-    capitalize: { ...defaultDescriptorProps, value: capitalizerFactory(instance, wrap) },
-    clone: { ...defaultDescriptorProps, get() { return clone(instance, customMethods); } },
-    firstUp: { ...defaultDescriptorProps, get() { return wrap(ucFirst(getStringValue(actualValue))); } },
-    history: { ...defaultDescriptorProps, get() { return history; }, set(value) { history = value; } },
-    empty: { ...defaultDescriptorProps, get() { return actualValue.length < 1; } },
-    notEmpty: { ...defaultDescriptorProps, get() { return actualValue.length < 1 ? undefined: instance; } },
-    kebabCase: { ...defaultDescriptorProps, get() { return wrap(parseKebabCase(getStringValue(actualValue))); } },
+    camelCase: { get() { return wrap(parseCamelcase(getStringValue(actualValue))); } },
+    capitalize: { value: capitalizerFactory(instance, wrap) },
+    clone: { get() { return clone(instance, customMethods); } },
+    firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); } },
+    history: { get() { return history; }, set(value) { history = value; } },
+    empty: { get() { return actualValue.length < 1; } },
+    notEmpty: { get() { return actualValue.length < 1 ? undefined: instance; } },
+    kebabCase: { get() { return wrap(parseKebabCase(getStringValue(actualValue))); } },
     quote: quotGetters(instance, wrap),
-    snakeCase: { ...defaultDescriptorProps, get() { return wrap(parseSnakeCase(getStringValue(actualValue))); } },
-    trimAll: { ...defaultDescriptorProps, get() { return wrap(trimAll(actualValue)); } },
-    trimAllKeepLF: { ...defaultDescriptorProps, get() { return wrap(trimAll(actualValue, true)); } },
-    undoAll: { ...defaultDescriptorProps, get() { return undoAll(); } },
-    undo: { ...defaultDescriptorProps, get() { return undoLast(); } },
-    wordsUCFirst: { ...defaultDescriptorProps, get() { return wrap(wordsFirstUp(getStringValue(actualValue))); } },
-    value: { ...defaultDescriptorProps,
+    snakeCase: { get() { return wrap(parseSnakeCase(getStringValue(actualValue))); } },
+    trimAll: { get() { return wrap(trimAll(actualValue)); } },
+    trimAllKeepLF: { get() { return wrap(trimAll(actualValue, true)); } },
+    undoAll: { get() { return undoAll(); } },
+    undo: { get() { return undoLast(); } },
+    wordsUCFirst: { get() { return wrap(wordsFirstUp(getStringValue(actualValue))); } },
+    value: {
       get() { return actualValue; },
       set(value) {
         const nwValue = getStringValue(value);
