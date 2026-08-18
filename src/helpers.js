@@ -171,7 +171,8 @@ function capitalizerFactory(instance, wrap) {
 
 function createExtendedCTOR(ctor, customMethods) {
   const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
-  const swInfo = () => getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
+  const swInfo = () =>
+    getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
   Symbol.toSB = Symbol(`toStringBuilder`);
   Object.defineProperty(
     String.prototype,
@@ -230,17 +231,20 @@ function createExtendedCTOR(ctor, customMethods) {
   return;
 }
 
-function maybeInjectCustomMethods({customMethods, instance, wrap, customStringProperties}) {
-  if (Object.entries(customMethods).length < 1) { return; }
-  Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
-    const {enumerable, method, isGetter} = methodContainer;
-    const configurable = false
-    const descriptor = isGetter
-      ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
-      : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
+function maybeInjectCustomMethods(specs) {
+  const {customMethods, instance, wrap, customStringProperties} = specs;
 
-    Object.defineProperty(customStringProperties, methodName, descriptor);
-  });
+  return Object.entries(customMethods).length < 1
+    ? true
+    : Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
+        const {enumerable, method, isGetter} = methodContainer;
+        const configurable = false
+        const descriptor = isGetter
+          ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
+          : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
+
+        Object.defineProperty(customStringProperties, methodName, descriptor);
+      });
 }
 
 function getSWInformation(notChainable, customMethods) {
