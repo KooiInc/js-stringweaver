@@ -4,7 +4,7 @@ import {
   replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, deprecatedRE, getTraps, maybeInjectCustomMethods } from "./helpers.js";
+import { capitalizerFactory, getTraps, maybeInjectCustomMethods } from "./helpers.js";
 
 export default instanceCreator;
 
