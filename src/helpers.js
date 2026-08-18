@@ -8,9 +8,9 @@ const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|ital
 
 export {
   capitalizerFactory, createExtendedCTOR, createRegExp, defineQuotingStyles,
-  deprecatedRE, getStringValue, escape4RE as escapeRE, infoValue, interpolate,
-  isArrayOf, isNumber, maybeInjectCustomMethods, randomString, resolveTemplateString,
-  retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
+  deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue,
+  interpolate, isArrayOf, isNumber, maybeInjectCustomMethods, randomString,
+  resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -77,6 +77,23 @@ function resolveTemplateString(str, ...args) {
   return str?.raw
     ? String.raw({ raw: str }, ...args)
     : getStringValue(str).length ? str : "";
+}
+
+function canWrapNative(key) {
+  return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
+}
+
+function getTraps({customStringProperties, wrapNative}) {
+  return {
+    get( target, key ) {
+      switch(true) {
+        case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
+        case Object.hasOwn(customStringProperties, key): return customStringProperties[key];
+        case canWrapNative(String(key)): return wrapNative(key);
+        default: return wrapNative(key);
+      }
+    },
+  };
 }
 
 function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {

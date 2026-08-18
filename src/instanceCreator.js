@@ -4,13 +4,13 @@ import {
   replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, deprecatedRE, maybeInjectCustomMethods } from "./helpers.js";
+import { capitalizerFactory, deprecatedRE, getTraps, maybeInjectCustomMethods } from "./helpers.js";
 
 export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
   let customStringProperties = Object.create(null, { });
-  let instance = new Proxy(customStringProperties, getTraps(customStringProperties));
+  let instance = new Proxy(customStringProperties, getTraps({customStringProperties, wrapNative}));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
   maybeInjectCustomMethods({customStringProperties, customMethods, instance, wrap});
@@ -67,23 +67,6 @@ function instanceCreator({initialstring} = {}) {
   });
 
   return instance;
-
-  function getTraps(customExtensions) {
-    return {
-      get( target, key ) {
-        switch(true) {
-          case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
-          case Object.hasOwn(customExtensions, key): return customExtensions[key];
-          case canWrapNative(String(key)): return wrapNative(key);
-          default: return wrapNative(key);
-        }
-      },
-    };
-  }
-
-  function canWrapNative(key) {
-    return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
-  }
 
   function wrapNative(key) {
     return typeof actualValue[key] === `function`
