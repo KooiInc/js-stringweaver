@@ -45,7 +45,7 @@ function instanceCreator({initialstring} = {}) {
     firstUp: { get() { return wrap(ucFirst(getStringValue(actualValue))); } },
     history: { get() { return history; }, set(value) { history = value; } },
     empty: { get() { return actualValue.length < 1; } },
-    notEmpty: { get() { return actualValue.length < 1 ? undefined: instance; } },
+    notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
     kebabCase: { get() { return wrap(parseKebabCase(getStringValue(actualValue))); } },
     quote: quotGetters(instance, wrap),
     snakeCase: { get() { return wrap(parseSnakeCase(getStringValue(actualValue))); } },
