@@ -1,28 +1,10 @@
 import {
-  format,
-  ucFirst,
-  truncate,
-  trimAll,
-  replaceWords,
-  indexOf,
-  lastIndexOf,
-  insert,
-  append,
-  prefix,
-  getStringValue,
-  quotGetters,
-  surroundWith,
-  parseCamelcase,
-  wordsFirstUp,
-  parseKebabCase,
-  parseSnakeCase,
-  customMethods,
-  isNumber,
-  clone,
-  trim,
+  append, clone, customMethods, getStringValue, format, indexOf, insert, isNumber,
+  lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix, quotGetters,
+  replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, deprecatedRE } from "./helpers.js";
+import { capitalizerFactory, deprecatedRE, maybeInjectCustomMethods } from "./helpers.js";
 
 export default instanceCreator;
 
@@ -31,6 +13,7 @@ function instanceCreator({initialstring} = {}) {
   let instance = new Proxy(customStringProperties, getTraps(customStringProperties));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
+  maybeInjectCustomMethods({customStringProperties, customMethods, instance, wrap});
 
   Object.defineProperties( customStringProperties, {
     // methods
@@ -83,15 +66,13 @@ function instanceCreator({initialstring} = {}) {
     },
   });
 
-  injectCustomMethods(customMethods);
-
   return instance;
 
   function getTraps(customExtensions) {
     return {
       get( target, key ) {
         switch(true) {
-          case key === Symbol.for("myType"): return `stringWeaver instance (Proxy)`;
+          case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
           case Object.hasOwn(customExtensions, key): return customExtensions[key];
           case canWrapNative(String(key)): return wrapNative(key);
           default: return wrapNative(key);
@@ -153,17 +134,5 @@ function instanceCreator({initialstring} = {}) {
     changed && push2History && history.push(result);
     actualValue = result;
     return instance;
-  }
-
-  function injectCustomMethods(customMethods) {
-    Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
-      const {enumerable, method, isGetter} = methodContainer;
-      const configurable = false
-      const descriptor = isGetter
-        ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
-        : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
-
-      Object.defineProperty(customStringProperties, methodName, descriptor);
-    });
   }
 }

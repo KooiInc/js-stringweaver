@@ -8,9 +8,9 @@ const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|ital
 
 export {
   capitalizerFactory, createExtendedCTOR, createRegExp, defineQuotingStyles,
-  deprecatedRE, getStringValue, escape4RE as escapeRE, infoValue, interpolate, isArrayOf,
-  isNumber, randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance,
-  quotingStyles, uuid4,
+  deprecatedRE, getStringValue, escape4RE as escapeRE, infoValue, interpolate,
+  isArrayOf, isNumber, maybeInjectCustomMethods, randomString, resolveTemplateString,
+  retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -211,6 +211,19 @@ function createExtendedCTOR(ctor, customMethods) {
   });
 
   return;
+}
+
+function maybeInjectCustomMethods({customMethods, instance, wrap, customStringProperties}) {
+  if (Object.entries(customMethods).length < 1) { return; }
+  Object.entries(customMethods).forEach(([methodName, methodContainer]) => {
+    const {enumerable, method, isGetter} = methodContainer;
+    const configurable = false
+    const descriptor = isGetter
+      ? { get() { return wrap(method(instance).value); }, enumerable, configurable }
+      : { value(...args) { return wrap(method(instance, ...args).value); }, enumerable, configurable };
+
+    Object.defineProperty(customStringProperties, methodName, descriptor);
+  });
 }
 
 function getSWInformation(notChainable, customMethods) {
