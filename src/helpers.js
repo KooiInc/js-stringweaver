@@ -227,8 +227,6 @@ function createExtendedCTOR(ctor, customMethods) {
     },
     regExp: { value: createRegExp }
   });
-
-  return;
 }
 
 function maybeInjectCustomMethods(specs) {
