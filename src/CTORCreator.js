@@ -1,6 +1,6 @@
 import createInstance from "./instanceCreator.js";
 import { createExtendedCTOR, resolveTemplateString, } from "./helpers.js";
-export default createExtendedCTOR(CustomStringConstructor); // { CustomStringConstructor, };
+export default createExtendedCTOR(CustomStringConstructor);
 
 function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
