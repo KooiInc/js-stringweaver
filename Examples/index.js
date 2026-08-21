@@ -1,7 +1,8 @@
 // noinspection JSValidateTypes
 const {
   $, $S, codeOverlay, exampleCode, SB,
-  print2Document, useBundle, load} = await initialize({useBundle: true});
+  print2Document, useBundle, load} = await initialize({useBundle: false});
+window.jqx = $;
 main();
 
 function main() {

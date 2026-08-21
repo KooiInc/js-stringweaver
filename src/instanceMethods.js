@@ -1,4 +1,4 @@
-import { customMethods, clone, } from "./CTORCreator.js";
+import { customMethods, } from "./CTORCreator.js";
 
 import {
   createRegExp as $RE, getStringValue, isArrayOf, interpolate,
@@ -25,7 +25,6 @@ export {
   quotGetters,
   surroundWith,
   customMethods,
-  clone,
   trim,
 };
 

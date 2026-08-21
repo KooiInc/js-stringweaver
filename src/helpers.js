@@ -7,10 +7,10 @@ const quotingStyles = defineQuotingStyles();
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i
 
 export {
-  capitalizerFactory, createExtendedCTOR, createRegExp, defineQuotingStyles,
-  deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue,
-  interpolate, isArrayOf, isNumber, maybeInjectCustomMethods, randomString,
-  resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
+  capitalizerFactory, cloneInstance, createExtendedCTOR, createRegExp, defineQuotingStyles,
+  deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue, interpolate,
+  isArrayOf, isNumber, maybeInjectCustomMethods, randomString, resolveTemplateString,
+  retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -83,17 +83,23 @@ function canWrapNative(key) {
   return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
 }
 
-function getTraps({customStringProperties, maybeRevalueNative}) {
+function getTraps({maybeRevalueNative}) {
   return {
     get( target, key ) {
       switch(true) {
         case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
-        case Object.hasOwn(customStringProperties, key): return customStringProperties[key];
+        case Object.hasOwn(target, key): return target[key];
         case canWrapNative(String(key)): return maybeRevalueNative(key);
         default: return maybeRevalueNative(key);
       }
     },
   };
+}
+
+function cloneInstance(instance) {
+    const newInstance = instance.constructor(instance.value);
+    newInstance.history = [...instance.history];
+    return newInstance;
 }
 
 function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
