@@ -1,10 +1,10 @@
 import {
-  append, customMethods, getStringValue, format, indexOf, insert, isNumber,
+  append, getStringValue, format, indexOf, insert, isNumber,
   lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix, quotGetters,
   replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, cloneInstance, getTraps, maybeInjectCustomMethods } from "./helpers.js";
+import { capitalizerFactory, cloneInstance, getTraps, maybeInjectCustomMethods, customMethods } from "./helpers.js";
 
 export default instanceCreator;
 

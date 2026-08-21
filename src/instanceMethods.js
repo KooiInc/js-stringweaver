@@ -1,4 +1,4 @@
-import { customMethods, } from "./CTORCreator.js";
+import { customMethods, } from "./helpers.js"; //"./CTORCreator.js";
 
 import {
   createRegExp as $RE, getStringValue, isArrayOf, interpolate,

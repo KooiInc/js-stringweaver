@@ -4,13 +4,14 @@ import {default as randomString, uuid4}  from "./Factories/randomStringFactory.j
 import {CustomStringConstructor} from "./CTORCreator.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const quotingStyles = defineQuotingStyles();
-const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i
+const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
+const customMethods = Object.create(null, {});
 
 export {
-  capitalizerFactory, cloneInstance, createExtendedCTOR, createRegExp, defineQuotingStyles,
-  deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue, interpolate,
-  isArrayOf, isNumber, maybeInjectCustomMethods, randomString, resolveTemplateString,
-  retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
+  capitalizerFactory, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
+  defineQuotingStyles, deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE,
+  infoValue, interpolate, isArrayOf, isNumber, maybeInjectCustomMethods, randomString,
+  resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -175,7 +176,7 @@ function capitalizerFactory(instance, wrap) {
   }
 }
 
-function createExtendedCTOR(ctor, customMethods) {
+function createExtendedCTOR(ctor) {
   const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
   const swInfo = () =>
     getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
