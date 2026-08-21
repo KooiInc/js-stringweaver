@@ -1,7 +1,7 @@
 import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
-import {CustomStringConstructor} from "./CTORCreator.js";
+import CustomStringConstructor from "./CTORCreator.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const quotingStyles = defineQuotingStyles();
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
@@ -234,6 +234,8 @@ function createExtendedCTOR(ctor) {
     },
     regExp: { value: createRegExp }
   });
+
+  return ctor;
 }
 
 function maybeInjectCustomMethods(specs) {
