@@ -41,7 +41,6 @@ function instanceCreator({initialstring} = {}) {
     // getters
     camelCase: { get() { return reValue(parseCamelcase(getStringValue(actualValue))); } },
     capitalize: { value: capitalizerFactory(instance, reValue) },
-    //clone: { get() { return clone(instance.value, /*customMethods,*/ [...instance.history]); } },
     clone: { get() { return cloneInstance(instance, [...instance.history]); } },
     firstUp: { get() { return reValue(ucFirst(getStringValue(actualValue))); } },
     history: { get() { return history; }, set(value) { history = value; } },
