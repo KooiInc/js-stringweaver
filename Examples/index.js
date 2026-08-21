@@ -417,7 +417,7 @@ function getCapitalizeExamples() {
       first: `equivalent of ${createInternalLink(`getter-firstUp`, `[instance].firstUp`, true)}`,
       kebab: `equivalent of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`,
       words: `equivalent of ${createInternalLink(`getter-wordsUCFirst`, `[instance].wordUCFirst`, true)}`,
-      dashed: `alias of <code>capitalize.kebab</code>`})
+      dashed: `alias of ${createInternalLink(`getter-kebabCase`, `[instance].kebabCase`, true)}`})
     .sort(([k1,], [k2,]) => k1.localeCompare(k2))
     .reduce((acc, [key, value]) => acc.concat(`<li><code>capitalize.${key}</code>: ${value}</li>`), ``);
   return {examples, capitalizers};
