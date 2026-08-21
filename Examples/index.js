@@ -1760,7 +1760,6 @@ function runAndReportPerformance() {
         StringWeaver's performance should not get in the way`.asNote.asDiv).value,
   });
    testResults = null;
-  return;
 }
 
 function debug(...things2Log) {
