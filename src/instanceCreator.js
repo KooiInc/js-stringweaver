@@ -1,16 +1,16 @@
 import {
-  append, clone, customMethods, getStringValue, format, indexOf, insert, isNumber,
+  append, customMethods, getStringValue, format, indexOf, insert, isNumber,
   lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix, quotGetters,
   replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, getTraps, maybeInjectCustomMethods } from "./helpers.js";
+import { capitalizerFactory, cloneInstance, getTraps, maybeInjectCustomMethods } from "./helpers.js";
 
 export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
-  let customStringProperties = Object.create(null, { });
-  let instance = new Proxy(customStringProperties, getTraps({customStringProperties, maybeRevalueNative}));
+  let customStringProperties = new WeakRef(Object.create(null, { }));
+  let instance = new Proxy(customStringProperties, getTraps({maybeRevalueNative}));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
   maybeInjectCustomMethods({customStringProperties, customMethods, instance, reValue});
@@ -41,7 +41,8 @@ function instanceCreator({initialstring} = {}) {
     // getters
     camelCase: { get() { return reValue(parseCamelcase(getStringValue(actualValue))); } },
     capitalize: { value: capitalizerFactory(instance, reValue) },
-    clone: { get() { return clone(instance, customMethods); } },
+    //clone: { get() { return clone(instance.value, /*customMethods,*/ [...instance.history]); } },
+    clone: { get() { return cloneInstance(instance, [...instance.history]); } },
     firstUp: { get() { return reValue(ucFirst(getStringValue(actualValue))); } },
     history: { get() { return history; }, set(value) { history = value; } },
     empty: { get() { return actualValue.length < 1; } },
