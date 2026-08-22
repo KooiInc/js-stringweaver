@@ -22,15 +22,11 @@ function instanceCreator({initialstring} = {}) {
     format: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
     indexOf: { value(str) { return indexOf(actualValue, str); } },
     interpolate: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
-    insert: { value({ value, values, at } = {}) {
-        return reValue(insert(actualValue, { value, values, at }));
-      }
-    },
+    insert: { value({ value, values, at } = {}) { return reValue(insert(actualValue, { value, values, at })); } },
     lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); } },
     prefix: { value(...strings) { return reValue(prefix(actualValue, ...strings)); } },
     replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
-      return reValue(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive }));
-    } },
+      return reValue(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive })); } },
     toString: { value() { return actualValue; } },
     trim: {value(start, end) { return reValue(trim(actualValue, start, end)); } },
     truncate: { value({at, html = false, wordBoundary = false} = {}) {
