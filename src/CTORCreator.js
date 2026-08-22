@@ -4,8 +4,6 @@ export default createExtendedCTOR(CustomStringConstructor);
 
 function CustomStringConstructor(str, ...args) {
   const instance = createInstance({initialstring: resolveTemplateString(str, ...args)});
-  Object.defineProperty( instance,
-    `constructor`, { get() { return CustomStringConstructor; }, enumerable: false}
-  );
+  Object.defineProperty( instance, `constructor`, { get() { return CustomStringConstructor; } } );
   return Object.freeze(instance);
 }

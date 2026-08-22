@@ -70,7 +70,7 @@ function infoValue(key, infoValue) {
 
 function checkType(type, item, includeInstances) {
   return type === String && includeInstances
-    ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
+    ? item?.constructor.name !== 'CustomStringConstructor' && item?.constructor !== type
     : item?.constructor !== type;
 }
 
