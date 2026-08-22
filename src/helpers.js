@@ -52,12 +52,12 @@ function escape4RE(str2Escape) {
 }
 
 function getStringValue(string) {
-  return string?.value || (string?.constructor === String && string) || ``;
+  return string?.value || (typeof string === `string` && string) || ``;
 }
 
-function isArrayOf(type, value, includeInstances = true) {
+function isArrayOf(type, value, StringsMayBeSWInstances = true) {
   return Array.isArray(value) && value.length > 0 &&
-    !value.find(v => checkType(type, v, includeInstances));
+    !value.find(v => checkType(type, v, StringsMayBeSWInstances));
 }
 
 function isNumber(value) {
@@ -68,8 +68,8 @@ function infoValue(key, infoValue) {
   return `${key} (${infoValue})`;
 }
 
-function checkType(type, item, includeInstances) {
-  return type === String && includeInstances
+function checkType(type, item, StringsMayBeSWInstances = true) {
+  return type === String && StringsMayBeSWInstances
     ? item?.constructor.name !== 'CustomStringConstructor' && item?.constructor !== type
     : item?.constructor !== type;
 }
