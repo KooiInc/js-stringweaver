@@ -5,7 +5,9 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S} from "../index.js";
-import {quotingStyles, isArrayOf, quotGetters4Instance, isNumber, maybe, checkNotOfType, maybeInjectCustomMethods} from "../src/helpers.js";
+import {
+  quotingStyles, isArrayOf, quotGetters4Instance, isNumber, maybe, checkNotOfType, getWrapperFunction,
+  maybeInjectCustomMethods, resolveTemplateString, getInfoPrefix, escapeRE} from "../src/helpers.js";
 
 describe(`Basics constructor and helpers`, () => {
   describe(`Instantiation`, () => {
@@ -450,6 +452,10 @@ describe(`Basics constructor and helpers`, () => {
       assert.strictEqual(isArrayOf(Number, arrOfNumbers), false);
     });
 
+    it(`isArrayOf (empty array)`, () => {
+      assert.strictEqual(isArrayOf(Number, []), false);
+    });
+
     it(`non enumerable custom getter NOT in instance keys`, () => {
       assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined);
     });
@@ -481,10 +487,15 @@ describe(`Basics constructor and helpers`, () => {
 
     it(`maybe as expected (undefined value retrieval)`, () => {
       assert.strictEqual(maybe(_ => TheyNeverAssignedMe).result, undefined);
+      assert.strictEqual(maybe(_ => TheyNeverAssignedMe).errorMessage, `TheyNeverAssignedMe is not defined`);
     });
 
     it(`maybe as expected (15<20 true)`, () => {
       assert.strictEqual(maybe(_ => 15 < 20).result, true);
+    });
+
+    it(`checkNotOfType as expected (nothing)`, () => {
+      assert.strictEqual(checkNotOfType(String, undefined), true);
     });
 
     it(`checkNotOfType as expected (String)`, () => {
@@ -496,8 +507,32 @@ describe(`Basics constructor and helpers`, () => {
       assert.strictEqual(checkNotOfType(Number, 42, true), false);
     });
 
+    it(`checkNotOfType as expected (String, false)`, () => {
+      assert.strictEqual(checkNotOfType(String, $S``, false), true);
+    });
+
+    it(`checkNotOfType as expected (String, true)`, () => {
+      assert.strictEqual(checkNotOfType(String, $S``, true), false);
+    });
+
     it(`maybeInjectCustomMethods no Params`, () =>{
       assert.strictEqual(maybeInjectCustomMethods(), true);
+    });
+
+    it(`getInfoPrefix`, () => {
+      assert.strictEqual(getInfoPrefix(), 'For the record:\n✔ chainable getters/methods modify the instance string\n✔ indexOf overrides returns [undefined] if nothing was found (so one can use [lastI]indexOf([some string value]) ?? 0\n✔ includes information for custom methods/getters if applicable');
+    });
+
+    it(`escapeRE`, () => {
+      assert.strictEqual(escapeRE(`hello&.*H[i]()^$$`), 'hello\\&\\.\\*H\\[i\\]\\(\\)\\^\\$\\$');
+    });
+
+    it(`wrapper (none)`, () => {
+      assert.strictEqual(getWrapperFunction().toString(), `function(me) { return me; }`);
+    });
+
+    it(`wrapper (fn)`, () => {
+      assert.strictEqual(getWrapperFunction(_ => `hithere`).toString(), `_ => \`hithere\``);
     });
 
     it(`maybeInjectCustomMethods empty object`, () =>{
@@ -512,6 +547,15 @@ describe(`Basics constructor and helpers`, () => {
           reValue: _ => {},
           customStringProperties: $S,
         }), true);
+    });
+
+    it(`resolveTemplateString with regular string`, () => {
+      assert.strictEqual(resolveTemplateString("HITHERE"), `HITHERE`);
+    });
+
+    it(`resolveTemplateString with template string`, () => {
+      const hi = `HI`;
+      assert.strictEqual(resolveTemplateString`${hi}THERE`, `HITHERE`);
     });
   });
 });

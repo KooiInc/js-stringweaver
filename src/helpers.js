@@ -10,9 +10,9 @@ let CTOR;
 
 export {
   capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
-  defineQuotingStyles, deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue, interpolate,
-  isArrayOf, isNumber, maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, retrieveQuotInfo,
-  quotGetters4Instance, quotingStyles, uuid4,
+  defineQuotingStyles, deprecatedRE, getInfoPrefix, getStringValue, getTraps, getWrapperFunction /*for test*/,
+  escape4RE as escapeRE, infoValue, interpolate, isArrayOf, isNumber, maybe, maybeInjectCustomMethods,
+  randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -71,7 +71,7 @@ function infoValue(key, infoValue) {
 
 function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
   return !item?.constructor
-    ? false
+    ? true
     : type === String && StringsMayBeSWInstances
       ? maybe(_ => item?.constructor !== CTOR).result && item?.constructor !== type
       : item?.constructor !== type;
@@ -84,7 +84,7 @@ function resolveTemplateString(str, ...args) {
 }
 
 function canWrapNative(key) {
-  return !deprecatedRE.test(key)  && Object.hasOwn(String.prototype, key);
+  return !deprecatedRE.test(key) && Object.hasOwn(String.prototype, key);
 }
 
 function getTraps({maybeRevalueNative}) {
@@ -118,8 +118,12 @@ function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
     }, []);
 }
 
+function getWrapperFunction(wrap) {
+  return wrap ?? function(me) { return me; };
+}
+
 function quotGetters4Instance(instance, wrap) {
-  wrap = wrap ?? function(me) { return me; };
+  wrap = getWrapperFunction(wrap);
 
   return {
     value: {
@@ -312,6 +316,7 @@ function maybe(/**type function*/test) {
     return {
       ok: false,
       result: undefined,
+      errorMessage: e.message,
     }
   }
 }
