@@ -5,7 +5,7 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S} from "../index.js";
-import {quotingStyles, isArrayOf, quotGetters4Instance} from "../src/helpers.js";
+import {quotingStyles, isArrayOf, quotGetters4Instance, isNumber} from "../src/helpers.js";
 
 describe(`Basics constructor`, () => {
   describe(`Instantiation`, () => {
@@ -461,7 +461,15 @@ describe(`Basics constructor`, () => {
     it(`quotGetters4Instance with dummy wrapper`, () => {
       const quotes4Instance = quotGetters4Instance($S``);
       assert.strictEqual(quotes4Instance.value.remove, ``);
-    })
+    });
+
+    it(`isNumber("15") as expected (false)`, () => {
+      assert.strictEqual(isNumber("15"), false);
+    });
+
+    it(`isNumber(15) as expected (true)`, () => {
+      assert.strictEqual(isNumber(15), true);
+    });
   });
 });
 

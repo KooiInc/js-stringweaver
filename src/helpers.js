@@ -72,7 +72,7 @@ function checkType(type, item, StringsMayBeSWInstances = true) {
   return !item?.constructor
     ? false
     : type === String && StringsMayBeSWInstances
-      ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
+      ? maybe(_ => item?.constructor !== CustomStringConstructor).result && item?.constructor !== type
       : item?.constructor !== type;
 }
 
@@ -294,6 +294,21 @@ function getPlainValues() {
     quote: `Object. See [constructor].quoteInfo`,
     capitalize: `getter. Object with chainable getters: [${capitalizerKeys.join(`, `)}]`,
   };
+}
+
+function maybe(/**type function*/test) {
+  try {
+    return {
+      ok: true,
+      result: test(),
+    };
+  }
+  catch(e) {
+    return {
+      ok: false,
+      result: undefined,
+    }
+  }
 }
 
 function getInfoPrefix() {
