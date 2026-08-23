@@ -69,9 +69,11 @@ function infoValue(key, infoValue) {
 }
 
 function checkType(type, item, StringsMayBeSWInstances = true) {
-  return type === String && StringsMayBeSWInstances
-    ? item?.constructor.name !== 'CustomStringConstructor' && item?.constructor !== type
-    : item?.constructor !== type;
+  return !item?.constructor
+    ? false
+    : type === String && StringsMayBeSWInstances
+      ? item?.constructor !== CustomStringConstructor && item?.constructor !== type
+      : item?.constructor !== type;
 }
 
 function resolveTemplateString(str, ...args) {
