@@ -138,6 +138,10 @@ describe(`Basics constructor`, () => {
       it(`parameter new String => empty string`, () => {
         assert.strictEqual($S(new String()).value, "");
       });
+
+      it(`parameter empty SW instance => empty string`, () => {
+        assert.strictEqual($S().value, "");
+      });
     });
 
     describe(`Instantiation by Symbolic String extensions`, () => {
