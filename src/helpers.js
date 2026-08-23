@@ -1,17 +1,18 @@
 import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
-import CustomStringConstructor from "./CTORCreator.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const quotingStyles = defineQuotingStyles();
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
 const customMethods = Object.create(null, {});
 
+let CTOR;
+
 export {
-  capitalizerFactory, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
-  defineQuotingStyles, deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE,
-  infoValue, interpolate, isArrayOf, isNumber, maybeInjectCustomMethods, randomString,
-  resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
+  capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
+  defineQuotingStyles, deprecatedRE, getStringValue, getTraps, escape4RE as escapeRE, infoValue, interpolate,
+  isArrayOf, isNumber, maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, retrieveQuotInfo,
+  quotGetters4Instance, quotingStyles, uuid4,
 };
 
 function defineQuotingStyles() {
@@ -57,22 +58,22 @@ function getStringValue(string) {
 
 function isArrayOf(type, value, StringsMayBeSWInstances = true) {
   return Array.isArray(value) && value.length > 0 &&
-    !value.find(v => checkType(type, v, StringsMayBeSWInstances));
+    !value.find(v => checkNotOfType(type, v, StringsMayBeSWInstances));
 }
 
 function isNumber(value) {
-  return value?.constructor === Number && !Number.isNaN(value);
+  return typeof value === `number` && !Number.isNaN(value) && value !== Infinity;
 }
 
 function infoValue(key, infoValue) {
   return `${key} (${infoValue})`;
 }
 
-function checkType(type, item, StringsMayBeSWInstances = true) {
+function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
   return !item?.constructor
     ? false
     : type === String && StringsMayBeSWInstances
-      ? maybe(_ => item?.constructor !== CustomStringConstructor).result && item?.constructor !== type
+      ? maybe(_ => item?.constructor !== CTOR).result && item?.constructor !== type
       : item?.constructor !== type;
 }
 
@@ -100,9 +101,9 @@ function getTraps({maybeRevalueNative}) {
 }
 
 function cloneInstance(instance) {
-    const newInstance = instance.constructor(instance.value);
-    newInstance.history = [...instance.history];
-    return newInstance;
+  const newInstance = CTOR(instance.value);
+  newInstance.history = [...instance.history];
+  return newInstance;
 }
 
 function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
@@ -203,12 +204,12 @@ function createExtendedCTOR(ctor) {
     },
     format: {
       value(str, ...tokens) {
-        return CustomStringConstructor(str).format(...tokens);
+        return ctor(str).format(...tokens);
       }
     },
     addCustom: {
       value( { name, method, enumerable = false, isGetter = false } = {} ) {
-        if (CustomStringConstructor``[name]) {
+        if (ctor``[name]) {
           console.error(`addCustom: the property "${name}" exists and can not be redefined`);
           return `addCustom: the property "${name}" exists and can not be redefined`;
         }
@@ -222,25 +223,29 @@ function createExtendedCTOR(ctor) {
     info: { get() { return swInfo(); } },
     keys: {
       get() {
-        return Object.keys(Object.getOwnPropertyDescriptors(CustomStringConstructor``))
+        return Object.keys(Object.getOwnPropertyDescriptors(ctor``))
           .sort( (a,b) => a.localeCompare(b) )
           .map(v => !/constructor|toString|valueOf/.test(v) && Object.hasOwn(customMethods, v) ? `${v} *custom*` : v);
       }
     },
     quoteInfo: { value: quoteInfo },
-    uuid4: { get() { return CustomStringConstructor(uuid4()); } },
+    uuid4: { get() { return ctor(uuid4()); } },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {
-        return CustomStringConstructor(randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic}));
+        return ctor(
+          randomString({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic})
+        );
       }
     },
     regExp: { value: createRegExp }
   });
 
-  return ctor;
+  return CTOR = ctor;
 }
 
 function maybeInjectCustomMethods(specs) {
+  if (!specs || Object.keys(specs).length < 1 ) { return true; }
+
   const {customMethods, instance, reValue, customStringProperties} = specs;
 
   return Object.entries(customMethods).length < 1
@@ -256,7 +261,7 @@ function maybeInjectCustomMethods(specs) {
 }
 
 function getSWInformation(notChainable, customMethods) {
-  const firstLines = CustomStringConstructor(getInfoPrefix());
+  const firstLines = CTOR(getInfoPrefix());
   const plainValues = getPlainValues();
 
   return firstLines.split(/\n/)

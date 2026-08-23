@@ -5,9 +5,9 @@
 import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S} from "../index.js";
-import {quotingStyles, isArrayOf, quotGetters4Instance, isNumber} from "../src/helpers.js";
+import {quotingStyles, isArrayOf, quotGetters4Instance, isNumber, maybe, checkNotOfType, maybeInjectCustomMethods} from "../src/helpers.js";
 
-describe(`Basics constructor`, () => {
+describe(`Basics constructor and helpers`, () => {
   describe(`Instantiation`, () => {
     it(`Constructor keys are not enumerable`, () => {
       const keys = Object.keys($S);
@@ -451,11 +451,11 @@ describe(`Basics constructor`, () => {
     });
 
     it(`non enumerable custom getter NOT in instance keys`, () => {
-      assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined );
+      assert.strictEqual(Object.keys($S``).find(v => v === `lowerQuotSingle`), undefined);
     });
 
     it(`custom enumerable getter in instance keys`, () => {
-      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted` );
+      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted`);
     });
 
     it(`quotGetters4Instance with dummy wrapper`, () => {
@@ -469,6 +469,49 @@ describe(`Basics constructor`, () => {
 
     it(`isNumber(15) as expected (true)`, () => {
       assert.strictEqual(isNumber(15), true);
+    });
+
+    it(`isNumber(NaN) as expected (false)`, () => {
+      assert.strictEqual(isNumber(parseInt(`hello`)), false);
+    });
+
+    it(`isNumber(Infinity) as expected (false)`, () => {
+      assert.strictEqual(isNumber(1/0), false);
+    });
+
+    it(`maybe as expected (undefined value retrieval)`, () => {
+      assert.strictEqual(maybe(_ => TheyNeverAssignedMe).result, undefined);
+    });
+
+    it(`maybe as expected (15<20 true)`, () => {
+      assert.strictEqual(maybe(_ => 15 < 20).result, true);
+    });
+
+    it(`checkNotOfType as expected (String)`, () => {
+      const myStr = $S`HELLO`;
+      assert.strictEqual(checkNotOfType(String, myStr), false);
+    });
+
+    it(`checkNotOfType as expected (Number)`, () => {
+      assert.strictEqual(checkNotOfType(Number, 42, true), false);
+    });
+
+    it(`maybeInjectCustomMethods no Params`, () =>{
+      assert.strictEqual(maybeInjectCustomMethods(), true);
+    });
+
+    it(`maybeInjectCustomMethods empty object`, () =>{
+      assert.strictEqual(maybeInjectCustomMethods({}), true);
+    });
+
+    it(`maybeInjectCustomMethods no methods`, () =>{
+      assert.strictEqual(
+        maybeInjectCustomMethods({
+          customMethods: {},
+          instance: $S``,
+          reValue: _ => {},
+          customStringProperties: $S,
+        }), true);
     });
   });
 });
