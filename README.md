@@ -29,7 +29,7 @@ An ES/JS "stringbuilder" utility module. The module delivers a constructor to cr
 - [x] retains history of changes
 - [x] no external dependencies
 - [x] instances can use and/or chain native String getters/methods (e.g. `replace`, `split`, `length`)
-- [x] 100% test coverage
+- [x] nearly 100% test coverage
 
 ### Documentation
 **<a href="https://kooiinc.codeberg.page/js-stringweaver/Examples/">Demonstration / Documentation</a>**.
