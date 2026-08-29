@@ -2,7 +2,6 @@ import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
-//const quotingStyles = defineQuotingStyles();
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
 const customMethods = Object.create(null, {});
 const quotingStyles = {
@@ -54,6 +53,7 @@ function isNumber(value) {
   return typeof value === `number` && !Number.isNaN(value) && value !== Infinity;
 }
 
+/* node:coverage ignore next */
 function infoValue(key, infoValue) {
   return `${key} (${infoValue})`;
 }
@@ -66,6 +66,7 @@ function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
       : item?.constructor !== type;
 }
 
+/* node:coverage ignore next */
 function resolveTemplateString(str, ...args) {
   return str?.raw
     ? String.raw({ raw: str }, ...args)
@@ -111,44 +112,12 @@ function encloseFactory(reValue, value) {
   const methods = Object.create(null, {
     custom: { value(start, end) { return reValue(enclose({value, start, end})); } }
   });
-
   Object.entries(quotingStyles).filter(([_, value]) => Array.isArray(value))
-    .forEach(([qs, [start, end]]) => Object.defineProperty(
-       methods, qs, { get() { return reValue(enclose({value, start, end})); } }) );
-
+    .forEach(([qs, [start, end]]) => {
+      const prop2Set = { get() { return reValue(enclose({value, start, end})); } }
+      return qs === `custom` ? false : Object.defineProperty( methods, qs, prop2Set );
+    } );
   return methods;
-}
-
-function quotGetters4Instance(instance, wrap) {
-  wrap = getWrapperFunction(wrap);
-
-  return {
-    value: {
-      get backtick() { return instance.enclose(...quotingStyles.backtick); },
-      get parentheses() { return instance.enclose(...quotingStyles.parentheses); },
-      get curlyBrackets() { return instance.enclose(...quotingStyles.curlyBrackets); },
-      get curlyDouble() { return instance.enclose(...quotingStyles.curlyDouble); },
-      get curlyDoubleInward() { return instance.enclose(...quotingStyles.curlyDoubleInward); },
-      get curlyDoubleEqual() { return instance.enclose(...quotingStyles.curlyDoubleEqual); },
-      get curlyLHDoubleInward() { return instance.enclose(...quotingStyles.curlyLHDoubleInward); },
-      get curlyLHSingle() { return instance.enclose(...quotingStyles.curlyLHSingle); },
-      get curlyLHSingleInward() { return instance.enclose(...quotingStyles.curlyLHSingleInward); },
-      get curlySingle() { return instance.enclose(...quotingStyles.curlySingle); },
-      get curlySingleEqual() { return instance.enclose(...quotingStyles.curlySingleEqual); },
-      get curlySingleInward() { return instance.enclose(...quotingStyles.curlySingleInward); },
-      get custom() { return (start, end) => instance.enclose(...[start, end ?? start]); },
-      get double() { return instance.enclose(...quotingStyles.double);  },
-      get guillemets() { return instance.enclose(...quotingStyles.guillemets); },
-      get guillemetsInward() { return instance.enclose(...quotingStyles.guillemetsInward); },
-      get guillemetsSingle() { return instance.enclose(...quotingStyles.guillemetsSingle); },
-      get guillemetsSingleInward() { return instance.enclose(...quotingStyles.guillemetsSingleInward); },
-      get remove() { return wrap(`${instance.value.replace(quotingStyles.re, ``)}`); },
-      get single() { return instance.enclose(...quotingStyles.single); },
-      get squareBrackets() { return instance.enclose(...quotingStyles.squareBrackets); },
-    },
-    enumerable: false,
-    configurable: false,
-  };
 }
 
 function capitalizerFactory(instance, wrap) {
@@ -181,7 +150,6 @@ function capitalizerFactory(instance, wrap) {
 }
 
 function createExtendedCTOR(ctor) {
-  //const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
   const swInfo = () =>
     getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
   Symbol.toSB = Symbol(`toStringBuilder`);

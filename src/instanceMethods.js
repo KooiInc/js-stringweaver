@@ -21,7 +21,6 @@ export {
   wordsFirstUp,
   parseKebabCase,
   parseSnakeCase,
-  surroundWith,
   customMethods,
   trim,
 };
@@ -33,14 +32,6 @@ function checkAndRun(string, fn, or) {
 
 function format(string, ...tokens) {
   return checkAndRun(string, () => `${interpolate(string, ...tokens)}`);
-}
-
-function surroundWith(string, start, end) {
-  if (!start && !end) {
-    return string;
-  }
-  [start, end] = isArrayOf(String, [start, end ?? ``]) ? [start, end] : [``, ``];
-  return `${start}${string}${end || start}`;
 }
 
 function ucFirst(string) {
