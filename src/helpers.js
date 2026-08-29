@@ -2,53 +2,42 @@ import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
-const quotingStyles = defineQuotingStyles();
+//const quotingStyles = defineQuotingStyles();
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
 const customMethods = Object.create(null, {});
-
+const quotingStyles = {
+  backtick: ["`", "`"],
+  parentheses: [`(`, `)`],
+  curlyBrackets: [`{`, `}`],
+  curlyDouble: [`“`, `”`],
+  curlyDoubleInward: [`”`, `“`],
+  curlyDoubleEqual: [`“`, `“`],
+  curlyLHDouble: [`„`, `”`],
+  curlyLHDoubleInward: [`„`, `“`],
+  curlyLHSingle: [`‚`, `’`],
+  curlyLHSingleInward: [`‚`, `‘`],
+  curlySingle: [`‛`, `’`],
+  curlySingleEqual: [`‛`, `‛`],
+  curlySingleInward: [`’`, `‛`],
+  double: [`"`, `"`],
+  guillemets: [`«`, `»`],
+  guillemetsInward: [`»`, `«`],
+  guillemetsSingle: [`‹`, `›`],
+  guillemetsSingleInward: [`›`, `‹`],
+  single: [`'`, `'`],
+  squareBrackets: [`[`, `]`],
+  custom(start, end) { return [start, end]; }
+};
 let CTOR;
 
 export {
   capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
-  defineQuotingStyles, deprecatedRE, getInfoPrefix, getStringValue, getTraps, getWrapperFunction /*for test*/,
-  escape4RE as escapeRE, infoValue, interpolate, isArrayOf, isNumber, maybe, maybeInjectCustomMethods,
-  randomString, resolveTemplateString, retrieveQuotInfo, quotGetters4Instance, quotingStyles, uuid4,
+  deprecatedRE, enclose, encloseFactory, getInfoPrefix, getStringValue, getTraps,
+  getWrapperFunction /*for test*/, infoValue, interpolate, isArrayOf, isNumber, escapeRE,
+  maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, quotingStyles, uuid4,
 };
 
-function defineQuotingStyles() {
-  // see https://en.wikipedia.org/wiki/Quotation_mark
-  const quots = {
-    backtick: ["`", "`"],
-    parentheses: [`(`, `)`],
-    curlyBrackets: [`{`, `}`],
-    curlyDoubleInward: [`”`, `“`],
-    curlyDouble: [`“`, `”`],
-    curlyDoubleEqual: [`“`, `“`],
-    curlyLHDouble: [`„`, `”`],
-    curlyLHDoubleInward: [`„`, `“`],
-    curlyLHSingle: [`‚`, `’`],
-    curlyLHSingleInward: [`‚`, `‘`],
-    curlySingle: [`‛`, `’`],
-    curlySingleEqual: [`‛`, `‛`],
-    curlySingleInward: [`’`, `‛`],
-    double: [`"`, `"`],
-    guillemets: [`«`, `»`],
-    guillemetsInward: [`»`, `«`],
-    guillemetsSingle: [`‹`, `›`],
-    guillemetsSingleInward: [`›`, `‹`],
-    single: [`'`, `'`],
-    squareBrackets: [`[`, `]`],
-  };
-  quots.re = new RegExp(`[${
-    escape4RE([...new Set(
-      Object.values(quots)
-        .filter(v => Array.isArray(v))
-        .flat())].join(``))
-    }]`, "g");
-  return quots;
-}
-
-function escape4RE(str2Escape) {
+function escapeRE(str2Escape) {
   return str2Escape.replace(/\p{S}|\p{P}/gu, a => `\\${a}`);
 }
 
@@ -106,20 +95,28 @@ function cloneInstance(instance) {
   return newInstance;
 }
 
-function retrieveQuotInfo(instanceQuotGetters4Info, ctor) {
-  return Object.entries(Object.getOwnPropertyDescriptors(instanceQuotGetters4Info.value))
-    .sort( (a,b) => a[0].localeCompare(b[0]) )
-    .reduce((acc, [k,]) => {
-      if (k === `remove`) { return [...acc, `[instance].quote.remove (only predefined)`]; }
-      if (k === `custom`) { return [...acc, `[instance].quote.custom(start:string, end:string)`]; }
-
-      const val = ctor(`[instance]`).quote[k];
-      return [...acc, `[instance].quote.${k} ( ${val} )`];
-    }, []);
-}
-
 function getWrapperFunction(wrap) {
   return wrap ?? function(me) { return me; };
+}
+
+function enclose({value, start, end}) {
+  start = start?.value || start;
+  end = end?.value || end;
+  start = typeof start === 'string' && start?.length > 0 ? start : ``;
+  end = typeof start === 'string' && end?.length > 0 ? end : start;
+  return `${start}${value}${end}`;
+}
+
+function encloseFactory(reValue, value) {
+  const methods = Object.create(null, {
+    custom: { value(start, end) { return reValue(enclose({value, start, end})); } }
+  });
+
+  Object.entries(quotingStyles).filter(([_, value]) => Array.isArray(value))
+    .forEach(([qs, [start, end]]) => Object.defineProperty(
+       methods, qs, { get() { return reValue(enclose({value, start, end})); } }) );
+
+  return methods;
 }
 
 function quotGetters4Instance(instance, wrap) {
@@ -184,7 +181,7 @@ function capitalizerFactory(instance, wrap) {
 }
 
 function createExtendedCTOR(ctor) {
-  const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
+  //const quoteInfo = retrieveQuotInfo(quotGetters4Instance(ctor()), ctor);
   const swInfo = () =>
     getSWInformation(`constructor,history,indexOf,toString,value,valueOf,empty`.split(`,`), customMethods);
   Symbol.toSB = Symbol(`toStringBuilder`);
@@ -232,7 +229,14 @@ function createExtendedCTOR(ctor) {
           .map(v => !/constructor|toString|valueOf/.test(v) && Object.hasOwn(customMethods, v) ? `${v} *custom*` : v);
       }
     },
-    quoteInfo: { value: quoteInfo },
+    quoteInfo: { get() {
+      return Object.keys(quotingStyles).filter(quot => !/^(re|remove)$/.test(quot)).map(quot => {
+          if (quot === `custom`) { return `[instance].quote.custom(start:string, end:string)`; }
+          const val = ctor(`[instance]`).quote[quot];
+          return `[instance].quote.${quot} ( ${val} )`;
+        }).sort((a, b) => a.localeCompare(b));
+      }
+    },
     uuid4: { get() { return ctor(uuid4()); } },
     randomString: {
       value: function({len, includeUppercase, includeNumbers, includeSymbols, startAlphabetic} = {}) {

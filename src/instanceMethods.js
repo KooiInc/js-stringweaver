@@ -1,8 +1,7 @@
 import { customMethods, } from "./helpers.js"; //"./CTORCreator.js";
 
 import {
-  createRegExp as $RE, getStringValue, isArrayOf, interpolate,
-  isNumber, escapeRE, quotGetters4Instance as quotGetters,
+  createRegExp as $RE, escapeRE, getStringValue, isArrayOf, interpolate, isNumber
 } from "./helpers.js";
 
 export {
@@ -22,7 +21,6 @@ export {
   wordsFirstUp,
   parseKebabCase,
   parseSnakeCase,
-  quotGetters,
   surroundWith,
   customMethods,
   trim,

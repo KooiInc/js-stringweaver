@@ -1,10 +1,10 @@
 import {
   append, getStringValue, format, indexOf, insert, isNumber,
-  lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix, quotGetters,
-  replaceWords, surroundWith, trim, trimAll, truncate, ucFirst, wordsFirstUp,
+  lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix,
+  replaceWords, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, cloneInstance, getTraps, maybeInjectCustomMethods, customMethods } from "./helpers.js";
+import { capitalizerFactory, cloneInstance, enclose, encloseFactory, getTraps, maybeInjectCustomMethods, customMethods } from "./helpers.js";
 
 export default instanceCreator;
 
@@ -18,7 +18,7 @@ function instanceCreator({initialstring} = {}) {
   Object.defineProperties( customStringProperties, {
     // methods
     append: { value(...strings) { return reValue(append(actualValue, ...strings)); } },
-    enclose: { value(start, end) { return reValue(surroundWith(actualValue, start, end)); } },
+    enclose: { value(start, end) { return reValue(enclose({value: actualValue, start, end})); } },
     format: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
     indexOf: { value(str) { return indexOf(actualValue, str); } },
     interpolate: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
@@ -43,7 +43,7 @@ function instanceCreator({initialstring} = {}) {
     empty: { get() { return actualValue.length < 1; } },
     notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
     kebabCase: { get() { return reValue(parseKebabCase(getStringValue(actualValue))); } },
-    quote: quotGetters(instance, reValue),
+    quote: { get() { return encloseFactory(reValue, actualValue); } },// quotGetters(instance, reValue),
     snakeCase: { get() { return reValue(parseSnakeCase(getStringValue(actualValue))); } },
     trimAll: { get() { return reValue(trimAll(actualValue)); } },
     trimAllKeepLF: { get() { return reValue(trimAll(actualValue, true)); } },
