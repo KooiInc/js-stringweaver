@@ -53,20 +53,10 @@ function isNumber(value) {
   return typeof value === `number` && !Number.isNaN(value) && value !== Infinity;
 }
 
-/* node:coverage ignore next */
 function infoValue(key, infoValue) {
   return `${key} (${infoValue})`;
 }
 
-function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
-  return !item?.constructor
-    ? true
-    : type === String && StringsMayBeSWInstances
-      ? maybe(_ => item?.constructor !== CTOR).result && item?.constructor !== type
-      : item?.constructor !== type;
-}
-
-/* node:coverage ignore next */
 function resolveTemplateString(str, ...args) {
   return str?.raw
     ? String.raw({ raw: str }, ...args)
@@ -75,6 +65,14 @@ function resolveTemplateString(str, ...args) {
 
 function canWrapNative(key) {
   return !deprecatedRE.test(key) && Object.hasOwn(String.prototype, key);
+}
+
+function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
+  return !item?.constructor
+    ? true
+    : type === String && StringsMayBeSWInstances
+      ? maybe(_ => item?.constructor !== CTOR).result && item?.constructor !== type
+      : item?.constructor !== type;
 }
 
 function getTraps({maybeRevalueNative}) {
