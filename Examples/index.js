@@ -571,40 +571,35 @@ function notEmptyEx() {
 }
 
 function quoteEx() {
-  const quotingStyleExamples = Object.keys($S``.quote)
-    .reduce((acc, v) => {
-      return !/re|custom|^_/.test(v)
-        ? [...acc, $S`<code>$S(" Hello ").quote.${v}</code> => <span class="quoted">${
-          " Hello "[SB].quote[v]}</span>`.toTag("div", "normal b5")]
-        : acc;
-    }, [])
-    .concat(
-      $S`<code>$S(" Hello ").quote.custom("**")</code> => <span class="quoted">${
-        $S(" Hello ").quote.custom("**")}</span>`.toTag("div", "normal b5"),
-      $S`<code>$S(" Hello ").quote.curlyDoubleEqual.quote.remove</code> => <span class="quoted">${
-        $S(" Hello ").quote.curlyDoubleEqual.quote.remove}</span>`.toTag("div", "normal b5")
-    );
+  const quotingStyleExamples = [...Object.getOwnPropertyNames($S.create.quote)]
+    .sort((a, b) => a.localeCompare(b))
+    .map(key => {
+      return key === `custom`
+        ? $S`<code>$S(" Hello ").quote.custom("**")</code> => <span class="quoted">${
+            $S(" Hello ").quote.custom("**")}</span>`.toTag("div", "normal b5")
+          .append($S`<code>$S(" Hello ").quote.custom("¡", "!")</code> => <span class="quoted">${
+            $S(" Hello ").quote.custom("¡", "!")}</span>`.toTag("div", "normal b5"))
+        : $S`<code>$S(" Hello ").quote.${key}</code> => <span class="quoted">${
+            " Hello "[SB].quote[key]}</span>`.toTag("div", "normal b5")
+    });
 
   return createChapter(
     itemHeader(" .quote[...]"),
     `Apply a quoting style to the instance string value.`[SB].asDiv
       .append(`The module includes a number of
-      <span class="internalLink" data-internal="[constructor].quoteInfo"
-        data-link-to="#static-quoteinfo"> predefined quoting styles</span>
-      one can use to quote the instance string value.`[SB].asDiv)
-      .append(`The <code>quote</code> getter returns an Object.
-      One of the properties of this object is the <code>[instance].quote.custom</code>
-      method that can be called to apply custom quotes to the instance string value.
-      The other properties are getters (e.g. <code>$S("hi").quote.singleQuote</code>).`.asDiv)
-      .append(`The <code>quote.remove</code> special getter can be used to remove
-      <i>predefined</i> quoting styles from the instance string value. It will not work
-      on custom quotes.`.asDiv)
+        <span class="internalLink" data-internal="[constructor].quoteInfo"
+          data-link-to="#static-quoteinfo"> predefined quoting styles</span>
+          one can use to quote the instance string value.`[SB].asDiv)
+     .append(`<div class="normal">The <code>quote</code> getter returns an Object.</div>
+      <div class="normal">All <code>[instance].quote</code> properties are getters, except
+        <code>[instance].quote.custom</code> which is a <i>method</i> to
+          enclose the instance string value with custom quotes.</div>`)
       .append($S`The <code>[instance].quote.custom</code> method works exactly like
         <span class="internalLink"
           data-internal="[instance].enclose"
           data-link-to="#method-enclose"> [instance].enclose</span>`
         .asNote.asDiv)
-      .append($S`<h4 class="between">Here are examples for all predefined- and special
+      .append($S`<h4 class="between" style="margin-top: 1.2em;">Here are examples for all predefined
       <code>quote</code> fields</h4>`.asDiv)
       .append(``, quotingStyleExamples.join(``)),
     "getter-quote");
