@@ -443,6 +443,15 @@ describe(`Basics constructor and helpers`, () => {
       assert.strictEqual(isArrayOf(String, arrOfString), true);
     });
 
+    it(`toString as expected`, () => {
+      const hi = $S`stringified`;
+      assert.strictEqual(hi.constructor, $S);
+      assert.notStrictEqual(hi.toString().constructor, $S);
+      assert.strictEqual(hi.toString(), `stringified`);
+      assert.strictEqual(String(hi), `stringified`);
+      assert(`${hi}`, `stringified`);
+    });
+
     it(`isArrayOf (Map)`, () => {
       const arrOfMaps = [new Map(), new Map()];
       assert.strictEqual(isArrayOf(Map, arrOfMaps), true);
@@ -1088,15 +1097,6 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
           "squareBrackets"
         ]);
     });
-  });
-  // TODO
-  it(`toString as expected`, () => {
-    const hi = $S`stringified`;
-    assert.strictEqual(hi.constructor, $S);
-    assert.notStrictEqual(hi.toString().constructor, $S);
-    assert.strictEqual(hi.toString(), `stringified`);
-    assert.strictEqual(String(hi), `stringified`);
-    assert(`${hi}`, `stringified`);
   });
 
   describe(`trim override`, () => {
