@@ -1,7 +1,11 @@
-// noinspection JSValidateTypes
+/*
+  Note: all html in the examples page is created using StringWeaver
+  Press CTRL-U or right click and select 'View Page Source' if you
+  don't believe it.
+*/
 const {
   $, $S, codeOverlay, exampleCode, SB,
-  print2Document, useBundle, load} = await initialize({useBundle: false});
+  print2Document, useBundle, load} = await initialize({useBundle: true});
 main();
 
 function main() {

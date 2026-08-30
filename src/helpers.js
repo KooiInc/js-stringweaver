@@ -122,31 +122,31 @@ function encloseFactory(reValue, value) {
   return methods;
 }
 
-function capitalizerFactory(instance, wrap) {
+function capitalizerFactory(instance, reValue) {
   return {
     get full() {
-      return wrap(instance.value.toUpperCase());
+      return reValue(instance.value.toUpperCase());
     },
     get none() {
-      return wrap(instance.value.toLowerCase());
+      return reValue(instance.value.toLowerCase());
     },
     get camel() {
-      return wrap(parseCamelcase(instance.value));
+      return reValue(parseCamelcase(instance.value));
     },
     get snake() {
-      return wrap(parseSnakeCase(instance.value));
+      return reValue(parseSnakeCase(instance.value));
     },
     get first() {
-      return wrap(ucFirst(instance.value));
+      return reValue(ucFirst(instance.value));
     },
     get kebab() {
-      return wrap(parseKebabCase(instance.value));
+      return reValue(parseKebabCase(instance.value));
     },
     get words() {
-      return wrap(wordsFirstUp(instance.value));
+      return reValue(wordsFirstUp(instance.value));
     },
     get dashed() {
-      return wrap(parseKebabCase(instance.value));
+      return reValue(parseKebabCase(instance.value));
     },
   }
 }
