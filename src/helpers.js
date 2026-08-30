@@ -4,7 +4,7 @@ import {default as randomString, uuid4}  from "./Factories/randomStringFactory.j
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
 const customMethods = Object.create(null, {});
-const quotingStyles = Object.create(null,{
+const quotingStyles = Object.create(null, {
   backtick: { value: ["`", "`"] },
   parentheses: { value: [`(`, `)`] },
   curlyBrackets: { value: [`{`, `}`] },
@@ -102,7 +102,7 @@ function enclose({value, start, end}) {
   start = start?.value || start;
   end = end?.value || end;
   start = typeof start === 'string' && start?.length > 0 ? start : ``;
-  end = typeof start === 'string' && end?.length > 0 ? end : start;
+  end = typeof end === 'string' && end?.length > 0 ? end : start;
   return `${start}${value}${end}`;
 }
 

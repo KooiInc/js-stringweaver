@@ -931,22 +931,24 @@ function encloseEx() {
     )
 
     .appendDiv(`b5`,
-      $S`if one of the values is not a string or instance,
-      the instance value will not change`.asNote
+      $S`if one of the values is not a string or StringWeaver instance,
+      it will be changed to an empty string. If only the start
+      parameter is given (and valid), that will also be the
+      value of the end parameter`.asNote
     )
 
     .appendDiv(`b5`,
       $S('$S`Hello world`.enclose([1,2,3], "&lt;")').toCode
         .append(
           ` => `,
-          $S`Hello world`.enclose([1,2,3]).qcd)
+          $S` [Hello world] `.enclose([1,2,3], `<`).qcd)
     )
 
     .appendDiv(`b5`,
-      $S('$S`Hello world`.enclose("hithere", {hi: 1})').toCode
+      $S('$S`Hello world`.enclose(" hithere ", {hi: 1})').toCode
         .append(
           ` => `,
-          $S`Hello world`.enclose("hithere", {hi: 1}).qcd)
+          $S`Hello world`.enclose(" hithere ", {hi: 1}).qcd)
     ),
     "method-enclose"
   );
