@@ -1035,7 +1035,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
   describe(`quoting`, () => {
       it(`[instance].quote[quotingStyle] for all possibilities as expected`, () => {
-        const allQuots =  Object.keys(quotingStyles).filter(q => !/^(re|remove)$/.test(q)).map(key => {
+        const allQuots =  Object.getOwnPropertyNames(quotingStyles).map(key => {
           if (key === "custom") { return $S`${key}: ` + $S(`quoting`).quote[key](`!!`); }
           return `${key}: ${$S(`quoting`).quote[key]}`;
         });

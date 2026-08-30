@@ -4,29 +4,29 @@ import {default as randomString, uuid4}  from "./Factories/randomStringFactory.j
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
 const customMethods = Object.create(null, {});
-const quotingStyles = {
-  backtick: ["`", "`"],
-  parentheses: [`(`, `)`],
-  curlyBrackets: [`{`, `}`],
-  curlyDouble: [`“`, `”`],
-  curlyDoubleInward: [`”`, `“`],
-  curlyDoubleEqual: [`“`, `“`],
-  curlyLHDouble: [`„`, `”`],
-  curlyLHDoubleInward: [`„`, `“`],
-  curlyLHSingle: [`‚`, `’`],
-  curlyLHSingleInward: [`‚`, `‘`],
-  curlySingle: [`‛`, `’`],
-  curlySingleEqual: [`‛`, `‛`],
-  curlySingleInward: [`’`, `‛`],
-  double: [`"`, `"`],
-  guillemets: [`«`, `»`],
-  guillemetsInward: [`»`, `«`],
-  guillemetsSingle: [`‹`, `›`],
-  guillemetsSingleInward: [`›`, `‹`],
-  single: [`'`, `'`],
-  squareBrackets: [`[`, `]`],
-  custom(start, end) { return [start, end]; }
-};
+const quotingStyles = Object.create(null,{
+  backtick: { value: ["`", "`"] },
+  parentheses: { value: [`(`, `)`] },
+  curlyBrackets: { value: [`{`, `}`] },
+  curlyDouble: { value: [`“`, `”`] },
+  curlyDoubleInward: { value: [`”`, `“`] },
+  curlyDoubleEqual: { value: [`“`, `“`] },
+  curlyLHDouble: { value: [`„`, `”`] },
+  curlyLHDoubleInward: { value: [`„`, `“`] },
+  curlyLHSingle: { value: [`‚`, `’`] },
+  curlyLHSingleInward: { value: [`‚`, `‘`] },
+  curlySingle: { value: [`‛`, `’`] },
+  curlySingleEqual: { value: [`‛`, `‛`] },
+  curlySingleInward: { value: [`’`, `‛`] },
+  double: { value: [`"`, `"`] },
+  guillemets: { value: [`«`, `»`] },
+  guillemetsInward: { value: [`»`, `«`] },
+  guillemetsSingle: { value: [`‹`, `›`] },
+  guillemetsSingleInward: { value: [`›`, `‹`] },
+  single: { value: [`'`, `'`] },
+  squareBrackets: { value: [`[`, `]`] },
+  custom: { value(start, end) { return [start, end]; } }
+});
 let CTOR;
 
 export {
@@ -110,10 +110,14 @@ function encloseFactory(reValue, value) {
   const methods = Object.create(null, {
     custom: { value(start, end) { return reValue(enclose({value, start, end})); } }
   });
-  Object.entries(quotingStyles).filter(([_, value]) => Array.isArray(value))
-    .forEach(([qs, [start, end]]) => {
-      const prop2Set = { get() { return reValue(enclose({value, start, end})); } }
-      return qs === `custom` ? false : Object.defineProperty( methods, qs, prop2Set );
+  Object.getOwnPropertyNames(quotingStyles)
+    .filter(v => v !== `custom`)
+    .forEach(qs => {
+      const [start, end] = quotingStyles?.[qs] ?? undefined;
+      return Object.defineProperty(
+        methods,
+        qs,
+        { get() { return reValue(enclose({value, start, end})); }} );
     } );
   return methods;
 }
@@ -196,7 +200,7 @@ function createExtendedCTOR(ctor) {
       }
     },
     quoteInfo: { get() {
-      return Object.keys(quotingStyles).filter(quot => !/^(re|remove)$/.test(quot)).map(quot => {
+      return Object.getOwnPropertyNames(quotingStyles).map(quot => {
           if (quot === `custom`) { return `[instance].quote.custom(start:string, end:string)`; }
           const val = ctor(`[instance]`).quote[quot];
           return `[instance].quote.${quot} ( ${val} )`;
