@@ -1646,7 +1646,7 @@ function codeViewerAndPerformanceClickHandler({me}) {
 
 function linkToLinkHandler({me}) {
   const linkElement = $(me.data.get(`link-to`).toLowerCase());
-  console.log(linkElement.node);
+
   if (!me.closest(`.lemma`).is.empty) {
     $(`[data-active='1']`).data.set({active: "0"});
     me.data.set({active: "1"});
