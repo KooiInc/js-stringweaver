@@ -3,36 +3,35 @@ import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
 const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
-const customMethods = Object.create(null, {});
-const quotingStyles = Object.create(null, {
-  backtick: { value: ["`", "`"] },
-  parentheses: { value: [`(`, `)`] },
-  curlyBrackets: { value: [`{`, `}`] },
-  curlyDouble: { value: [`“`, `”`] },
-  curlyDoubleInward: { value: [`”`, `“`] },
-  curlyDoubleEqual: { value: [`“`, `“`] },
-  curlyLHDouble: { value: [`„`, `”`] },
-  curlyLHDoubleInward: { value: [`„`, `“`] },
-  curlyLHSingle: { value: [`‚`, `’`] },
-  curlyLHSingleInward: { value: [`‚`, `‘`] },
-  curlySingle: { value: [`‛`, `’`] },
-  curlySingleEqual: { value: [`‛`, `‛`] },
-  curlySingleInward: { value: [`’`, `‛`] },
-  double: { value: [`"`, `"`] },
-  guillemets: { value: [`«`, `»`] },
-  guillemetsInward: { value: [`»`, `«`] },
-  guillemetsSingle: { value: [`‹`, `›`] },
-  guillemetsSingleInward: { value: [`›`, `‹`] },
-  single: { value: [`'`, `'`] },
-  squareBrackets: { value: [`[`, `]`] },
-  custom: { value(start, end) { return [start, end]; } }
-});
+const customMethods = new WeakRef({});
+const quotingStyles = {
+  get backtick() { return ["`", "`"] },
+  get parentheses() { return [`(`, `)`] },
+  get curlyBrackets() { return [`{`, `}`] },
+  get curlyDouble() { return [`“`, `”`] },
+  get curlyDoubleInward() { return [`”`, `“`] },
+  get curlyDoubleEqual() { return  [`“`, `“`] },
+  get curlyLHDouble() { return [`„`, `”`] },
+  get curlyLHDoubleInward() { return [`„`, `“`] },
+  get curlyLHSingle() { return [`‚`, `’`] },
+  get curlyLHSingleInward() { return [`‚`, `‘`] },
+  get curlySingle() { return [`‛`, `’`] },
+  get curlySingleEqual() { return [`‛`, `‛`] },
+  get curlySingleInward() { return [`’`, `‛`] },
+  get double() { return [`"`, `"`] },
+  get guillemets() { return [`«`, `»`] },
+  get guillemetsInward() { return [`»`, `«`] },
+  get guillemetsSingle() { return [`‹`, `›`] },
+  get guillemetsSingleInward() { return [`›`, `‹`] },
+  get single() { return [`'`, `'`] },
+  get squareBrackets() { return [`[`, `]`] },
+};
 let CTOR;
 
 export {
   capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
   deprecatedRE, enclose, encloseFactory, getInfoPrefix, getStringValue, getTraps,
-  getWrapperFunction /*for test*/, infoValue, interpolate, isArrayOf, isNumber, escapeRE,
+  getReValueFunction /*for test*/, infoValue, interpolate, isArrayOf, isNumber, escapeRE,
   maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, quotingStyles, uuid4,
 };
 
@@ -94,8 +93,8 @@ function cloneInstance(instance) {
   return newInstance;
 }
 
-function getWrapperFunction(wrap) {
-  return wrap ?? function(me) { return me; };
+function getReValueFunction(reValueFn) {
+  return typeof reValueFn === `function` ? reValueFn : function(me) { return me; };
 }
 
 function enclose({value, start, end}) {
@@ -107,48 +106,28 @@ function enclose({value, start, end}) {
 }
 
 function encloseFactory(reValue, value) {
-  const methods = Object.create(null, {
-    custom: { value(start, end) { return reValue(enclose({value, start, end})); } }
-  });
+  const methods = { custom(start, end) { return reValue(enclose({value, start, end})); } };
   Object.getOwnPropertyNames(quotingStyles)
-    .filter(v => v !== `custom`)
     .forEach(qs => {
       const [start, end] = quotingStyles?.[qs] ?? undefined;
       return Object.defineProperty(
-        methods,
-        qs,
-        { get() { return reValue(enclose({value, start, end})); }} );
+        methods, qs,
+        { get() { return reValue(enclose({value, start, end})); } } );
     } );
   return methods;
 }
 
-function capitalizerFactory(instance, reValue) {
+function capitalizerFactory(value, reValue) {
   return {
-    get full() {
-      return reValue(instance.value.toUpperCase());
-    },
-    get none() {
-      return reValue(instance.value.toLowerCase());
-    },
-    get camel() {
-      return reValue(parseCamelcase(instance.value));
-    },
-    get snake() {
-      return reValue(parseSnakeCase(instance.value));
-    },
-    get first() {
-      return reValue(ucFirst(instance.value));
-    },
-    get kebab() {
-      return reValue(parseKebabCase(instance.value));
-    },
-    get words() {
-      return reValue(wordsFirstUp(instance.value));
-    },
-    get dashed() {
-      return reValue(parseKebabCase(instance.value));
-    },
-  }
+    get full() { return reValue(value.toUpperCase()); },
+    get none() { return reValue(value.toLowerCase()); },
+    get camel() { return reValue(parseCamelcase(value)); },
+    get snake() { return reValue(parseSnakeCase(value)); },
+    get first() { return reValue(ucFirst(value)); },
+    get kebab() { return reValue(parseKebabCase(value)); },
+    get words() { return reValue(wordsFirstUp(value)); },
+    get dashed() { return reValue(parseKebabCase(value)); },
+  };
 }
 
 function createExtendedCTOR(ctor) {
@@ -200,11 +179,14 @@ function createExtendedCTOR(ctor) {
       }
     },
     quoteInfo: { get() {
-      return Object.getOwnPropertyNames(quotingStyles).map(quot => {
-          if (quot === `custom`) { return `[instance].quote.custom(start:string, end:string)`; }
+      return Object.keys(quotingStyles)
+        .concat(`custom`)
+        .map(quot => {
           const val = ctor(`[instance]`).quote[quot];
-          return `[instance].quote.${quot} ( ${val} )`;
-        }).sort((a, b) => a.localeCompare(b));
+          return quot === `custom`
+            ? `[instance].quote.custom(start:string, end:string) - method`
+            : `[instance].quote.${quot} ( ${val} )`; })
+        .sort((a, b) => a.localeCompare(b));
       }
     },
     uuid4: { get() { return ctor(uuid4()); } },
@@ -269,7 +251,7 @@ function getSWInformation(notChainable, customMethods) {
 }
 
 function getPlainValues() {
-  const capitalizerKeys = Object.keys(capitalizerFactory());
+  const capitalizerKeys = Object.getOwnPropertyNames(capitalizerFactory());
   return {
     value: `getter/setter`,
     clone: `chainable getter`,

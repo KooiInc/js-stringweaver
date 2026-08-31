@@ -4,12 +4,14 @@ import {
   replaceWords, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
-import { capitalizerFactory, cloneInstance, enclose, encloseFactory, getTraps, maybeInjectCustomMethods, customMethods } from "./helpers.js";
+import {
+  capitalizerFactory, cloneInstance, enclose, encloseFactory,
+  getTraps, maybeInjectCustomMethods, customMethods } from "./helpers.js";
 
 export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
-  let customStringProperties = new WeakRef(Object.create(null, { }));
+  let customStringProperties = {};
   let instance = new Proxy(customStringProperties, getTraps({maybeRevalueNative}));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
@@ -36,14 +38,14 @@ function instanceCreator({initialstring} = {}) {
 
     // getters
     camelCase: { get() { return reValue(parseCamelcase(getStringValue(actualValue))); } },
-    capitalize: { value: capitalizerFactory(instance, reValue) },
+    capitalize: { value: capitalizerFactory(actualValue, reValue) },
     clone: { get() { return cloneInstance(instance); } },
     firstUp: { get() { return reValue(ucFirst(getStringValue(actualValue))); } },
     history: { get() { return history; }, set(value) { history = value; } },
     empty: { get() { return actualValue.length < 1; } },
     notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
     kebabCase: { get() { return reValue(parseKebabCase(getStringValue(actualValue))); } },
-    quote: { get() { return encloseFactory(reValue, actualValue); } },// quotGetters(instance, reValue),
+    quote: { get() { return encloseFactory(reValue, actualValue); } },
     snakeCase: { get() { return reValue(parseSnakeCase(getStringValue(actualValue))); } },
     trimAll: { get() { return reValue(trimAll(actualValue)); } },
     trimAllKeepLF: { get() { return reValue(trimAll(actualValue, true)); } },
@@ -103,7 +105,7 @@ function instanceCreator({initialstring} = {}) {
     return typeof actualValue[key] === `function`
       ? function(...args) {
         const result = actualValue[key](...args);
-        return typeof result === `string` ? reValue(actualValue[key](...args)) : result;
+        return typeof result === `string` ? reValue(result) : result;
       }
       : actualValue[key];
   }

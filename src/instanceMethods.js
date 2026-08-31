@@ -43,7 +43,7 @@ function parseKebabCase(str) {
 
   for (const s of [...str]) {
     switch(true) {
-      case !/[a-z _]/i.test(s): break;
+      case !/[a-z _-]/i.test(s): break;
       case /[ _]/.test(s): result += `-`; break;
       case s === s.toUpperCase(): result += `-${s.toLowerCase()}`; break;
       default: result += s;
