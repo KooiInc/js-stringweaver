@@ -6,7 +6,7 @@ import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S} from "../index.js";
 import {
-  quotingStyles, isArrayOf, isNumber, maybe, checkNotOfType, escapeRE, getWrapperFunction,
+  quotingStyles, isArrayOf, isNumber, maybe, checkNotOfType, escapeRE, getReValueFunction,
   maybeInjectCustomMethods, resolveTemplateString, getInfoPrefix, encloseFactory } from "../src/helpers.js";
 
 describe(`Basics constructor and helpers`, () => {
@@ -276,7 +276,7 @@ describe(`Basics constructor and helpers`, () => {
         "[instance].quote.curlySingle ( ‛[instance]’ )",
         "[instance].quote.curlySingleEqual ( ‛[instance]‛ )",
         "[instance].quote.curlySingleInward ( ’[instance]‛ )",
-        "[instance].quote.custom(start:string, end:string)",
+        "[instance].quote.custom(start:string, end:string) - method",
         "[instance].quote.double ( \"[instance]\" )",
         "[instance].quote.guillemets ( «[instance]» )",
         "[instance].quote.guillemetsInward ( »[instance]« )",
@@ -538,11 +538,11 @@ describe(`Basics constructor and helpers`, () => {
     });
 
     it(`wrapper (none)`, () => {
-      assert.strictEqual(getWrapperFunction().toString(), `function(me) { return me; }`);
+      assert.strictEqual(getReValueFunction().toString(), `function(me) { return me; }`);
     });
 
     it(`wrapper (fn)`, () => {
-      assert.strictEqual(getWrapperFunction(_ => `hithere`).toString(), `_ => \`hithere\``);
+      assert.strictEqual(getReValueFunction(_ => `hithere`).toString(), `_ => \`hithere\``);
     });
 
     it(`maybeInjectCustomMethods empty object`, () =>{
@@ -1035,7 +1035,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
   describe(`quoting`, () => {
       it(`[instance].quote[quotingStyle] for all possibilities as expected`, () => {
-        const allQuots =  Object.getOwnPropertyNames(quotingStyles).map(key => {
+        const allQuots =  Object.keys(quotingStyles).concat(`custom`).map(key => {
           if (key === "custom") { return $S`${key}: ` + $S(`quoting`).quote[key](`!!`); }
           return `${key}: ${$S(`quoting`).quote[key]}`;
         });
