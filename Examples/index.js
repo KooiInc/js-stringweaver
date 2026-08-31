@@ -1763,12 +1763,6 @@ function runAndReportPerformance() {
    testResults = null;
 }
 
-function debug(...things2Log) {
-  if (/localhost/i.test(location.href)) {
-    things2Log.forEach(thing => console.warn(thing));
-  }
-}
-
 function pageLoadDurationFactory() {
   let startTime = performance.now();
   let pageDuration = 0;
