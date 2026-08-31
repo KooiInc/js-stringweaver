@@ -2,7 +2,7 @@ import interpolate from "./factories/splatESBundle.js";
 import createRegExp from "./Factories/regExpFromMultilineStringFactory.js";
 import {default as randomString, uuid4}  from "./Factories/randomStringFactory.js";
 import {parseCamelcase, parseKebabCase, parseSnakeCase, ucFirst, wordsFirstUp} from "./instanceMethods.js";
-const deprecatedRE = /symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub/i;
+const deprecatedNativePropertiesRE = /^(symbol|anchor|big|blink|bold|fixed|fontsize|fontcolor|italics|link|small|strike|sup|sub)$/i;
 const customMethods = new WeakRef({});
 const quotingStyles = {
   get backtick() { return ["`", "`"] },
@@ -30,7 +30,7 @@ let CTOR;
 
 export {
   capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
-  deprecatedRE, enclose, encloseFactory, getInfoPrefix, getStringValue, getTraps,
+  deprecatedNativePropertiesRE, enclose, encloseFactory, getInfoPrefix, getStringValue, getTraps,
   getReValueFunction /*for test*/, infoValue, interpolate, isArrayOf, isNumber, escapeRE,
   maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, quotingStyles, uuid4,
 };
@@ -63,7 +63,7 @@ function resolveTemplateString(str, ...args) {
 }
 
 function canWrapNative(key) {
-  return !deprecatedRE.test(key) && Object.hasOwn(String.prototype, key);
+  return !deprecatedNativePropertiesRE.test(key) && Object.hasOwn(String.prototype, key);
 }
 
 function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
@@ -74,14 +74,14 @@ function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
       : item?.constructor !== type;
 }
 
-function getTraps({maybeRevalueNative}) {
+function getTraps({maybeRevalue}) {
   return {
     get( target, key ) {
       switch(true) {
         case key === Symbol.for("type"): return `StringWeaver instance (Proxy)`;
-        case Object.hasOwn(target, key): return target[key];
-        case canWrapNative(String(key)): return maybeRevalueNative(key);
-        default: return maybeRevalueNative(key);
+        case key in target: return target[key];
+        case canWrapNative(String(key)): return maybeRevalue(key);
+        default: return maybeRevalue(target[key]);
       }
     },
   };
@@ -159,7 +159,7 @@ function createExtendedCTOR(ctor) {
     },
     addCustom: {
       value( { name, method, enumerable = false, isGetter = false } = {} ) {
-        if (ctor``[name]) {
+        if (ctor.create[name]) {
           console.error(`addCustom: the property "${name}" exists and can not be redefined`);
           return `addCustom: the property "${name}" exists and can not be redefined`;
         }
