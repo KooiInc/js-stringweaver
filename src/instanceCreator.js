@@ -37,21 +37,21 @@ function instanceCreator({initialstring} = {}) {
     undoLast: { value(nSteps) { return undoSteps(nSteps); } },
 
     // getters
-    camelCase: { get() { return reValue(parseCamelcase(getStringValue(actualValue))); } },
+    camelCase: { get() { return reValue(parseCamelcase(actualValue)); } },
     capitalize: { value: capitalizerFactory(actualValue, reValue) },
     clone: { get() { return cloneInstance(instance); } },
-    firstUp: { get() { return reValue(ucFirst(getStringValue(actualValue))); } },
+    firstUp: { get() { return reValue(ucFirst(actualValue)); } },
     history: { get() { return history; }, set(value) { history = value; } },
     empty: { get() { return actualValue.length < 1; } },
     notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
-    kebabCase: { get() { return reValue(parseKebabCase(getStringValue(actualValue))); } },
+    kebabCase: { get() { return reValue(parseKebabCase(actualValue)); } },
     quote: { get() { return encloseFactory(reValue, actualValue); } },
-    snakeCase: { get() { return reValue(parseSnakeCase(getStringValue(actualValue))); } },
+    snakeCase: { get() { return reValue(parseSnakeCase(actualValue)); } },
     trimAll: { get() { return reValue(trimAll(actualValue)); } },
     trimAllKeepLF: { get() { return reValue(trimAll(actualValue, true)); } },
     undoAll: { get() { return undoAll(); } },
     undo: { get() { return undoLast(); } },
-    wordsUCFirst: { get() { return reValue(wordsFirstUp(getStringValue(actualValue))); } },
+    wordsUCFirst: { get() { return reValue(wordsFirstUp(actualValue)); } },
     value: {
       get() { return actualValue; },
       set(value) {
