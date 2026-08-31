@@ -104,8 +104,8 @@ function instanceCreator({initialstring} = {}) {
   function maybeRevalueNative(key) {
     return typeof actualValue[key] === `function`
       ? function(...args) {
-        const result = actualValue[key](...args);
-        return typeof result === `string` ? reValue(result) : result;
+          const result = actualValue[key](...args);
+          return typeof result === `string` ? reValue(result) : result;
       }
       : actualValue[key];
   }
