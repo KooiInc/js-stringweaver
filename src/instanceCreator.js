@@ -12,7 +12,7 @@ export default instanceCreator;
 
 function instanceCreator({initialstring} = {}) {
   let customStringProperties = {};
-  let instance = new Proxy(customStringProperties, getTraps({maybeRevalueNative}));
+  let instance = new Proxy(customStringProperties, getTraps({maybeRevalue}));
   let actualValue = getStringValue(initialstring);
   let history = [actualValue];
   maybeInjectCustomMethods({customStringProperties, customMethods, instance, reValue});
@@ -30,28 +30,28 @@ function instanceCreator({initialstring} = {}) {
     replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
       return reValue(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive })); } },
     toString: { value() { return actualValue; } },
+    valueOf: { value() { return actualValue; } },
+    [Symbol.toPrimitive]: { value() { return actualValue; } },
     trim: {value(start, end) { return reValue(trim(actualValue, start, end)); } },
     truncate: { value({at, html = false, wordBoundary = false} = {}) {
       return reValue(truncate(actualValue, {at, html, wordBoundary})); } },
-    valueOf: { value() { return actualValue; } },
     undoLast: { value(nSteps) { return undoSteps(nSteps); } },
 
     // getters
     camelCase: { get() { return reValue(parseCamelcase(actualValue)); } },
     capitalize: { value: capitalizerFactory(actualValue, reValue) },
     clone: { get() { return cloneInstance(instance); } },
+    empty: { get() { return actualValue.length < 1; } },
     firstUp: { get() { return reValue(ucFirst(actualValue)); } },
     history: { get() { return history; }, set(value) { history = value; } },
-    empty: { get() { return actualValue.length < 1; } },
-    notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
     kebabCase: { get() { return reValue(parseKebabCase(actualValue)); } },
+    notEmpty: { get() { return actualValue.length < 1 ? undefined : instance; } },
     quote: { get() { return encloseFactory(reValue, actualValue); } },
     snakeCase: { get() { return reValue(parseSnakeCase(actualValue)); } },
     trimAll: { get() { return reValue(trimAll(actualValue)); } },
     trimAllKeepLF: { get() { return reValue(trimAll(actualValue, true)); } },
     undoAll: { get() { return undoAll(); } },
     undo: { get() { return undoLast(); } },
-    wordsUCFirst: { get() { return reValue(wordsFirstUp(actualValue)); } },
     value: {
       get() { return actualValue; },
       set(value) {
@@ -62,6 +62,7 @@ function instanceCreator({initialstring} = {}) {
         }
       }
     },
+    wordsUCFirst: { get() { return reValue(wordsFirstUp(actualValue)); } },
   });
 
   return instance;
@@ -101,7 +102,7 @@ function instanceCreator({initialstring} = {}) {
     return reValue(actualValue, false);
   }
 
-  function maybeRevalueNative(key) {
+  function maybeRevalue(key) {
     return typeof actualValue[key] === `function`
       ? function(...args) {
           const result = actualValue[key](...args);
