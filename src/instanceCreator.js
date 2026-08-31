@@ -113,7 +113,7 @@ function instanceCreator({initialstring} = {}) {
   function reValue(result, push2History = true) {
     const changed = actualValue !== result;
     changed && push2History && history.push(result);
-    actualValue = result;
+    actualValue = changed ? result : actualValue;
     return instance;
   }
 }
