@@ -878,10 +878,6 @@ function wordsUCFirst() {
       $S`hello:world;etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
 
     .appendDiv(`b5`,
-      $S("$S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\\`etc.`.wordsUCFirst").toCode,
-      $S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\`etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
-
-    .appendDiv(`b5`,
       $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
       $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")
     )
@@ -889,7 +885,12 @@ function wordsUCFirst() {
     .appendDiv(`b5`,
       $S("$S`\\t   hello-world-and-whatNOT   `.wordsUCFirst").toCode,
       $S`\t   hello-world-and-whatNOT   `.wordsUCFirst.qcd.prefix(" => ").toTag(`span`, `pre`)
-    ),
+    )
+
+    .appendDiv(`b5`,
+      $S("$S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\\`etc.`.wordsUCFirst").toCode,
+      $S`etc.étc@ëtc##êtc.%^ètc.@etc--$tc!€tc *ætc\`etc.`.wordsUCFirst.qcd.prefix(" => "))
+        .toTag(`span`, `pre`),
 
     "getter-wordsucfirst"
   );
