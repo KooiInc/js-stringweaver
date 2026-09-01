@@ -81,7 +81,7 @@ function parseCamelcase(string) {
 
 function wordsFirstUp(string) {
   const toUpperWords = checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
-      acc + ( /\p{P}|\p{Zs}|\p{M}|\p{S}|[\^\|`][^'?\W]/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
+      acc + ( /\p{P}|\p{Zs}|\p{M}|\p{S}|[\^|`][^'?\W]/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
       string[0].toUpperCase()
   ));
 
