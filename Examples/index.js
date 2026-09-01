@@ -890,6 +890,11 @@ function wordsUCFirst() {
     .appendDiv(`b5`,
       $S("$S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\\`etc.`.wordsUCFirst").toCode,
       $S`etc.étc@ëtc##êtc.%^ètc.@etc--$tc!€tc *ætc\`etc.`.wordsUCFirst.qcd.prefix(" => "))
+        .toTag(`span`, `pre`)
+
+    .appendDiv(`b5`,
+      $S("$S`hello world What a Day ’t is`.wordsUCFirst").toCode,
+      $S`hello world What a Day ’t is`.wordsUCFirst.qcd.prefix(" => "))
         .toTag(`span`, `pre`),
 
     "getter-wordsucfirst"
