@@ -878,8 +878,8 @@ function wordsUCFirst() {
       $S`hello:world;etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
 
     .appendDiv(`b5`,
-      $S("$S`etc.etc@etc##etc.%^etc.@etc--  !! !etc *etc\\`etc.`.wordsUCFirst").toCode,
-      $S`etc.etc@etc##etc.%^etc.@etc--  !! !etc *etc\`etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
+      $S("$S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\\`etc.`.wordsUCFirst").toCode,
+      $S`etc.étc@ëtc##êtc.%^ètc.@etc--  !! !€tc *ætc\`etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
 
     .appendDiv(`b5`,
       $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
