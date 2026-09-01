@@ -948,6 +948,11 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
       const hi = $S`there`.prefix(`HI`, [42]);
       assert.strictEqual(hi.value, `HIthere`);
     });
+
+    it(`prefix no value to prefix as expected`, () => {
+      const hi = $S`HI`.prefix();
+      assert.strictEqual(hi.value, `HI`);
+    });
   });
 
   describe(`replaceWords`, () => {

@@ -174,17 +174,15 @@ function prefix(value, ...strings) {
 
 function insert({ actualValue, values, at } = {}) {
   at = typeof at === "number" && at || 0;
-
-  if (isArrayOf({type: String, value: values})) {
-    actualValue = actualValue.slice(0, at) + values.join(``) + actualValue.slice(at);
-  }
+  values = [values].flat();
+  actualValue = actualValue.slice(0, at) + values.join(``) + actualValue.slice(at);
 
   return actualValue;
 }
 
 function append(actualValue, ...strings2Append) {
   if (strings2Append.length > 0) {
-    strings2Append = strings2Append?.filter(s => typeof s === `string` || !!s?.value);
+    strings2Append = strings2Append?.filter(s => (typeof s === `string`) || !!s?.value);
     return `${getStringValue(actualValue)}`.concat(strings2Append.join(``));
   }
 
