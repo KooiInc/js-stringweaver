@@ -86,8 +86,6 @@ function wordsFirstUp(string) {
   ));
 }
 
-//\p{P}|\p{Zs}|\p{M}
-
 function trim(string, start, end) {
   return checkAndRun(string, () => {
     if (!end && !start) { return string.trim(); }
