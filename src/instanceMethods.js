@@ -80,10 +80,12 @@ function parseCamelcase(string) {
 }
 
 function wordsFirstUp(string) {
-  return checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
-      acc + ( /\p{P}|\p{Zs}|\p{M}|\p{S}|[\^\|`]/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
-    string[0].toUpperCase()
+  const toUpperWords = checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
+      acc + ( /\p{P}|\p{Zs}|\p{M}|\p{S}|[\^\|`][^'?\W]/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
+      string[0].toUpperCase()
   ));
+
+  return toUpperWords.replace(/\p{P}[A-Z]\s/gu, a => a.toLocaleLowerCase());
 }
 
 function trim(string, start, end) {
@@ -136,7 +138,7 @@ function trimAll(string,  keepLines = false) {
 function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) {
   string = getStringValue(string);
   let replacements2Array = Object.entries(replacements).flat();
-  const cando = isArrayOf(String, replacements2Array) && caseSensitive?.constructor === Boolean;
+  const cando = isArrayOf({type: String, value: replacements2Array}) && caseSensitive?.constructor === Boolean;
   const modifiers = `g${!caseSensitive ? 'i' : ''}`;
 
   if (!cando) { return string; }
@@ -165,36 +167,26 @@ function lastIndexOf(string, findMe, beforeIndex = 0) {
   return index < 0 ? undefined : index;
 }
 
-function insert(string, { value, values, at = 0 } = {}) {
-  string = getStringValue(string);
-  at = isNumber(at) && at || 0;
-  const valuesMaybeValue = getStringValue(values);
-  values = getStringValue(value).length
-    ? value
-    : valuesMaybeValue.length
-    ? valuesMaybeValue
-    : isArrayOf(String, values)
-      ? values.map(v => getStringValue(v)).join(``)
-      : [];
-
-  return values.length <= 1
-    ? string
-    : string.length === 0
-      ? `${values}${string}`
-      : `${string.slice(0, at)}${values}${string.slice(at)}`;
+function prefix(value, ...strings) {
+  strings = strings.filter(s => (typeof s === `string`) || !!s?.value);
+  return insert({actualValue: value, values: strings, at: 0});
 }
 
-function prefix(string, ...strings) {
-  strings = isArrayOf(String, strings) && strings;
-  return strings ? insert(getStringValue(string), {values: strings, at: 0}) : getStringValue(string);
-}
+function insert({ actualValue, values, at } = {}) {
+  at = typeof at === "number" && at || 0;
 
-function append(string, ...strings2Append) {
-  strings2Append = isArrayOf(String, strings2Append) && strings2Append;
-
-  if (strings2Append && strings2Append.length > 0) {
-    return `${getStringValue(string)}`.concat(strings2Append.join(``))
+  if (isArrayOf({type: String, value: values})) {
+    actualValue = actualValue.slice(0, at) + values.join(``) + actualValue.slice(at);
   }
 
-  return getStringValue(string);
+  return actualValue;
+}
+
+function append(actualValue, ...strings2Append) {
+  if (strings2Append.length > 0) {
+    strings2Append = strings2Append?.filter(s => typeof s === `string` || !!s?.value);
+    return `${getStringValue(actualValue)}`.concat(strings2Append.join(``));
+  }
+
+  return getStringValue(actualValue);
 }

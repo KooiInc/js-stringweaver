@@ -6,7 +6,7 @@ import assert from 'node:assert';
 import {describe, it} from 'node:test';
 import {default as $S} from "../index.js";
 import {
-  quotingStyles, isArrayOf, isNumber, maybe, checkNotOfType, escapeRE, getReValueFunction,
+  quotingStyles, isArrayOf, isNumber, maybe, escapeRE, getReValueFunction,
   maybeInjectCustomMethods, resolveTemplateString, getInfoPrefix, encloseFactory } from "../src/helpers.js";
 
 describe(`Basics constructor and helpers`, () => {
@@ -440,7 +440,7 @@ describe(`Basics constructor and helpers`, () => {
   describe(`Miscellaneous`, () => {
     it(`isArrayOf (strings)`, () => {
       const arrOfString = [`a`, `b`];
-      assert.strictEqual(isArrayOf(String, arrOfString), true);
+      assert.strictEqual(isArrayOf({type: String, value: arrOfString}), true);
     });
 
     it(`toString as expected`, () => {
@@ -454,21 +454,21 @@ describe(`Basics constructor and helpers`, () => {
 
     it(`isArrayOf (Map)`, () => {
       const arrOfMaps = [new Map(), new Map()];
-      assert.strictEqual(isArrayOf(Map, arrOfMaps), true);
+      assert.strictEqual(isArrayOf({type: Map, value: arrOfMaps}), true);
     });
 
     it(`isArrayOf (numbers)`, () => {
       const arrOfNumbers = [1, 2, 3];
-      assert.strictEqual(isArrayOf(Number, arrOfNumbers), true);
+      assert.strictEqual(isArrayOf({type: Number, value: arrOfNumbers}), true);
     });
 
     it(`isArrayOf (number, not all numbers)`, () => {
       const arrOfNumbers = [1, 2, `3`];
-      assert.strictEqual(isArrayOf(Number, arrOfNumbers), false);
+      assert.strictEqual(isArrayOf({type: Number, value: arrOfNumbers}), false);
     });
 
     it(`isArrayOf (empty array)`, () => {
-      assert.strictEqual(isArrayOf(Number, []), false);
+      assert.strictEqual(isArrayOf({type: Number, value: []}), false);
     });
 
     it(`non enumerable custom getter NOT in instance keys`, () => {
@@ -476,7 +476,8 @@ describe(`Basics constructor and helpers`, () => {
     });
 
     it(`custom enumerable getter in instance keys`, () => {
-      assert.strictEqual(Object.keys($S``).find(v => v === `upperQuoted`), `upperQuoted`);
+      $S.addCustom({name: `upperQuoted`, method: me => {return me.toUpperCase().quote.curlyDouble; }, enumerable: true, isGetter: true});
+      assert.strictEqual(Object.getOwnPropertyNames($S.create).find(v => v === `upperQuoted`), `upperQuoted`, `${Object.getOwnPropertyNames($S.create)}`);
     });
 
     it(`isNumber("15") as expected (false)`, () => {
@@ -502,27 +503,6 @@ describe(`Basics constructor and helpers`, () => {
 
     it(`maybe as expected (15<20 true)`, () => {
       assert.strictEqual(maybe(_ => 15 < 20).result, true);
-    });
-
-    it(`checkNotOfType as expected (nothing)`, () => {
-      assert.strictEqual(checkNotOfType(String, undefined), true);
-    });
-
-    it(`checkNotOfType as expected (String)`, () => {
-      const myStr = $S`HELLO`;
-      assert.strictEqual(checkNotOfType(String, myStr), false);
-    });
-
-    it(`checkNotOfType as expected (Number)`, () => {
-      assert.strictEqual(checkNotOfType(Number, 42, true), false);
-    });
-
-    it(`checkNotOfType as expected (String, false)`, () => {
-      assert.strictEqual(checkNotOfType(String, $S``, false), true);
-    });
-
-    it(`checkNotOfType as expected (String, true)`, () => {
-      assert.strictEqual(checkNotOfType(String, $S``, true), false);
     });
 
     it(`maybeInjectCustomMethods no Params`, () =>{
@@ -857,7 +837,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
 
     it(`insert (single value) as expected`, () => {
-      const hi = $S`oh dear world`.insert({value: `Hello `});
+      const hi = $S`oh dear world`.insert({values: `Hello `});
       assert.strictEqual(hi.value, `Hello oh dear world`);
     });
 
@@ -875,7 +855,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
 
     it(`insert impossible at-value as expected`, () => {
-      const hi = $S`oh dear world`.insert({value: `Hello`, at: 25});
+      const hi = $S`oh dear world`.insert({values: `Hello`, at: 25});
       assert.strictEqual(hi.value, `oh dear worldHello`);
     });
 
@@ -965,8 +945,8 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
 
     it(`prefix (one of) input not a string as expected`, () => {
-      const hi = $S`HI`.prefix(`there`, [42]);
-      assert.strictEqual(hi.value, `HI`);
+      const hi = $S`there`.prefix(`HI`, [42]);
+      assert.strictEqual(hi.value, `HIthere`);
     });
   });
 

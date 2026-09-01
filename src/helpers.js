@@ -29,7 +29,7 @@ const quotingStyles = {
 let CTOR;
 
 export {
-  capitalizerFactory, checkNotOfType, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
+  capitalizerFactory, cloneInstance, createExtendedCTOR, createRegExp, customMethods,
   deprecatedNativePropertiesRE, enclose, encloseFactory, getInfoPrefix, getStringValue, getTraps,
   getReValueFunction /*for test*/, infoValue, interpolate, isArrayOf, isNumber, escapeRE,
   maybe, maybeInjectCustomMethods, randomString, resolveTemplateString, quotingStyles, uuid4,
@@ -43,9 +43,19 @@ function getStringValue(string) {
   return string?.value || (typeof string === `string` && string) || ``;
 }
 
-function isArrayOf(type, value, StringsMayBeSWInstances = true) {
-  return Array.isArray(value) && value.length > 0 &&
-    !value.find(v => checkNotOfType(type, v, StringsMayBeSWInstances));
+function isArrayOf({type, value} = {}) {
+  value = Array.isArray(value) ? value : [value];
+
+  if (value.length) {
+    if (type === String || type === Number) {
+      return value.filter(v => (typeof v === type.name.toLowerCase()) || !!v?.value).length === value.length;
+    }
+
+    return Array.isArray(value) && value.length > 0 &&
+      value.filter(v => v?.constructor === type).length === value.length;
+  }
+
+  return false;
 }
 
 function isNumber(value) {
@@ -64,14 +74,6 @@ function resolveTemplateString(str, ...args) {
 
 function canWrapNative(key) {
   return !deprecatedNativePropertiesRE.test(key) && Object.hasOwn(String.prototype, key);
-}
-
-function checkNotOfType(type, item, StringsMayBeSWInstances = true) {
-  return !item?.constructor
-    ? true
-    : type === String && StringsMayBeSWInstances
-      ? maybe(_ => item?.constructor !== CTOR).result && item?.constructor !== type
-      : item?.constructor !== type;
 }
 
 function getTraps({maybeRevalue}) {

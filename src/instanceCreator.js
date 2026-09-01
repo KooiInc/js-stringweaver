@@ -23,7 +23,7 @@ function instanceCreator({initialstring} = {}) {
     enclose: { value(start, end) { return reValue(enclose({value: actualValue, start, end})); } },
     format: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
     indexOf: { value(str) { return indexOf(actualValue, str); } },
-    insert: { value({ value, values, at } = {}) { return reValue(insert(actualValue, { value, values, at })); } },
+    insert: { value({ values, at } = {}) { return reValue(insert({actualValue, values: [values].flat(), at })); } },
     interpolate: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
     lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); } },
     prefix: { value(...strings) { return reValue(prefix(actualValue, ...strings)); } },
