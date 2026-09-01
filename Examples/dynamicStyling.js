@@ -90,6 +90,7 @@ function initStyling($, $S) {
     `pre:not(.codebox).syntax {
       margin-top: 0.2rem;
     }`,
+    `span.pre { white-space: pre; }`,
     `b.note { color: red; }`,
     `.normal {
        font-family: system-ui, sans-serif;

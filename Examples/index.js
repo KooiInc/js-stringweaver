@@ -874,8 +874,19 @@ function wordsUCFirst() {
       $S`hello world`.wordsUCFirst.qcd.prefix(" => "))
 
     .appendDiv(`b5`,
+      $S("$S`hello:   world etc.`.wordsUCFirst").toCode,
+      $S`hello:   world etc.`.wordsUCFirst.qcd.prefix(" => ")).toTag(`span`, `pre`)
+
+    .appendDiv(`b5`,
       $S("$S`   hello world and whatNOT`.trim().wordsUCFirst").toCode,
-      $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")),
+      $S`   hello world and whatNOT`.trim().wordsUCFirst.qcd.prefix(" => ")
+    )
+
+    .appendDiv(`b5`,
+      $S("$S`\\t   hello-world-and-whatNOT   `.wordsUCFirst").toCode,
+      $S`\t   hello-world-and-whatNOT   `.wordsUCFirst.qcd.prefix(" => ").toTag(`span`, `pre`)
+    ),
+
     "getter-wordsucfirst"
   );
 }

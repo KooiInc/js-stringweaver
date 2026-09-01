@@ -79,12 +79,21 @@ function parseCamelcase(string) {
   );
 }
 
-function wordsFirstUp(string) {
+function _wordsFirstUp(string) {
   return checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
       acc + ( !/\p{L}|[-']/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
     string[0].toUpperCase()
   ));
 }
+
+function wordsFirstUp(string) {
+  return checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
+      acc + ( /\p{P}|\p{Zs}|\p{M}/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
+    string[0].toUpperCase()
+  ));
+}
+
+//\p{P}|\p{Zs}|\p{M}
 
 function trim(string, start, end) {
   return checkAndRun(string, () => {
