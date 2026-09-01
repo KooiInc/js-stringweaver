@@ -81,7 +81,7 @@ function parseCamelcase(string) {
 
 function wordsFirstUp(string) {
   return checkAndRun(string, () => [...string.toLowerCase()].slice(1).reduce( (acc, v) =>
-      acc + ( /[^\w]/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
+      acc + ( /\W/u.test(acc.at(-1)) ? v.toUpperCase() : v.toLowerCase() ),
     string[0].toUpperCase()
   ));
 }
