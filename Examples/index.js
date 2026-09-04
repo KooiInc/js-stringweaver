@@ -1075,7 +1075,7 @@ function indexOfEx() {
 
     .appendDiv(``,
       $S("The override returns "),
-      $S("undefined").toCode,
+      $S("false").toCode,
       " if the string to search was not found, instead of ",
       $S("-1").toCode,
       ".",
@@ -1175,7 +1175,7 @@ function interpolateEx() {
 function lastIndexOfEx() {
   const initial = $S`hello world world`;
   const lastWord2Universe = instance =>
-    instance.slice(0, instance.lastIndexOf("world") ?? instance.length)
+    instance.slice(0, instance.lastIndexOf("world") || instance.length)
       .append(" and universe");
   lastWord2Universe(initial);
 
@@ -1198,7 +1198,7 @@ function lastIndexOfEx() {
 
   .appendDiv(`b5`,
     $S("The override returns "),
-    $S("undefined").toCode,
+    $S("false").toCode,
     " if the string to search was not found, instead of ",
     $S("-1").toCode, ".")
 

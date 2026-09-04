@@ -899,7 +899,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
   it(`indexof (override, nothing found => undefined) as expected`, () => {
     const hi = $S`hello world`;
-    assert.strictEqual(hi.indexOf(`z`), undefined);
+    assert.strictEqual(hi.indexOf(`z`), false);
   });
 
   it(`lastIndexof (override) as expected`, () => {
@@ -909,7 +909,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
 
   it(`lastIndexof (override, nothing found => undefined) as expected`, () => {
     const hi = $S`hello world`;
-    assert.strictEqual(hi.lastIndexOf(`z`), undefined);
+    assert.strictEqual(hi.lastIndexOf(`z`), false);
   });
 
   describe(`.notEmpty as expected`, () => {
