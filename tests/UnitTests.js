@@ -897,6 +897,16 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.indexOf(`o`), 4);
   });
 
+  it(`indexof (override) with fromIndex as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.indexOf(`o`, 5), 7);
+  });
+
+  it(`indexof (override) with impossible fromIndex as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.indexOf(`o`, 120), false);
+  });
+
   it(`indexof (override, nothing found => undefined) as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.indexOf(`z`), false);
@@ -905,6 +915,16 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
   it(`lastIndexof (override) as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.lastIndexOf(`o`), 7);
+  });
+
+  it(`lastIndexof (override) with fromIndex as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.lastIndexOf(`o`, 5), 4);
+  });
+
+  it(`lastIndexof (override) with impossible fromIndex as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.lastIndexOf(`o`, -12), false);
   });
 
   it(`lastIndexof (override, nothing found => undefined) as expected`, () => {
