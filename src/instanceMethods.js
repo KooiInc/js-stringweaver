@@ -151,21 +151,6 @@ function replaceWords(string, { replacements = {}, caseSensitive = false} = {}) 
   return string;
 }
 
-// SEE https://youtu.be/99Zacm7SsWQ?t=2101
-function _indexOf(string, findMe, fromIndex = 0) {
-  string = getStringValue(string);
-  fromIndex = isNumber(fromIndex) && fromIndex || 0;
-  const index = string.indexOf(findMe, fromIndex || 0);
-  return index < 0 ? undefined : index;
-}
-
-function lastIndexOf(string, findMe, beforeIndex) {
-  string = getStringValue(string);
-  beforeIndex = isNumber(beforeIndex) && beforeIndex || string.length;
-  const index = string.lastIndexOf(findMe, beforeIndex);
-  return index < 0 ? undefined : index;
-}
-
 function indexOf({actualValue, str2Find, last, fromIndex}) {
   fromIndex = isNumber(fromIndex) ? fromIndex : !!last ? actualValue.length : 0;
   const indexMethod = !!last ? `lastIndexOf` : `indexOf`;
