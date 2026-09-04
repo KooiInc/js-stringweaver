@@ -892,7 +892,7 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     });
   });
 
-  it(`indexof (override) as expected`, () => {
+  it(`indexof (override) no fromIndex as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.indexOf(`o`), 4);
   });
@@ -907,12 +907,17 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.indexOf(`o`, 120), false);
   });
 
-  it(`indexof (override, nothing found => undefined) as expected`, () => {
+  it(`indexof (override) with null input value expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.indexOf(null), false);
+  });
+
+  it(`indexof (override, nothing found => false) as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.indexOf(`z`), false);
   });
 
-  it(`lastIndexof (override) as expected`, () => {
+  it(`lastIndexof (override) no fromIndex as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.lastIndexOf(`o`), 7);
   });
@@ -927,7 +932,17 @@ describe(`Instance methods, setters & getters (alphabetically ordered)`, () => {
     assert.strictEqual(hi.lastIndexOf(`o`, -12), false);
   });
 
-  it(`lastIndexof (override, nothing found => undefined) as expected`, () => {
+  it(`lastIndexof (override) with non string input value as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.lastIndexOf({w: `o`}), false);
+  });
+
+  it(`lastIndexof (override) with null input value as expected`, () => {
+    const hi = $S`hello world`;
+    assert.strictEqual(hi.lastIndexOf(null), false);
+  });
+
+  it(`lastIndexof (override, nothing found => false) as expected`, () => {
     const hi = $S`hello world`;
     assert.strictEqual(hi.lastIndexOf(`z`), false);
   });
