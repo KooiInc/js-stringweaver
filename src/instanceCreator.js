@@ -1,6 +1,6 @@
 import {
   append, getStringValue, format, indexOf, insert, isNumber,
-  lastIndexOf, parseCamelcase, parseKebabCase, parseSnakeCase, prefix,
+  parseCamelcase, parseKebabCase, parseSnakeCase, prefix,
   replaceWords, trim, trimAll, truncate, ucFirst, wordsFirstUp,
 } from "./instanceMethods.js";
 
@@ -22,10 +22,10 @@ function instanceCreator({initialstring} = {}) {
     append: { value(...strings) { return reValue(append(actualValue, ...strings)); } },
     enclose: { value(start, end) { return reValue(enclose({value: actualValue, start, end})); } },
     format: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
-    indexOf: { value(str) { return indexOf(actualValue, str); } },
+    indexOf: { value(str2Find, fromIndex) { return indexOf({actualValue, str2Find, last: false, fromIndex}); } },
     insert: { value({ values, at } = {}) { return reValue(insert({actualValue, values: [values].flat(), at })); } },
     interpolate: { value(...tokens) { return reValue(format(actualValue, ...tokens)); } },
-    lastIndexOf: { value(str) { return lastIndexOf(actualValue, str); } },
+    lastIndexOf: { value(str2Find, fromIndex) { return indexOf({actualValue, str2Find, last: true, fromIndex}); } },
     prefix: { value(...strings) { return reValue(prefix(actualValue, ...strings)); } },
     replaceWords: { value({caseSensitive = false, replacements = {}} = {}) {
       return reValue(replaceWords(actualValue, { replacements: replacements ?? {}, caseSensitive })); } },
